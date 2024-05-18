@@ -60,6 +60,18 @@ const isPasswordValid = computed(() => {
     );
 });
 
+const showPassword = ref(false);
+
+const togglePasswordVisibility = () => {
+    showPassword.value = !showPassword.value;
+};
+const showPasswordConfirmation = ref(false);
+
+const togglePasswordConfirmationVisibility = () => {
+    showPasswordConfirmation.value = !showPasswordConfirmation.value;
+};
+
+
 </script>
 
 <template>
@@ -99,17 +111,33 @@ const isPasswordValid = computed(() => {
             </div>
 
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
-                <TextInput
-                    id="password"
-                    v-model="form.password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password" />
-            </div>
+    <InputLabel for="password" value="Password" />
+    <div class="relative">
+        <TextInput
+            id="password"
+            v-model="form.password"
+            :type="showPassword ? 'text' : 'password'"
+            class="mt-1 block w-full"
+            required
+            autocomplete="new-password"
+        />
+        <button @click="togglePasswordVisibility" class="absolute inset-y-0 right-0 px-2 py-1 inline-flex items-center">
+            <!-- Show/hide password toggle button icon -->
+            <svg v-if="showPassword" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Eye icon for showing password -->
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12s3-6 10-6 10 6-3 6-10 6S2 12 2 12zm3 0a1 1 0 100-2 1 1 0 000 2z"></path>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Eye-off icon for hiding password -->
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.63 18.63A10 10 0 108.37 8.37M23 23L1 1"></path>
+            </svg>
+        </button>
+    </div>
+    <InputError class="mt-2" :message="form.errors.password" />
+</div>
+
             <div class="mt-4" v-if="form.password">
         <ul class="text-sm text-gray-600">
             <li v-if="!passwordValidations.minLength" class="text-red-600">
@@ -134,18 +162,35 @@ const isPasswordValid = computed(() => {
         </ul>
     </div>
 
-            <div class="mt-4">
-                <InputLabel for="password_confirmation" value="Confirm Password" />
-                <TextInput
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    required
-                    autocomplete="new-password"
-                />
-                <InputError class="mt-2" :message="form.errors.password_confirmation" />
-            </div>
+    <div class="mt-4">
+    <InputLabel for="password_confirmation" value="Confirm Password" />
+    <div class="relative">
+        <TextInput
+            id="password_confirmation"
+            v-model="form.password_confirmation"
+            :type="showPasswordConfirmation ? 'text' : 'password'"
+            class="mt-1 block w-full"
+            required
+            autocomplete="new-password"
+        />
+        <button @click="togglePasswordConfirmationVisibility" class="absolute inset-y-0 right-0 px-2 py-1 inline-flex items-center">
+            <!-- Show/hide password toggle button icon -->
+            <svg v-if="showPasswordConfirmation" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Eye icon for showing password -->
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2 12s3-6 10-6 10 6-3 6-10 6S2 12 2 12zm3 0a1 1 0 100-2 1 1 0 000 2z"></path>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <!-- Eye-off icon for hiding password -->
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.63 18.63A10 10 0 108.37 8.37M23 23L1 1"></path>
+            </svg>
+        </button>
+    </div>
+    <InputError class="mt-2" :message="form.errors.password_confirmation" />
+</div>
+
+
 
             <div v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature" class="mt-4">
                 <InputLabel for="terms">
