@@ -1,4 +1,5 @@
 <script setup>
+import { ref, computed, watch } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
 import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
@@ -16,11 +17,49 @@ const form = useForm({
     terms: false,
 });
 
+const passwordCriteria = {
+    minLength: 8,
+    hasUpperCase: /[A-Z]/,
+    hasLowerCase: /[a-z]/,
+    hasNumber: /[0-9]/,
+    hasSpecialChar: /[^A-Za-z0-9]/,
+};
+
+const passwordValidations = ref({
+    minLength: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+});
+
+const checkPasswordRequirements = (password) => {
+    passwordValidations.value.minLength = password.length >= passwordCriteria.minLength;
+    passwordValidations.value.hasUpperCase = passwordCriteria.hasUpperCase.test(password);
+    passwordValidations.value.hasLowerCase = passwordCriteria.hasLowerCase.test(password);
+    passwordValidations.value.hasNumber = passwordCriteria.hasNumber.test(password);
+    passwordValidations.value.hasSpecialChar = passwordCriteria.hasSpecialChar.test(password);
+};
+
+watch(() => form.password, (newPassword) => {
+    checkPasswordRequirements(newPassword);
+});
+
 const submit = () => {
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
     });
 };
+const isPasswordValid = computed(() => {
+    return (
+        passwordValidations.value.minLength &&
+        passwordValidations.value.hasUpperCase &&
+        passwordValidations.value.hasLowerCase &&
+        passwordValidations.value.hasNumber &&
+        passwordValidations.value.hasSpecialChar
+    );
+});
+
 </script>
 
 <template>
@@ -71,6 +110,29 @@ const submit = () => {
                 />
                 <InputError class="mt-2" :message="form.errors.password" />
             </div>
+            <div class="mt-4" v-if="form.password">
+        <ul class="text-sm text-gray-600">
+            <li v-if="!passwordValidations.minLength" class="text-red-600">
+                Minimum 8 characters
+            </li>
+
+            <li v-if="!passwordValidations.hasUpperCase" class="text-red-600">
+                At least one uppercase letter
+            </li>
+
+            <li v-if="!passwordValidations.hasLowerCase" class="text-red-600">
+                At least one lowercase letter
+            </li>
+
+            <li v-if="!passwordValidations.hasNumber" class="text-red-600">
+                At least one number
+            </li>
+
+            <li v-if="!passwordValidations.hasSpecialChar" class="text-red-600">
+                At least one special character
+            </li>
+        </ul>
+    </div>
 
             <div class="mt-4">
                 <InputLabel for="password_confirmation" value="Confirm Password" />
@@ -103,10 +165,16 @@ const submit = () => {
                     Already registered?
                 </Link>
 
-                <PrimaryButton class="ms-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Register
-                </PrimaryButton>
+                <PrimaryButton 
+        class="ms-4" 
+        :class="{ 'opacity-25': form.processing }" 
+        :disabled="form.processing || !isPasswordValid"
+        title="Kindly check your details"
+    >
+        Register
+    </PrimaryButton>
             </div>
+            
         </form>
     </AuthenticationCard>
 </template>
