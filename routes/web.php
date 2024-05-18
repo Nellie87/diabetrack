@@ -2,6 +2,8 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PasswordVerificationController;
+
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -21,4 +23,8 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/verify-password', [PasswordVerificationController::class, 'verify'])->name('verify-password');
 });

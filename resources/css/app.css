@@ -5,3 +5,9 @@
 [x-cloak] {
     display: none;
 }
+/* resources/css/app.css */
+.blur {
+    filter: blur(10px);
+    transition: filter 0.3s ease-in-out;
+}
+
