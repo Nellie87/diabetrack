@@ -402,4 +402,13 @@ onMounted(() => {
     filter: blur(5px);
     transition: filter 0.3s ease-in-out;
 }
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 </style>
