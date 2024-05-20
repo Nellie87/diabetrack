@@ -21,6 +21,16 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'photo' => ['nullable', 'mimes:jpg,jpeg,png', 'max:1024'],
+            // Add validation rules for new fields
+            'first_name' => ['nullable', 'string', 'max:255'],
+            'last_name' => ['nullable', 'string', 'max:255'],
+            'contact' => ['nullable', 'string', 'max:255'],
+            'residence' => ['nullable', 'string', 'max:255'],
+            'doctor_name' => ['nullable', 'string', 'max:255'],
+            'doctor_email' => ['nullable', 'email', 'max:255'],
+            'doctor_contact' => ['nullable', 'string', 'max:255'],
+            'role' => ['nullable', 'string', 'max:255'],
+            // Add more validation rules as needed
         ])->validateWithBag('updateProfileInformation');
 
         if (isset($input['photo'])) {
@@ -34,6 +44,15 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                // Update with new fields
+                'first_name' => $input['first_name'],
+                'last_name' => $input['last_name'],
+                'contact' => $input['contact'],
+                'residence' => $input['residence'],
+                'doctor_name' => $input['doctor_name'],
+                'doctor_email' => $input['doctor_email'],
+                'doctor_contact' => $input['doctor_contact'],
+                'role' => $input['role'],
             ])->save();
         }
     }
@@ -48,6 +67,15 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
+            // Update with new fields
+            'first_name' => $input['first_name'],
+            'last_name' => $input['last_name'],
+            'contact' => $input['contact'],
+            'residence' => $input['residence'],
+            'doctor_name' => $input['doctor_name'],
+            'doctor_email' => $input['doctor_email'],
+            'doctor_contact' => $input['doctor_contact'],
+            'role' => $input['role'],
             'email_verified_at' => null,
         ])->save();
 
