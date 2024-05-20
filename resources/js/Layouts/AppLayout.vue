@@ -94,6 +94,12 @@ onMounted(() => {
         resetLockTimeout();
     }
 });
+
+const confirmLogout = () => {
+        if (confirm("Are you sure you want to log out?")) {
+            logout(); // Call the logout function if the user confirms
+        }
+    };
 </script>
 
 <template>
@@ -253,11 +259,12 @@ onMounted(() => {
                                         <div class="border-t border-gray-200" />
 
                                         <!-- Authentication -->
-                                        <form @submit.prevent="logout">
-                                            <DropdownLink as="button">
-                                                Log Out
-                                            </DropdownLink>
-                                        </form>
+                                     <form @submit.prevent="confirmLogout">
+    <DropdownLink as="button">
+        Log Out
+    </DropdownLink>
+</form>
+
                                     </template>
                                 </Dropdown>
                             </div>
@@ -333,11 +340,13 @@ onMounted(() => {
                                             </ResponsiveNavLink>
                                             </form>
                             <!-- Authentication -->
-                            <form method="POST" @submit.prevent="logout">
+                            <form @submit.prevent="confirmLogout">
                                 <ResponsiveNavLink as="button">
                                     Log Out
                                 </ResponsiveNavLink>
                             </form>
+
+                             
 
                             <!-- Team Management -->
                             <template v-if="$page.props.jetstream.hasTeamFeatures">

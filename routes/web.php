@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordVerificationController;
+use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
+
 
 use Inertia\Inertia;
 
@@ -28,3 +30,6 @@ Route::middleware([
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/verify-password', [PasswordVerificationController::class, 'verify'])->name('verify-password');
 });
+
+Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
+    ->name('logout');
