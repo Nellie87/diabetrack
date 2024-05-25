@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordVerificationController;
 use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
+use App\Http\Controllers\DoctorController;
 
 
 use Inertia\Inertia;
@@ -33,3 +34,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
+    Route::middleware(['auth:sanctum', 'verified'])->get('/doctor', [DoctorController::class, 'index'])->name('doctor');
