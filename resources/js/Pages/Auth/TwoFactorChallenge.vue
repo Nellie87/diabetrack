@@ -40,10 +40,11 @@ const submit = () => {
 <template>
     <Head title="Two-factor Confirmation" />
 
+    
     <AuthenticationCard>
-        <template #logo>
+        <!-- <template #logo>
             <AuthenticationCardLogo />
-        </template>
+        </template> -->
 
         <div class="mb-4 text-sm text-gray-600">
             <template v-if="! recovery">

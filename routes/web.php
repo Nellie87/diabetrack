@@ -16,7 +16,9 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('welcome');
+
+
 
 Route::middleware([
     'auth:sanctum',
@@ -35,3 +37,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
     Route::middleware(['auth:sanctum', 'verified'])->get('/doctor', [DoctorController::class, 'index'])->name('doctor');
+
+
+    

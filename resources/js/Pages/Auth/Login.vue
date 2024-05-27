@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
+// import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
 import Checkbox from '@/Components/Checkbox.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -32,10 +32,18 @@ const submit = () => {
 <template>
     <Head title="Login" />
 
+    <div class="relative">
+        <!-- Back to home link -->
+        <Link :href="route('welcome')" class="absolute top-4 left-4 text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back
+        </Link>
+    </div>
+
     <AuthenticationCard>
- <!-- <template #logo> -->
-            <!-- <AuthenticationCardLogo /> -->
-        <!-- </template> -->
+        <!-- Logo (if you want to re-enable it)
+        <template #logo>
+            <AuthenticationCardLogo />
+        </template> -->
 
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
             {{ status }}

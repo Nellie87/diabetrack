@@ -76,11 +76,20 @@ const togglePasswordConfirmationVisibility = () => {
 
 <template>
     <Head title="Register" />
+    <div class="relative">
+        <!-- Back to home link -->
+        <Link :href="route('welcome')" class="absolute top-4 left-4 text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Back
+        </Link>
+    </div>
 
     <AuthenticationCard>
-        <template #logo>
+        <!-- <template #logo>
             <AuthenticationCardLogo />
-        </template>
+        </template> -->
+
+        <h1 class="text-2xl font-bold text-center mb-4">REGISTER</h1>
+
 
         <form @submit.prevent="submit">
             <div>
