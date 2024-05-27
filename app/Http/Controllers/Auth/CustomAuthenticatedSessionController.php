@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+
 
 class CustomAuthenticatedSessionController extends Controller
 {
@@ -19,9 +21,16 @@ class CustomAuthenticatedSessionController extends Controller
         // Add your custom logic here
         // For example, you can add a confirmation dialog using JavaScript
         
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        Auth::guard('web')->logout();
 
-        return redirect('/')->with('status', 'You have been logged out.');
+    $request->session()->invalidate();
+
+    $request->session()->regenerateToken();
+
+    return Inertia::location(route('login'));
+        // $request->session()->invalidate();
+        // $request->session()->regenerateToken();
+
+        // return redirect('/')->with('status', 'You have been logged out.');
     }
 }
