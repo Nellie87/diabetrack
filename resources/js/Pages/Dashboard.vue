@@ -90,19 +90,7 @@ onMounted(() => {
             </div>
         </div>
  
-      <!-- Lock screen overlay -->
-        <!-- <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4">Locked</h2>
-                <input v-model="password" type="password" placeholder="Enter password" class="w-full px-3 py-2 border rounded-md mb-4">
-                <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md">Unlock</button>
-            </div>
-        </div> -->
-
-        <!-- Lock screen button -->
-        <!-- <div class="fixed bottom-4 right-4">
-            <button @click="manualLock" class="bg-red-500 text-white px-4 py-2 rounded-md">Lock Screen</button>
-        </div>   --> 
+     
     </AppLayout>
 </template>
 
