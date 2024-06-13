@@ -25,7 +25,7 @@ const form = useForm({
     doctor_name: '', // Define the doctor_name key
     doctor_email: '', // Define the doctor_email key
     doctor_contact: '', // Define the doctor_contact key
-    role: '', // Define the role key
+    // role: '', // Define the role key
 });
 
 // Define the total number of fields inside the profile information section
@@ -43,25 +43,44 @@ const profileFields = [
     'Doctor Name',
     'Doctor Email',
     'Doctor Contact',
-    'Role'
+    // 'Role'
 ];
 
-// Update the completion percentage whenever the form fields change
-watch(form.fields, () => {
-    let filledFields = 0;
-    
-    // Loop through the input labels array
-    for (const label of profileFields) {
-        // Get the corresponding field name based on the label
-        const fieldName = label.toLowerCase().replace(/\s+/g, '_');
-        
-        // Check if the field has a non-empty value and not excluded
-        if (form.fields[fieldName] && form.fields[fieldName] !== '' && fieldName !== 'name' && fieldName !== 'email' && fieldName !== 'photo') {
-            filledFields++;
+// Watch the form fields directly
+watch(
+    () => ({
+        first_name: form.first_name,
+        last_name: form.last_name,
+        contact: form.contact,
+        residence: form.residence,
+        doctor_name: form.doctor_name,
+        doctor_email: form.doctor_email,
+        doctor_contact: form.doctor_contact,
+        // role: form.role,
+    }),
+    () => {
+        let filledFields = 0;
+
+        for (const fieldName of profileFields) {
+            if (form[fieldName] && form[fieldName] !== '') {
+                filledFields++;
+            }
         }
-    }
-    
-    completionPercentage.value = (filledFields / totalFields) * 100;
+
+        completionPercentage.value = (filledFields / totalFields) * 100;
+    },
+    { deep: true }
+);
+
+onMounted(() => {
+    form.first_name = props.user.first_name || '';
+    form.last_name = props.user.last_name || '';
+    form.contact = props.user.contact || '';
+    form.residence = props.user.residence || '';
+    form.doctor_name = props.user.doctor_name || '';
+    form.doctor_email = props.user.doctor_email || '';
+    form.doctor_contact = props.user.doctor_contact || '';
+    // form.role = props.user.role || '';
 });
 
 
@@ -130,7 +149,7 @@ onMounted(() => {
     form.doctor_name = props.user.doctor_name;
     form.doctor_email = props.user.doctor_email;
     form.doctor_contact = props.user.doctor_contact;
-    form.role = props.user.role;
+    // form.role = props.user.role;
 });
 </script>
 
@@ -331,7 +350,7 @@ onMounted(() => {
     <InputError :message="form.errors.doctor_contact" class="mt-2" />
 </div>
 
-<!-- Role -->
+<!-- Role
 <div class="col-span-6 sm:col-span-4">
     <InputLabel for="role" value="Role" />
     <TextInput
@@ -342,7 +361,7 @@ onMounted(() => {
         required
     />
     <InputError :message="form.errors.role" class="mt-2" />
-</div>
+</div> -->
 
         </template>
 

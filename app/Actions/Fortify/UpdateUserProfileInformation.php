@@ -29,7 +29,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'doctor_name' => ['nullable', 'string', 'max:255'],
             'doctor_email' => ['nullable', 'email', 'max:255'],
             'doctor_contact' => ['nullable', 'string', 'max:255'],
-            'role' => ['nullable', 'string', 'max:255'],
+            // 'role' => ['nullable', 'string', 'max:255'],
             // Add more validation rules as needed
         ])->validateWithBag('updateProfileInformation');
 
@@ -52,7 +52,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'doctor_name' => $input['doctor_name'],
                 'doctor_email' => $input['doctor_email'],
                 'doctor_contact' => $input['doctor_contact'],
-                'role' => $input['role'],
+                // 'role' => $input['role'],
             ])->save();
         }
     }
@@ -75,7 +75,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'doctor_name' => $input['doctor_name'],
             'doctor_email' => $input['doctor_email'],
             'doctor_contact' => $input['doctor_contact'],
-            'role' => $input['role'],
+            // 'role' => $input['role'],
             'email_verified_at' => null,
         ])->save();
 
