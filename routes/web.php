@@ -44,3 +44,25 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/patient', [PatientController::class, 'index'])->name('patient.index');
     });
+
+    Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('Dashboard');
+        })->name('dashboard');
+    
+        Route::get('/patient', function () {
+            return Inertia::render('Patient');
+        })->name('patient');
+    
+        Route::get('/doctor', function () {
+            return Inertia::render('Doctor');
+        })->name('doctor');
+    });
+
+    Route::post('/login', [CustomAuthenticatedSessionController::class, 'store'])->name('login');
+Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])->name('logout');
+    
+    // // Apply middleware to redirect based on role after login
+    // Route::middleware(['auth:sanctum', 'verified', 'role.redirect'])->get('/home', function () {
+    //     return redirect()->route('dashboard');
+    // });
