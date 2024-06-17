@@ -1,8 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import Welcome from '@/Components/Welcome.vue';
+
+import DataStatsOne from '/resources/js/Components/DataStats/DataStatsOne.vue';
+
+import DefaultLayout from '/resources/js/Layouts/DefaultLayout.vue';
+
+import TableOne from '/resources/js/Components/Tables/TableOne.vue';
+
+import ChartOne from '/resources/js/Components/Charts/ChartOne.vue'
+import ChartThree from '/resources/js/Components/Charts/ChartThree.vue'
+import ChartTwo from '/resources/js/Components/Charts/ChartTwo.vue'
 
 const isLocked = ref(false);
 const password = ref('');
@@ -89,8 +99,36 @@ onMounted(() => {
                 </div>
             </div>
         </div>
- 
+
+        <DefaultLayout>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+      <DataStatsOne />
+    </div>
+
+    <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
+      <!-- ====== Chart One Start -->
+      <ChartOne />
+      <!-- ====== Chart One End -->
+
+      <!-- ====== Chart Two Start -->
+      <ChartTwo />
+      <!-- ====== Chart Two End -->
+
+      <!-- ====== Chart Three Start -->
+      <ChartThree />
+      <!-- ====== Chart Three End -->
+
      
+
+      <!-- ====== Table One Start -->
+      <div class="col-span-12 xl:col-span-8">
+        <TableOne />
+      </div>
+      <!-- ====== Table One End -->
+
+    
+    </div>
+  </DefaultLayout>
     </AppLayout>
 </template>
 
