@@ -2,7 +2,7 @@
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import Welcome from '@/Components/Welcome.vue';
+// import Welcome from '@/Components/Welcome.vue';
 
 import DataStatsOne from '/resources/js/Components/DataStats/DataStatsOne.vue';
 
@@ -92,15 +92,21 @@ onMounted(() => {
         </template>
 
         <!-- Main content -->
-        <div :class="{ 'blur': isLocked }" class="py-12">
+        <!-- <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                     <Welcome />
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <DefaultLayout>
+                  <!-- ====== Table One Start -->
+      <div class="col-span-12 xl:col-span-8">
+        <TableOne />
+      </div>
+      <!-- ====== Table One End -->
+
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
       <DataStatsOne />
     </div>
@@ -120,11 +126,7 @@ onMounted(() => {
 
      
 
-      <!-- ====== Table One Start -->
-      <div class="col-span-12 xl:col-span-8">
-        <TableOne />
-      </div>
-      <!-- ====== Table One End -->
+
 
     
     </div>

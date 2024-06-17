@@ -1,110 +1,161 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 
-import BrandOne from '/resources/images/brand/brand-01.svg';
-import BrandTwo from '/resources/images/brand/brand-02.svg';
-import BrandThree from '/resources/images/brand/brand-03.svg';
-import BrandFour from '/resources/images/brand/brand-04.svg';
-import BrandFive from '/resources/images/brand/brand-05.svg';
+const usersPerPage = 5; // Number of users per page
+const currentPage = ref(1); // Current page of pagination
+const users = ref([]);
+const editingUser = ref(null); // To track which user is being edited
 
-const brandData = ref([
-  {
-    logo: BrandOne,
-    name: 'Google',
-    visitors: 3.5,
-    revenues: '5,768',
-    sales: 590,
-    conversion: 4.8
-  },
-  {
-    logo: BrandTwo,
-    name: 'Twitter',
-    visitors: 2.2,
-    revenues: '4,635',
-    sales: 467,
-    conversion: 4.3
-  },
-  {
-    logo: BrandThree,
-    name: 'Github',
-    visitors: 2.1,
-    revenues: '4,290',
-    sales: 420,
-    conversion: 3.7
-  },
-  {
-    logo: BrandFour,
-    name: 'Vimeo',
-    visitors: 1.5,
-    revenues: '3,580',
-    sales: 389,
-    conversion: 2.5
-  },
-  {
-    logo: BrandFive,
-    name: 'Facebook',
-    visitors: 3.5,
-    revenues: '6,768',
-    sales: 390,
-    conversion: 4.2
+// Dynamically load Font Awesome
+const loadFontAwesome = () => {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css';
+  document.head.appendChild(link);
+};
+
+onMounted(async () => {
+  loadFontAwesome(); // Load Font Awesome when the component is mounted
+  await fetchUsers(); // Fetch users initially
+});
+
+const fetchUsers = async () => {
+  try {
+    const response = await axios.get('/users');
+    console.log(response.data); // Debug the response
+    users.value = response.data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
   }
-])
+};
+
+const startEditing = (user) => {
+  editingUser.value = { ...user }; // Create a copy of the user object to edit
+};
+
+const cancelEditing = () => {
+  editingUser.value = null;
+};
+
+const saveUser = async (user) => {
+  try {
+    const response = await axios.put(`/users/${user.id}`, { role: user.role });
+    console.log(response.data);
+    // Update the local users array
+    const index = users.value.findIndex((u) => u.id === user.id);
+    if (index !== -1) {
+      users.value[index] = response.data;
+    }
+    editingUser.value = null;
+  } catch (error) {
+    console.error('Error updating user:', error);
+  }
+};
+
+const deleteUser = async (user) => {
+  if (!confirm('Are you sure you want to delete this user?')) return;
+  try {
+    await axios.delete(`/users/${user.id}`);
+    users.value = users.value.filter((u) => u.id !== user.id);
+  } catch (error) {
+    console.error('Error deleting user:', error);
+  }
+};
+
+// Computed property to paginate users
+const paginatedUsers = computed(() => {
+  const startIndex = (currentPage.value - 1) * usersPerPage;
+  return users.value.slice(startIndex, startIndex + usersPerPage);
+});
+
+// Methods to navigate between pages
+const goToNextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const goToPrevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+// Computed property to calculate total pages
+const totalPages = computed(() => {
+  return Math.ceil(users.value.length / usersPerPage);
+});
 </script>
 
 <template>
-  <div
-    class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1"
-  >
-    <h4 class="mb-6 text-xl font-semibold text-black dark:text-white">Top Channels</h4>
+  <div>
+    <h2 class="text-2xl font-semibold mb-4 text-center">USERS</h2>
+    <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+      <h4 class="mb-6 text-xl font-semibold text-black dark:text-white">User Table</h4>
 
-    <div class="flex flex-col">
-      <div class="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-5">
-        <div class="p-2.5 xl:p-5">
-          <h5 class="text-sm font-medium uppercase xsm:text-base">Source</h5>
-        </div>
-        <div class="p-2.5 text-center xl:p-5">
-          <h5 class="text-sm font-medium uppercase xsm:text-base">Visitors</h5>
-        </div>
-        <div class="p-2.5 text-center xl:p-5">
-          <h5 class="text-sm font-medium uppercase xsm:text-base">Revenues</h5>
-        </div>
-        <div class="hidden p-2.5 text-center sm:block xl:p-5">
-          <h5 class="text-sm font-medium uppercase xsm:text-base">Sales</h5>
-        </div>
-        <div class="hidden p-2.5 text-center sm:block xl:p-5">
-          <h5 class="text-sm font-medium uppercase xsm:text-base">Conversion</h5>
-        </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+          <thead class="bg-gray-2 dark:bg-meta-4">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
+            <tr v-for="(user, index) in paginatedUsers" :key="index">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" />
+                </div>
+                <div v-else>
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-save"></i>
+                  </button>
+                  <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div v-else>
+                  <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div
-        v-for="(brand, key) in brandData"
-        :key="key"
-        :class="`grid grid-cols-3 sm:grid-cols-5 ${
-          key === brandData.length - 1 ? '' : 'border-b border-stroke dark:border-strokedark'
-        }`"
-      >
-        <div class="flex items-center gap-3 p-2.5 xl:p-5">
-          <div class="flex-shrink-0">
-            <img :src="brand.logo" alt="Brand" />
-          </div>
-          <p class="hidden text-black dark:text-white sm:block">{{ brand.name }}</p>
-        </div>
-
-        <div class="flex items-center justify-center p-2.5 xl:p-5">
-          <p class="text-black dark:text-white">{{ brand.visitors }}K</p>
-        </div>
-
-        <div class="flex items-center justify-center p-2.5 xl:p-5">
-          <p class="text-meta-3">${{ brand.revenues }}</p>
-        </div>
-
-        <div class="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-          <p class="text-black dark:text-white">{{ brand.sales }}</p>
-        </div>
-
-        <div class="hidden items-center justify-center p-2.5 sm:flex xl:p-5">
-          <p class="text-meta-5">{{ brand.conversion }}%</p>
-        </div>
+      <!-- Pagination controls -->
+      <div class="flex justify-end mt-4">
+        <button @click="goToPrevPage" :disabled="currentPage === 1" class="px-3 py-1 bg-gray-200 text-gray-700 rounded mr-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">Previous</button>
+        <span class="text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="goToNextPage" :disabled="currentPage === totalPages" class="px-3 py-1 bg-gray-200 text-gray-700 rounded ml-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">Next</button>
       </div>
     </div>
   </div>

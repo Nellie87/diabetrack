@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 
+use App\Http\Controllers\UserController;
 
 
 use Inertia\Inertia;
@@ -66,3 +67,4 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
     // Route::middleware(['auth:sanctum', 'verified', 'role.redirect'])->get('/home', function () {
     //     return redirect()->route('dashboard');
     // });
+    Route::get('/users', [UserController::class, 'index']);
