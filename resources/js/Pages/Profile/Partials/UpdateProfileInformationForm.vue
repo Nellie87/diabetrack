@@ -146,9 +146,9 @@ onMounted(() => {
     form.last_name = props.user.last_name;
     form.contact = props.user.contact;
     form.residence = props.user.residence;
-    form.doctor_name = props.user.doctor_name;
-    form.doctor_email = props.user.doctor_email;
-    form.doctor_contact = props.user.doctor_contact;
+    // form.doctor_name = props.user.doctor_name;
+    // form.doctor_email = props.user.doctor_email;
+    // form.doctor_contact = props.user.doctor_contact;
     // form.role = props.user.role;
 });
 </script>
@@ -312,7 +312,7 @@ onMounted(() => {
 </div>
 
 <!-- Doctor Name -->
-<div class="col-span-6 sm:col-span-4">
+<!-- <div class="col-span-6 sm:col-span-4">
     <InputLabel for="doctor_name" value="Doctor Name" />
     <TextInput
         id="doctor_name"
@@ -325,7 +325,7 @@ onMounted(() => {
 </div>
 
 <!-- Doctor Email -->
-<div class="col-span-6 sm:col-span-4">
+<!-- <div class="col-span-6 sm:col-span-4">
     <InputLabel for="doctor_email" value="Doctor Email" />
     <TextInput
         id="doctor_email"
@@ -335,10 +335,10 @@ onMounted(() => {
         required
     />
     <InputError :message="form.errors.doctor_email" class="mt-2" />
-</div>
+</div>  -->
 
 <!-- Doctor Contact -->
-<div class="col-span-6 sm:col-span-4">
+<!-- <div class="col-span-6 sm:col-span-4">
     <InputLabel for="doctor_contact" value="Doctor Contact" />
     <TextInput
         id="doctor_contact"
@@ -348,7 +348,7 @@ onMounted(() => {
         required
     />
     <InputError :message="form.errors.doctor_contact" class="mt-2" />
-</div>
+</div> -->
 
 <!-- Role
 <div class="col-span-6 sm:col-span-4">

@@ -67,4 +67,6 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
     // Route::middleware(['auth:sanctum', 'verified', 'role.redirect'])->get('/home', function () {
     //     return redirect()->route('dashboard');
     // });
-    Route::get('/users', [UserController::class, 'index']);
+// Define the routes for users
+Route::get('/users', [UserController::class, 'index']);
+Route::put('/users/{id}', [UserController::class, 'update']);

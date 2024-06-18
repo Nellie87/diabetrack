@@ -218,7 +218,9 @@ const confirmLogout = () => {
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <button v-if="$page.props.jetstream.managesProfilePhotos" class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
-                                            <img class="h-8 w-8 rounded-full object-cover" :src="$page.props.auth.user.profile_photo_url" :alt="$page.props.auth.user.name">
+                                            <!-- <img class="h-8 w-8 rounded-full object-cover" :src="$page.props.auth.user.profile_photo_path" :alt="$page.props.auth.user.name"> -->
+                                            <!-- <img src="{{Storage::url($this->user->profile_photo_path)}}" alt="{{ $this->user->name }}" class="rounded-full h-20 w-20 object-cover"> -->
+                                            <img class="h-8 w-8 rounded-full object-cover" src="{{ Storage::url(Auth::user()->profile_photo_path) }}" />
                                         </button>
 
                                         <span v-else class="inline-flex rounded-md">

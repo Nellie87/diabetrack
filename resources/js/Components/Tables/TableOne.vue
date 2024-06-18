@@ -6,6 +6,7 @@ const usersPerPage = 5; // Number of users per page
 const currentPage = ref(1); // Current page of pagination
 const users = ref([]);
 const editingUser = ref(null); // To track which user is being edited
+const feedbackMessage = ref(''); // To provide feedback to the user
 
 // Dynamically load Font Awesome
 const loadFontAwesome = () => {
@@ -36,6 +37,7 @@ const startEditing = (user) => {
 
 const cancelEditing = () => {
   editingUser.value = null;
+  feedbackMessage.value = ''; // Clear feedback message
 };
 
 const saveUser = async (user) => {
@@ -48,8 +50,10 @@ const saveUser = async (user) => {
       users.value[index] = response.data;
     }
     editingUser.value = null;
+    feedbackMessage.value = 'User updated successfully!';
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error('Error updating user:', error.response ? error.response.data : error.message);
+    feedbackMessage.value = `Error updating user: ${error.response ? error.response.data.message : error.message}`;
   }
 };
 
@@ -58,8 +62,10 @@ const deleteUser = async (user) => {
   try {
     await axios.delete(`/users/${user.id}`);
     users.value = users.value.filter((u) => u.id !== user.id);
+    feedbackMessage.value = 'User deleted successfully!';
   } catch (error) {
     console.error('Error deleting user:', error);
+    feedbackMessage.value = 'Error deleting user.';
   }
 };
 
@@ -86,13 +92,18 @@ const goToPrevPage = () => {
 const totalPages = computed(() => {
   return Math.ceil(users.value.length / usersPerPage);
 });
-</script>
 
+
+</script>
 <template>
   <div>
     <h2 class="text-2xl font-semibold mb-4 text-center">USERS</h2>
     <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
       <h4 class="mb-6 text-xl font-semibold text-black dark:text-white">User Table</h4>
+
+      <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
+        {{ feedbackMessage }}
+      </div>
 
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
@@ -122,7 +133,7 @@ const totalPages = computed(() => {
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div v-if="editingUser && editingUser.id === user.id">
-                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" />
+                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
                 </div>
                 <div v-else>
                   <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
