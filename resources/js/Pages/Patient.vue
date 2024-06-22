@@ -8,7 +8,6 @@ import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
-// import Welcome from '@/Components/Welcome.vue';
 
 const isLocked = ref(false);
 const password = ref('');
@@ -77,18 +76,73 @@ onMounted(() => {
         resetLockTimeout();
     }
 });
+
+// New properties and methods for doctor form
+const showDoctorForm = ref(false);
+
+function toggleDoctorForm() {
+    showDoctorForm.value = !showDoctorForm.value;
+}
+
+const doctorForm = ref({
+    name: '',
+    email: '',
+    specialization: '',
+    licenseNumber: '',
+    institution: '',
+    graduationYear: '',
+    idDocument: null, // ID document (e.g., government-issued ID)
+    passportPhoto: null, // Passport photo
+    medicalLicenseCard: null // Medical license card
+});
+
+
+async function submitDoctorForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(doctorForm.value).forEach(key => {
+            formData.append(key, doctorForm.value[key]);
+        });
+
+        const response = await axios.post('/path-to-submit-form', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            doctorForm.value = {
+                name: '',
+                email: '',
+                specialization: '',
+                licenseNumber: '',
+                institution: '',
+                graduationYear: '',
+                idDocument: null,
+                passportPhoto: null,
+                medicalLicenseCard: null
+            };
+            showDoctorForm.value = false;
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error during form submission:', error);
+        alert('An error occurred. Please try again.');
+    }
+}
+
 </script>
 
 <template>
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-               Patient Dashboard
+                Patient Dashboard
             </h2>
         </template>
 
         <!-- Main content -->
-         
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -96,14 +150,8 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-        <div>
-        <!-- <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-            <ApplicationLogo class="block h-12 w-auto" /> -->
-<!-- 
-            <h1 class="mt-8 text-2xl font-medium text-gray-900">
-                Welcome , {{ user.name }}!
-            </h1> -->
 
+        <div>
             <p class="mt-6 text-gray-500 leading-relaxed">
                 How are you feeling today?
             </p>
@@ -138,7 +186,7 @@ onMounted(() => {
             <div>
                 <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
+                        <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 004.5 7.5v9a2.25 2.25 0 002.25 2.25z" />
                     </svg>
                     <h2 class="ms-3 text-xl font-semibold text-gray-900">
                         <a href="https://laracasts.com">View previous readings</a>
@@ -181,19 +229,55 @@ onMounted(() => {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
                     <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        Authentication
+                        <a href="javascript:void(0);" @click="toggleDoctorForm">Are you a doctor?</a>
                     </h2>
                 </div>
 
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Authentication and registration views are included with Laravel Jetstream, as well as support for user email verification and resetting forgotten passwords. So, you're free to get started with what matters most: building your application.
-                </p>
+                <div v-if="showDoctorForm" class="mt-4 text-gray-500 text-sm leading-relaxed">
+                    <form @submit.prevent="doctors">
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700">Name:</label>
+                            <input id="name" type="text" class="mt-1 block w-full" v-model="doctorForm.name">
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="block text-gray-700">Email:</label>
+                            <input id="email" type="email" class="mt-1 block w-full" v-model="doctorForm.email">
+                        </div>
+                        <div class="mb-4">
+                            <label for="specialization" class="block text-gray-700">Specialization:</label>
+                            <input id="specialization" type="text" class="mt-1 block w-full" v-model="doctorForm.specialization">
+                        </div>
+                        <div class="mb-4">
+                            <label for="licenseNumber" class="block text-gray-700">License Number:</label>
+                            <input id="licenseNumber" type="text" class="mt-1 block w-full" v-model="doctorForm.licenseNumber">
+                        </div>
+                        <div class="mb-4">
+                            <label for="institution" class="block text-gray-700">Institution:</label>
+                            <input id="institution" type="text" class="mt-1 block w-full" v-model="doctorForm.institution">
+                        </div>
+                        <div class="mb-4">
+                            <label for="graduationYear" class="block text-gray-700">Graduation Year:</label>
+                            <input id="graduationYear" type="text" class="mt-1 block w-full" v-model="doctorForm.graduationYear">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="idDocument" class="block text-gray-700">Upload ID Document:</label>
+                            <input id="idDocument" type="file" class="mt-1 block w-full" @change="e => doctorForm.idDocument = e.target.files[0]">
+                        </div>
+                        <div class="mb-4">
+            <label for="passportPhoto" class="block text-gray-700">Upload Passport Photo:</label>
+            <input id="passportPhoto" type="file" class="mt-1 block w-full" @change="e => doctorForm.passportPhoto = e.target.files[0]">
+        </div>
+        <div class="mb-4">
+            <label for="medicalLicenseCard" class="block text-gray-700">Upload Medical License Card:</label>
+            <input id="medicalLicenseCard" type="file" class="mt-1 block w-full" @change="e => doctorForm.medicalLicenseCard = e.target.files[0]">
+        </div>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+                    </form>
+                </div>
             </div>
         </div>
- 
-     
     </AppLayout>
-    
 </template>
 
 <style>

@@ -70,3 +70,6 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
 // Define the routes for users
 Route::get('/users', [UserController::class, 'index']);
 Route::put('/users/{id}', [UserController::class, 'update']);
+
+Route::post('/doctors', [DoctorController::class, 'store']);
+Route::get('/doctors', [DoctorController::class, 'index']);
