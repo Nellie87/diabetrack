@@ -129,14 +129,22 @@ const confirmLogout = () => {
             </div>
         </div>
 
-        <!-- Lock screen overlay -->
-        <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 backdrop-blur-md">
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4">Screen is Locked</h2>
-                <input v-model="password" type="password" placeholder="Enter password to continue" class="w-full px-3 py-2 border rounded-md mb-4">
-                <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md justify-center items-center">Unlock</button>
-            </div>
+  <!-- Lock screen overlay with centered square GIF -->
+<div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 backdrop-blur-md">
+    <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+        <h2 class="text-2xl font-semibold mb-4">Screen is Locked</h2>
+        <div class="square-gif-container">
+            <!-- Replace with your own GIF URL and apply class for square form -->
+            <img src="/videos/waiting.gif" class="square-gif rounded-md mb-4" alt="Locked Screen GIF">
         </div>
+        <input v-model="password" type="password" placeholder="Enter password to continue" class="w-full px-3 py-2 border rounded-md mb-4">
+        <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md justify-center items-center">Unlock</button>
+    </div>
+</div>
+
+
+
+
 
         <!-- Lock screen button -->
         <div class="fixed bottom-4 right-4">
@@ -421,5 +429,18 @@ nav {
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+/* CSS for square aspect ratio */
+.square-gif-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px; /* Adjust container width */
+    height: 200px; /* Adjust container height */
+}
 
+.square-gif {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Ensure the GIF fills the square without stretching */
+}
 </style>
