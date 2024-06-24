@@ -9,7 +9,7 @@
         "@inertiajs/vue3": "^1.0.14",
         "@tailwindcss/forms": "^0.5.7",
         "@tailwindcss/typography": "^0.5.10",
-        "@vitejs/plugin-vue": "^5.0.0",
+        "@vitejs/plugin-vue": "^5.0.5",
         "autoprefixer": "^10.4.16",
         "axios": "^1.7.2",
         "laravel-vite-plugin": "^1.0",
@@ -21,7 +21,9 @@
     "dependencies": {
         "@inertiajs/inertia-vue3": "^0.6.0",
         "@vueuse/core": "^10.11.0",
+        "chart.js": "^3.7.0",
         "pinia": "^2.1.7",
+        "vite-plugin-laravel": "^0.3.1",
         "vue3-apexcharts": "^1.5.3"
     }
 }
