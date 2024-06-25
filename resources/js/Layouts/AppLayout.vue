@@ -100,6 +100,11 @@ const confirmLogout = () => {
             logout(); // Call the logout function if the user confirms
         }
     };
+
+// Handle the back button click
+const goBack = () => {
+    window.history.back();
+};
 </script>
 
 <template>
@@ -116,9 +121,13 @@ const confirmLogout = () => {
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationMark class="block h-9 w-auto" />
-                                </Link>
+                                <!-- <Link :href="route('dashboard')"> -->
+                                    <!-- <ApplicationMark class="block h-9 w-auto" /> -->
+                                <!-- </Link> -->
+                                <!-- Back Button -->
+                <Button class="me-2" type="button" @click.prevent="goBack">
+                    Back
+                </Button>
                             </div>
                              <!-- Main content -->
         <div :class="{ 'blur': isLocked }" class="py-12">
@@ -156,9 +165,10 @@ const confirmLogout = () => {
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <!-- <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
-                                </NavLink>
+                                </NavLink> -->
+                                
                             </div>
                         </div>
 
@@ -312,9 +322,13 @@ const confirmLogout = () => {
                 <!-- Responsive Navigation Menu -->
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                      <!-- <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
-                        </ResponsiveNavLink>
+                        </ResponsiveNavLink> -->
+                        <!-- Back Button -->
+                <!-- <SecondaryButton class="me-2" type="button" @click.prevent="goBack">
+                    Back
+                </SecondaryButton> -->
                     </div>
 
                     <!-- Responsive Settings Options -->
