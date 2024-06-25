@@ -4,6 +4,9 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import GradientLineChart from "@/Components/Charts/GradientLineChart.vue";
+import TimelineList from "@/Components/TimelineList.vue";
+import TimelineItem from "@/Components/TimelineItem.vue";
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 
 const page = usePage();
@@ -138,7 +141,7 @@ async function submitDoctorForm() {
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Patient Dashboard
+                Patient 
             </h2>
         </template>
 
@@ -150,6 +153,90 @@ async function submitDoctorForm() {
                 </div>
             </div>
         </div>
+
+        <-- <div class="col-lg-7">
+        <!-- line chart -->
+
+        <div class="col-lg-4 col-md-6">
+        <timeline-list
+          class="h-100"
+          title="Orders overview"
+          description="<i class='fa fa-arrow-up text-success' aria-hidden='true'></i>
+        <span class='font-weight-bold'>24%</span> this month"
+        >
+          <timeline-item
+            color="success"
+            icon="bell-55"
+            title="$2400 Design changes"
+            date-time="22 DEC 7:20 PM"
+          />
+          <TimelineItem
+            color="danger"
+            icon="html5"
+            title="New order #1832412"
+            date-time="21 DEC 11 PM"
+          />
+          <TimelineItem
+            color="info"
+            icon="cart"
+            title="Server payments for April"
+            date-time="21 DEC 9:34 PM"
+          />
+          <TimelineItem
+            color="warning"
+            icon="credit-card"
+            title="New card added for order #4395133"
+            date-time="20 DEC 2:20 AM"
+          />
+          <TimelineItem
+            color="primary"
+            icon="key-25"
+            title="Unlock packages for development"
+            date-time="18 DEC 4:54 AM"
+          />
+          <TimelineItem
+            color="info"
+            icon="check-bold"
+            title="Notifications unread"
+            date-time="15 DEC"
+          />
+        </timeline-list>
+      </div>
+         
+        <div class="card z-index-2">
+          <gradient-line-chart
+            id="chart-line"
+            title="Gradient Line Chart"
+            description="<i class='fa fa-arrow-up text-success'></i>
+      <span class='font-weight-bold'>4% more</span> in 2021"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+                },
+                {
+                  label: 'Websites',
+                  data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
+                },
+              ],
+            }"
+          />
+        </div>
+      </div>
+
+      
 
         <div>
             <p class="mt-6 text-gray-500 leading-relaxed">
@@ -279,6 +366,7 @@ async function submitDoctorForm() {
         </div>
     </AppLayout>
 </template>
+
 
 <style>
 .blur {
