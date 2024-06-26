@@ -22,14 +22,14 @@ onMounted(async () => {
 });
 
 const fetchUsers = async () => {
-  try {
-    const response = await axios.get('/users');
-    console.log(response.data); // Debug the response
-    users.value = response.data;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
+    try {
+        const response = await axios.get('/users?role=1');
+        users.value = response.data;
+    } catch (error) {
+        feedbackMessage.value = 'Failed to fetch users';
+    }
 };
+
 
 const startEditing = (user) => {
   editingUser.value = { ...user }; // Create a copy of the user object to edit
