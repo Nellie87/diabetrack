@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FormController;
+
+
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -9,3 +12,5 @@ Route::get('/user', function (Request $request) {
 
 // routes/api.php
 Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
+
+Route::post('/submit-form', [FormController::class, 'submit']);
