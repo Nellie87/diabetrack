@@ -1,13 +1,21 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
-import AppLayout from '@/Layouts/AppLayout.vue';
-import { computed } from 'vue';
+// import { useForm } from '@inertiajs/vue3';
 import { usePage } from '@inertiajs/vue3';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { computed } from 'vue';
+import { Link, router, useForm } from '@inertiajs/vue3';
+import ActionMessage from '@/Components/ActionMessage.vue';
+import FormSection from '/resources/js/Components/FormSection.vue';
+import InputError from '@/Components/InputError.vue';
+import InputLabel from '@/Components/InputLabel.vue';
+import PrimaryButton from '@/Components/PrimaryButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
+import TextInput from '@/Components/TextInput.vue';
 
-const page = usePage();
-const user = computed(() => page.props.auth.user);
+const props = defineProps({
+    user: Object,
+});
 
 const isLocked = ref(false);
 const password = ref('');
@@ -77,63 +85,107 @@ onMounted(() => {
     }
 });
 
-// New properties and methods for doctor form
-const showDoctorForm = ref(false);
 
-function toggleDoctorForm() {
-    showDoctorForm.value = !showDoctorForm.value;
-}
-
-const doctorForm = ref({
+const form = useForm({
+    _method: 'PUT',
     name: '',
     email: '',
-    specialization: '',
-    licenseNumber: '',
-    institution: '',
-    graduationYear: '',
-    idDocument: null, // ID document (e.g., government-issued ID)
-    passportPhoto: null, // Passport photo
-    medicalLicenseCard: null // Medical license card
+    photo: null,
+    first_name: '',
+    last_name: '',
+    contact: '',
+    residence: '',
+    doctor_name: '',
+    doctor_email: '',
+    doctor_contact: '',
+    // role: '',
 });
 
+// Define the total number of fields inside the profile information section
+const totalFields = 8;
 
-async function submitDoctorForm() {
-    try {
-        const formData = new FormData();
-        Object.keys(doctorForm.value).forEach(key => {
-            formData.append(key, doctorForm.value[key]);
-        });
+// Define a ref to hold the percentage of completion
+const completionPercentage = ref(0);
 
-        const response = await axios.post('/path-to-submit-form', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+// Define an array of input labels corresponding to the fields in the profile information section
+const profileFields = [
+    'first_name',
+    'last_name',
+    'contact',
+    'residence',
+    'doctor_name',
+    'doctor_email',
+    'doctor_contact',
+    // 'role'
+];
+
+// Watch the form fields directly
+watch(
+    () => ({
+        first_name: form.first_name,
+        last_name: form.last_name,
+        contact: form.contact,
+        residence: form.residence,
+        doctor_name: form.doctor_name,
+        doctor_email: form.doctor_email,
+        doctor_contact: form.doctor_contact,
+        // role: form.role,
+    }),
+    () => {
+        let filledFields = 0;
+
+        for (const fieldName of profileFields) {
+            if (form[fieldName] && form[fieldName] !== '') {
+                filledFields++;
             }
-        });
-        if (response.data.success) {
-            alert('Form submitted successfully.');
-            doctorForm.value = {
-                name: '',
-                email: '',
-                specialization: '',
-                licenseNumber: '',
-                institution: '',
-                graduationYear: '',
-                idDocument: null,
-                passportPhoto: null,
-                medicalLicenseCard: null
-            };
-            showDoctorForm.value = false;
-        } else {
-            alert('Submission failed. Please try again.');
         }
-    } catch (error) {
-        console.error('Error during form submission:', error);
-        alert('An error occurred. Please try again.');
+
+        completionPercentage.value = (filledFields / totalFields) * 100;
+    },
+    { deep: true }
+);
+
+onMounted(() => {
+    if (props.user) {
+        form.name = props.user.name || '';
+        form.email = props.user.email || '';
+        form.first_name = props.user.first_name || '';
+        form.last_name = props.user.last_name || '';
+        form.contact = props.user.contact || '';
+        form.residence = props.user.residence || '';
+        form.doctor_name = props.user.doctor_name || '';
+        form.doctor_email = props.user.doctor_email || '';
+        form.doctor_contact = props.user.doctor_contact || '';
+        // form.role = props.user.role || '';
     }
-}
+});
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+
+// Function to save profile information
+const updateProfileInformation = async () => {
+    try {
+        await form.put(route('user-profile-information.update'));
+        // Optionally, you can add a success message or other post-save actions here
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        // Optionally, handle error cases here
+    }
+};
+
+// Function to handle sending email verification
+const sendEmailVerification = async () => {
+    try {
+        await axios.post(route('verification.send'));
+        // Optionally, you can handle success message or state update here
+    } catch (error) {
+        console.error('Error sending email verification:', error);
+        // Optionally, handle error cases here
+    }
+};
 
 </script>
-
 <template>
     <AppLayout title="Dashboard">
         <template #header>
@@ -222,63 +274,185 @@ async function submitDoctorForm() {
                     Laravel Jetstream is built with Tailwind, an amazing utility first CSS framework that doesn't get in your way. You'll be amazed how easily you can build and maintain fresh, modern designs with this wonderful framework at your fingertips.
                 </p>
             </div>
+</div>
+</AppLayout>
+    <FormSection @submitted="updateProfileInformation">
+        
+       
 
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="javascript:void(0);" @click="toggleDoctorForm">Are you a doctor?</a>
-                    </h2>
+        <template #form>
+            <!-- Profile Photo -->
+             <div></div><br >          <h2>
+            Doctor Details
+       </h2>
+           
+            <!-- Name -->
+            <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="name" value="Name" />
+                <TextInput
+                    id="name"
+                    v-model="form.name"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                    autocomplete="name"
+                />
+                <InputError :message="form.errors.name" class="mt-2" />
+            </div> -->
+
+            <!-- Email -->
+             <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="email" value="Email" />
+                <TextInput
+                    id="email"
+                    v-model="form.email"
+                    type="email"
+                    class="mt-1 block w-full"
+                    required
+                    autocomplete="username"
+                /> 
+                <InputError :message="form.errors.email" class="mt-2" />
+
+                <div v-if="$page.props.jetstream.hasEmailVerification && user.email_verified_at === null">
+                    <p class="text-sm mt-2">
+                        Your email address is unverified.
+
+                        <Link
+                            :href="route('verification.send')"
+                            method="post"
+                            as="button"
+                            class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            @click.prevent="sendEmailVerification"
+                        >
+                            Click here to re-send the verification email.
+                        </Link>
+                    </p>
+
+                    <div v-show="verificationLinkSent" class="mt-2 font-medium text-sm text-green-600">
+                        A new verification link has been sent to your email address.
+                    </div>
                 </div>
+            </div>  -->
 
-                <div v-if="showDoctorForm" class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    <form @submit.prevent="doctors">
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-700">Name:</label>
-                            <input id="name" type="text" class="mt-1 block w-full" v-model="doctorForm.name">
-                        </div>
-                        <div class="mb-4">
-                            <label for="email" class="block text-gray-700">Email:</label>
-                            <input id="email" type="email" class="mt-1 block w-full" v-model="doctorForm.email">
-                        </div>
-                        <div class="mb-4">
-                            <label for="specialization" class="block text-gray-700">Specialization:</label>
-                            <input id="specialization" type="text" class="mt-1 block w-full" v-model="doctorForm.specialization">
-                        </div>
-                        <div class="mb-4">
-                            <label for="licenseNumber" class="block text-gray-700">License Number:</label>
-                            <input id="licenseNumber" type="text" class="mt-1 block w-full" v-model="doctorForm.licenseNumber">
-                        </div>
-                        <div class="mb-4">
-                            <label for="institution" class="block text-gray-700">Institution:</label>
-                            <input id="institution" type="text" class="mt-1 block w-full" v-model="doctorForm.institution">
-                        </div>
-                        <div class="mb-4">
-                            <label for="graduationYear" class="block text-gray-700">Graduation Year:</label>
-                            <input id="graduationYear" type="text" class="mt-1 block w-full" v-model="doctorForm.graduationYear">
-                        </div>
+            <!-- First Name -->
+            <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="first_name" value="First Name" />
+                <TextInput
+                    id="first_name"
+                    v-model="form.first_name"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.first_name" class="mt-2" />
+            </div> -->
 
-                        <div class="mb-4">
-                            <label for="idDocument" class="block text-gray-700">Upload ID Document:</label>
-                            <input id="idDocument" type="file" class="mt-1 block w-full" @change="e => doctorForm.idDocument = e.target.files[0]">
-                        </div>
-                        <div class="mb-4">
-            <label for="passportPhoto" class="block text-gray-700">Upload Passport Photo:</label>
-            <input id="passportPhoto" type="file" class="mt-1 block w-full" @change="e => doctorForm.passportPhoto = e.target.files[0]">
-        </div>
-        <div class="mb-4">
-            <label for="medicalLicenseCard" class="block text-gray-700">Upload Medical License Card:</label>
-            <input id="medicalLicenseCard" type="file" class="mt-1 block w-full" @change="e => doctorForm.medicalLicenseCard = e.target.files[0]">
-        </div>
-                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-                    </form>
-                </div>
+            <!-- Last Name -->
+            <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="last_name" value="Last Name" />
+                <TextInput
+                    id="last_name"
+                    v-model="form.last_name"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.last_name" class="mt-2" />
+            </div> -->
+
+            <!-- Contact -->
+            <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="contact" value="Contact" />
+                <TextInput
+                    id="contact"
+                    v-model="form.contact"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.contact" class="mt-2" />
+            </div> -->
+
+            <!-- Residence -->
+            <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="residence" value="Residence" />
+                <TextInput
+                    id="residence"
+                    v-model="form.residence"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.residence" class="mt-2" />
+            </div> -->
+
+            <!-- Doctor Name -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="doctor_name" value="Doctor Name" />
+                <TextInput
+                    id="doctor_name"
+                    v-model="form.doctor_name"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.doctor_name" class="mt-2" />
             </div>
-        </div>
-    </AppLayout>
+
+            <!-- Doctor Email -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="doctor_email" value="Doctor Email" />
+                <TextInput
+                    id="doctor_email"
+                    v-model="form.doctor_email"
+                    type="email"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.doctor_email" class="mt-2" />
+            </div>
+
+            <!-- Doctor Contact -->
+            <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="doctor_contact" value="Doctor Contact" />
+                <TextInput
+                    id="doctor_contact"
+                    v-model="form.doctor_contact"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.doctor_contact" class="mt-2" />
+            </div>
+
+            <!-- Role -->
+            <!-- <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="role" value="Role" />
+                <TextInput
+                    id="role"
+                    v-model="form.role"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.role" class="mt-2" />
+            </div> -->
+        </template>
+
+        <template #actions>
+            <ActionMessage :on="form.recentlySuccessful" class="me-3">
+                Saved.
+            </ActionMessage>
+
+            <div class="flex justify-between items-center mt-4">
+                <PrimaryButton :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                    Save
+                </PrimaryButton>
+            </div>
+        </template>
+    </FormSection>
 </template>
+
 
 <style>
 .blur {
