@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
-// import { useForm } from '@inertiajs/vue3';
+import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
@@ -277,14 +277,13 @@ const sendEmailVerification = async () => {
 </div>
 </AppLayout>
     <FormSection @submitted="updateProfileInformation">
-        
+        <template #title>
+            Enter Doctor Credentials
+        </template>
        
 
         <template #form>
             <!-- Profile Photo -->
-             <div></div><br >          <h2>
-            Doctor Details
-       </h2>
            
             <!-- Name -->
             <!-- <div class="col-span-6 sm:col-span-4">
@@ -385,7 +384,18 @@ const sendEmailVerification = async () => {
                 />
                 <InputError :message="form.errors.residence" class="mt-2" />
             </div> -->
-
+  <!-- Doctor Contact -->
+  <div class="col-span-6 sm:col-span-4">
+                <InputLabel for="doctor_contact" value="Doctor ID" />
+                <TextInput
+                    id="doctor_contact"
+                    v-model="form.doctor_contact"
+                    type="text"
+                    class="mt-1 block w-full"
+                    required
+                />
+                <InputError :message="form.errors.doctor_contact" class="mt-2" />
+            </div>
             <!-- Doctor Name -->
             <div class="col-span-6 sm:col-span-4">
                 <InputLabel for="doctor_name" value="Doctor Name" />
@@ -412,18 +422,7 @@ const sendEmailVerification = async () => {
                 <InputError :message="form.errors.doctor_email" class="mt-2" />
             </div>
 
-            <!-- Doctor Contact -->
-            <div class="col-span-6 sm:col-span-4">
-                <InputLabel for="doctor_contact" value="Doctor Contact" />
-                <TextInput
-                    id="doctor_contact"
-                    v-model="form.doctor_contact"
-                    type="text"
-                    class="mt-1 block w-full"
-                    required
-                />
-                <InputError :message="form.errors.doctor_contact" class="mt-2" />
-            </div>
+          
 
             <!-- Role -->
             <!-- <div class="col-span-6 sm:col-span-4">
