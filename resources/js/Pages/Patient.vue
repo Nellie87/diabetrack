@@ -3,6 +3,14 @@ import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
+import GradientLineChart from "@/Components/Charts/GradientLineChart.vue";
+import TimelineList from "@/Components/TimelineList.vue";
+import TimelineItem from "@/Components/TimelineItem.vue";
+import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { formatDate } from '@vueuse/core';
+
+const page = usePage();
+const user = computed(() => page.props.auth.user);
 import { computed } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
 import ActionMessage from '@/Components/ActionMessage.vue';
@@ -86,6 +94,39 @@ onMounted(() => {
 });
 
 
+const patientForm = ref({
+    PhoneNo: '',
+    Gender: '',
+    Address: '',
+    EmergencyContactName: '',
+    EmergencyContactPhone: '',
+    DoctorID:'',
+
+
+async function submitpatientForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(patientForm.value).forEach(key => {
+            formData.append(key, patientForm.value[key]);
+        });
+
+        const response = await axios.post('/api/submit-form', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            patientForm.value = {
+                PhoneNo: '',
+                Gender: '',
+                Address: '',
+                Emergency_Contact_Name: '',
+                Emergency_Contact_Phone: '',
+                DoctorID:'',
+               };
+        } else {
+            alert('Submission failed. Please try again.');
 const form = useForm({
     _method: 'PUT',
     name: '',
@@ -174,6 +215,20 @@ const updateProfileInformation = async () => {
     }
 };
 
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/chart-data');
+        chartData.value = response.data;
+        $hue=chartData.value;
+        renderChart(chart);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+
+</script>
 // Function to handle sending email verification
 const sendEmailVerification = async () => {
     try {
@@ -190,7 +245,7 @@ const sendEmailVerification = async () => {
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Patient Dashboard
+                Patient 
             </h2>
         </template>
 
@@ -203,39 +258,130 @@ const sendEmailVerification = async () => {
             </div>
         </div>
 
-        <div>
-            <p class="mt-6 text-gray-500 leading-relaxed">
-                How are you feeling today?
-            </p>
+        <div class="col-lg-7">
+        <!-- line chart -->
+
+        <div class="col-lg-4 col-md-6">
+        <timeline-list
+          class="h-100"
+          title="Orders overview"
+          description="<i class='fa fa-arrow-up text-success' aria-hidden='true'></i>
+        <span class='font-weight-bold'>24%</span> this month"
+        >
+          <timeline-item
+            color="success"
+            icon="bell-55"
+            title="$2400 Design changes"
+            date-time="22 DEC 7:20 PM"
+          />
+          <TimelineItem
+            color="danger"
+            icon="html5"
+            title="New order #1832412"
+            date-time="21 DEC 11 PM"
+          />
+          <TimelineItem
+            color="info"
+            icon="cart"
+            title="Server payments for April"
+            date-time="21 DEC 9:34 PM"
+          />
+          <TimelineItem
+            color="warning"
+            icon="credit-card"
+            title="New card added for order #4395133"
+            date-time="20 DEC 2:20 AM"
+          />
+          <TimelineItem
+            color="primary"
+            icon="key-25"
+            title="Unlock packages for development"
+            date-time="18 DEC 4:54 AM"
+          />
+          <TimelineItem
+            color="info"
+            icon="check-bold"
+            title="Notifications unread"
+            date-time="15 DEC"
+          />
+        </timeline-list>
+      </div>
+         
+        <div class="card z-index-2">
+          <gradient-line-chart
+            id="chart-line"
+            title="Gradient Line Chart"
+            description="<i class='fa fa-arrow-up text-success'></i>
+      <span class='font-weight-bold'>4% more</span> in 2021"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data:  $hue,
+                },
+                {
+                  label: 'Websites',
+                  data: [30, 90, 40, 140, 290, 290, 340, 230, 400],
+                },
+              ],
+            }"
+          />
         </div>
+      </div>
 
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">
+      
+
+        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
             <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://laravel.com/docs">Enter readings</a>
-                    </h2>
-                </div>
+                <form @submit.prevent="submitForm">
+                        <div class="mb-4">
+                            <label for="name" class="block text-gray-700">Name:</label>
+                            <input id="name" type="text" class="mt-1 block w-full">
+                        </div>
+        
+                        <div class="mb-4">
+                            <label for="PhoneNo" class="block text-gray-700">Phone Number:</label>
+                            <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.PhoneNo">
+                        </div>
+                        <div class="mb-4">
+                            <label for="Gender" class="block text-gray-700">Gender:</label>
+                            <input id="Gender" type="text" class="mt-1 block w-full" v-model="patientForm.Gender">
+                        </div>
+                        <div class="mb-4">
+                            <label for="Address" class="block text-gray-700">Adress:</label>
+                            <input id="Address" type="text" class="mt-1 block w-full" v-model="patientForm.Address">
+                        </div>
+                        <div class="mb-4">
+                            <label for="EmergencyContactName" class="block text-gray-700">Name of Emergency Contact:</label>
+                            <input id="EmergencyContactName" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactName">
+                        </div>
 
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laravel has wonderful documentation covering every aspect of the framework. Whether you're new to the framework or have previous experience, we recommend reading all of the documentation from beginning to end.
-                </p>
+                        <div class="mb-4">
+                            <label for="EmergencyContactPhone" class="block text-gray-700">Phone of Emergency Contact:</label>
+                            <input id="EmergencyContactPhone" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactPhone">
+                            </div>
 
-                <p class="mt-4 text-sm">
-                    <a href="https://laravel.com/docs" class="inline-flex items-center font-semibold text-indigo-700">
-                        Explore the documentation
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="ms-1 w-5 h-5 fill-indigo-500">
-                            <path fill-rule="evenodd" d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </p>
-            </div>
-
-            <div>
+                        <div class="mb-4">
+                            <label for="DoctorID" class="block text-gray-700">Doctor:</label>
+                            <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.DoctorID">
+                        </div>
+                    
+                        <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+                        <div>
+                        <button @click="fetchData" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Chart</button>
+                        </div>
+                    </form>               
                 <div class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
                         <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 004.5 7.5v9a2.25 2.25 0 002.25 2.25z" />
