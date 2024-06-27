@@ -81,60 +81,6 @@ onMounted(() => {
     }
 });
 
-// New properties and methods for doctor form
-const showDoctorForm = ref(false);
-
-function toggleDoctorForm() {
-    showDoctorForm.value = !showDoctorForm.value;
-}
-
-const doctorForm = ref({
-    name: '',
-    email: '',
-    specialization: '',
-    licenseNumber: '',
-    institution: '',
-    graduationYear: '',
-    idDocument: null, // ID document (e.g., government-issued ID)
-    passportPhoto: null, // Passport photo
-    medicalLicenseCard: null // Medical license card
-});
-
-
-async function submitDoctorForm() {
-    try {
-        const formData = new FormData();
-        Object.keys(doctorForm.value).forEach(key => {
-            formData.append(key, doctorForm.value[key]);
-        });
-
-        const response = await axios.post('/path-to-submit-form', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        if (response.data.success) {
-            alert('Form submitted successfully.');
-            doctorForm.value = {
-                name: '',
-                email: '',
-                specialization: '',
-                licenseNumber: '',
-                institution: '',
-                graduationYear: '',
-                idDocument: null,
-                passportPhoto: null,
-                medicalLicenseCard: null
-            };
-            showDoctorForm.value = false;
-        } else {
-            alert('Submission failed. Please try again.');
-        }
-    } catch (error) {
-        console.error('Error during form submission:', error);
-        alert('An error occurred. Please try again.');
-    }
-}
 
 const patientForm = ref({
     PhoneNo: '',
@@ -144,8 +90,6 @@ const patientForm = ref({
     EmergencyContactPhone: '',
     DoctorID:'',
 });
-
-
 
 
 async function submitpatientForm() {
@@ -178,6 +122,19 @@ async function submitpatientForm() {
         alert('An error occurred. Please try again.');
     }
 }
+
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/chart-data');
+        chartData.value = response.data;
+        $hue=chartData.value;
+        renderChart(chart);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
 
 </script>
 
@@ -268,7 +225,7 @@ async function submitpatientForm() {
               datasets: [
                 {
                   label: 'Mobile Apps',
-                  data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+                  data:  $hue,
                 },
                 {
                   label: 'Websites',
@@ -316,8 +273,11 @@ async function submitpatientForm() {
                             <label for="DoctorID" class="block text-gray-700">Doctor:</label>
                             <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.DoctorID">
                         </div>
+                    
                         <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-
+                        <div>
+                        <button @click="fetchData" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Chart</button>
+                        </div>
                     </form>               
             </div>
         </div>

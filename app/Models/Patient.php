@@ -17,7 +17,7 @@ class Patient extends Model
         'DoctorID',
     ];
 
-    public function getGender(){
+    public function getData(){
         return $this->Gender;
     }
 

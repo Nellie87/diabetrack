@@ -16,3 +16,6 @@ Route::get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
 
 Route::post('/submit-form', [FormController::class, 'submit']);
+
+Route::get('/chart-data', [FormController::class, 'getData']);
+

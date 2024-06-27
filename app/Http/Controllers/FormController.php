@@ -25,4 +25,10 @@ class FormController extends Controller
         // Return a JSON response
         return response()->json(['success' => 'Form submitted successfully!', 'patient' => $patient]);
     }
+
+    public function getData()
+    {
+        $data = Patient::pluck('Number');
+        return response()->json($data);
+    }
 }
