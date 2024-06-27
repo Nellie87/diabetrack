@@ -61,7 +61,7 @@ onMounted(() => {
 });
 
 const users = ref([]);
-const editingUser = ref(null);
+const selectedUser = ref(null);
 const feedbackMessage = ref('');
 
 const fetchUsers = async () => {
@@ -78,41 +78,12 @@ onMounted(async () => {
     await fetchUsers();
 });
 
-const startEditing = (user) => {
-    editingUser.value = { ...user };
+const showUserDetails = (user) => {
+    selectedUser.value = { ...user };
 };
 
-const cancelEditing = () => {
-    editingUser.value = null;
-    feedbackMessage.value = '';
-};
-
-const saveUser = async (user) => {
-    try {
-        const response = await axios.put(`/users/${user.id}`, { role: user.role });
-        console.log(response.data);
-        const index = users.value.findIndex((u) => u.id === user.id);
-        if (index !== -1) {
-            users.value[index] = response.data;
-        }
-        editingUser.value = null;
-        feedbackMessage.value = 'User updated successfully!';
-    } catch (error) {
-        console.error('Error updating user:', error.response ? error.response.data : error.message);
-        feedbackMessage.value = `Error updating user: ${error.response ? error.response.data.message : error.message}`;
-    }
-};
-
-const deleteUser = async (user) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
-    try {
-        await axios.delete(`/users/${user.id}`);
-        users.value = users.value.filter((u) => u.id !== user.id);
-        feedbackMessage.value = 'User deleted successfully!';
-    } catch (error) {
-        console.error('Error deleting user:', error);
-        feedbackMessage.value = 'Error deleting user.';
-    }
+const closeUserDetails = () => {
+    selectedUser.value = null;
 };
 </script>
 
@@ -120,12 +91,11 @@ const deleteUser = async (user) => {
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-               Doctor Dashboard
+                Doctor Dashboard
             </h2>
         </template>
 
         <!-- Main content -->
-         
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -133,32 +103,38 @@ const deleteUser = async (user) => {
                 </div>
             </div>
         </div>
-        <!-- <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-            <ApplicationLogo class="block h-12 w-auto" /> -->
-<!-- 
-            <h1 class="mt-8 text-2xl font-medium text-gray-900">
-                Welcome , {{ user.name }}!
-            </h1> -->
 
-            <!-- User table -->
+        <!-- User table -->
         <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <div v-for="(user, index) in users" :key="index" class="bg-white shadow-md rounded-md p-6">
                 <div class="text-xl font-semibold mb-2">{{ user.name }}</div>
                 <div class="text-gray-600 mb-2">{{ user.email }}</div>
                 <div class="text-gray-600">Role {{ user.role }}</div>
                 <div class="mt-4 flex justify-end">
-                    <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
-                        <i class="fas fa-edit"></i> Edit
+                    <button @click="showUserDetails(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                        Show More
                     </button>
-                    <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded ml-2">
-                        <i class="fas fa-trash"></i> Delete
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for showing user details -->
+        <div v-if="selectedUser" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full">
+                <h3 class="text-xl font-semibold mb-4">User Details</h3>
+                <p><strong>Name:</strong> {{ selectedUser.name }}</p>
+                <p><strong>Email:</strong> {{ selectedUser.email }}</p>
+                <p><strong>Role:</strong> {{ selectedUser.role }}</p>
+                <p><strong>Additional Data:</strong> {{ selectedUser.additionalData }}</p>
+                <div class="mt-4 flex justify-end">
+                    <button @click="closeUserDetails" class="bg-red-500 text-white px-3 py-1 rounded">
+                        Close
                     </button>
                 </div>
             </div>
         </div>
     </AppLayout>
 </template>
-
 
 <style>
 .blur {
