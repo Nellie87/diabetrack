@@ -3,9 +3,9 @@ import { ref, watch, onMounted } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
-import GradientLineChart from "@/Components/Charts/GradientLineChart.vue";
-import TimelineList from "@/Components/TimelineList.vue";
-import TimelineItem from "@/Components/TimelineItem.vue";
+import GradientLineChart from "/resources/js/Components/Charts/GradientLineChart.vue";
+import TimelineList from "/resources/js/Components/TimelineList.vue";
+import TimelineItem from "/resources/js/Components/TimelineItem.vue";
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import { formatDate } from '@vueuse/core';
 
@@ -13,13 +13,13 @@ const page = usePage();
 const user = computed(() => page.props.auth.user);
 import { computed } from 'vue';
 import { Link, router, useForm } from '@inertiajs/vue3';
-import ActionMessage from '@/Components/ActionMessage.vue';
+import ActionMessage from '/resources/js/Components/ActionMessage.vue';
 import FormSection from '/resources/js/Components/FormSection.vue';
-import InputError from '@/Components/InputError.vue';
-import InputLabel from '@/Components/InputLabel.vue';
-import PrimaryButton from '@/Components/PrimaryButton.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import InputError from '/resources/js/Components/InputError.vue';
+import InputLabel from '/resources/js/Components/InputLabel.vue';
+import PrimaryButton from '/resources/js/Components/PrimaryButton.vue';
+import SecondaryButton from '/resources/js/Components/SecondaryButton.vue';
+import TextInput from '/resources/js/Components/TextInput.vue';
 
 const props = defineProps({
     user: Object,
@@ -101,6 +101,7 @@ const patientForm = ref({
     EmergencyContactName: '',
     EmergencyContactPhone: '',
     DoctorID:'',
+});
 
 
 async function submitpatientForm() {
@@ -115,6 +116,7 @@ async function submitpatientForm() {
                 'Content-Type': 'multipart/form-data'
             }
         });
+
         if (response.data.success) {
             alert('Form submitted successfully.');
             patientForm.value = {
@@ -123,10 +125,16 @@ async function submitpatientForm() {
                 Address: '',
                 Emergency_Contact_Name: '',
                 Emergency_Contact_Phone: '',
-                DoctorID:'',
-               };
+                DoctorID: '',
+            };
         } else {
             alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+}
 const form = useForm({
     _method: 'PUT',
     name: '',
@@ -201,8 +209,8 @@ onMounted(() => {
     }
 });
 
-const page = usePage();
-const user = computed(() => page.props.auth.user);
+// const page = usePage();
+// const user = computed(() => page.props.auth.user);
 
 // Function to save profile information
 const updateProfileInformation = async () => {
@@ -211,6 +219,16 @@ const updateProfileInformation = async () => {
         // Optionally, you can add a success message or other post-save actions here
     } catch (error) {
         console.error('Error saving profile:', error);
+        // Optionally, handle error cases here
+    }
+};
+// Function to handle sending email verification
+const sendEmailVerification = async () => {
+    try {
+        await axios.post(route('verification.send'));
+        // Optionally, you can handle success message or state update here
+    } catch (error) {
+        console.error('Error sending email verification:', error);
         // Optionally, handle error cases here
     }
 };
@@ -229,18 +247,9 @@ const updateProfileInformation = async () => {
 
 
 </script>
-// Function to handle sending email verification
-const sendEmailVerification = async () => {
-    try {
-        await axios.post(route('verification.send'));
-        // Optionally, you can handle success message or state update here
-    } catch (error) {
-        console.error('Error sending email verification:', error);
-        // Optionally, handle error cases here
-    }
-};
 
-</script>
+
+
 <template>
     <AppLayout title="Dashboard">
         <template #header>

@@ -57,6 +57,9 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
             return Inertia::render('Doctor');
         })->name('doctor');
     });
+    Route::get('/patient', function () {
+            return Inertia::render('Patient');
+        })->name('patient');
 
     Route::post('/login', [CustomAuthenticatedSessionController::class, 'store'])->name('login');
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])->name('logout');
