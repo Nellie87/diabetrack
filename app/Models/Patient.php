@@ -9,7 +9,6 @@ class Patient extends Model
 {
 
     protected $fillable = [
-        'DateOfBirth',
         'Gender',
         'PhoneNo',
         'Address',
@@ -17,6 +16,10 @@ class Patient extends Model
         'EmergencyContactPhone',
         'DoctorID',
     ];
+
+    public function getGender(){
+        return $this->Gender;
+    }
 
     use HasFactory;
 }

@@ -11,7 +11,6 @@ class FormController extends Controller
     {
         // Validate the form data
         $data = $request->validate([
-            'DateOfBirth' => 'required|date|max:255',
             'Gender' => 'required|string|max:255',
             'PhoneNo' => 'required|string|max:255',
             'Address' => 'required|string|max:255',

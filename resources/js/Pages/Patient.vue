@@ -8,6 +8,7 @@ import GradientLineChart from "@/Components/Charts/GradientLineChart.vue";
 import TimelineList from "@/Components/TimelineList.vue";
 import TimelineItem from "@/Components/TimelineItem.vue";
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import { formatDate } from '@vueuse/core';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -136,7 +137,6 @@ async function submitDoctorForm() {
 }
 
 const patientForm = ref({
-    DateOfBirth: new Date(),
     PhoneNo: '',
     Gender: '',
     Address: '',
@@ -144,6 +144,8 @@ const patientForm = ref({
     EmergencyContactPhone: '',
     DoctorID:'',
 });
+
+
 
 
 async function submitpatientForm() {
@@ -161,7 +163,6 @@ async function submitpatientForm() {
         if (response.data.success) {
             alert('Form submitted successfully.');
             patientForm.value = {
-                DateOfBirth: new Date(),
                 PhoneNo: '',
                 Gender: '',
                 Address: '',
@@ -283,18 +284,15 @@ async function submitpatientForm() {
 
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
             <div>
-                <form @submit.prevent="patientsForm">
+                <form @submit.prevent="submitForm">
                         <div class="mb-4">
                             <label for="name" class="block text-gray-700">Name:</label>
                             <input id="name" type="text" class="mt-1 block w-full">
                         </div>
-                        <div class="mb-4">
-                            <label for="Birthday" class="block text-gray-700">Birthday:</label>
-                            <input id="DateOfBirth" type="date" class="mt-1 block w-full" v-model="patientForm.Birthday">
-                        </div>
+        
                         <div class="mb-4">
                             <label for="PhoneNo" class="block text-gray-700">Phone Number:</label>
-                            <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.Phone_number">
+                            <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.PhoneNo">
                         </div>
                         <div class="mb-4">
                             <label for="Gender" class="block text-gray-700">Gender:</label>
@@ -306,17 +304,17 @@ async function submitpatientForm() {
                         </div>
                         <div class="mb-4">
                             <label for="EmergencyContactName" class="block text-gray-700">Name of Emergency Contact:</label>
-                            <input id="EmergencyContactName" type="text" class="mt-1 block w-full" v-model="patientForm.Emergency_Contact_Name">
+                            <input id="EmergencyContactName" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactName">
                         </div>
 
                         <div class="mb-4">
                             <label for="EmergencyContactPhone" class="block text-gray-700">Phone of Emergency Contact:</label>
-                            <input id="EmergencyContactPhone" type="text" class="mt-1 block w-full" v-model="patientForm.Emergency_Contact_Phone">
+                            <input id="EmergencyContactPhone" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactPhone">
                             </div>
 
                         <div class="mb-4">
-                            <label for="Doctor" class="block text-gray-700">Doctor:</label>
-                            <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.Doctor">
+                            <label for="DoctorID" class="block text-gray-700">Doctor:</label>
+                            <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.DoctorID">
                         </div>
                         <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 

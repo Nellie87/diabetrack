@@ -8,9 +8,10 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 
 use App\Http\Controllers\UserController;
-
-
+use App\Models\Patient;
 use Inertia\Inertia;
+
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -20,7 +21,6 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 })->name('welcome');
-
 
 
 Route::middleware([
@@ -51,7 +51,7 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
             return Inertia::render('Dashboard');
         })->name('dashboard');
     
-        Route::get('/patient', [PatientController::Class, 'index']);
+        Route::get('/patient', [PatientController::class, 'index']);
     
         Route::get('/doctor', function () {
             return Inertia::render('Doctor');
@@ -71,3 +71,8 @@ Route::put('/users/{id}', [UserController::class, 'update']);
 
 Route::post('/doctors', [DoctorController::class, 'store']);
 Route::get('/doctors', [DoctorController::class, 'index']);
+
+Route::get('scum', function(){
+    return Patient::get();
+});
+
