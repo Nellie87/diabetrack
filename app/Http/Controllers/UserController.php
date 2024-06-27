@@ -13,6 +13,17 @@ class UserController extends Controller
         $users = User::all();
         return response()->json($users);
     }
+//     public function index(Request $request)
+// {
+//     $role = $request->query('role');
+//     if ($role) {
+//         $users = User::where('role', $role)->get();
+//     } else {
+//         $users = User::all();
+//     }
+//     return response()->json($users);
+// }
+
 
     // Method to update a user's role
     public function update(Request $request, $id)
