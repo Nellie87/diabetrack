@@ -18,5 +18,5 @@ Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index'
 
 Route::post('/submit-form', [GlucoseReadingController::class, 'submit']);
 
-Route::get('/chart-data', [FormController::class, 'getData']);
+Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
 

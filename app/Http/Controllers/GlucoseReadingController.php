@@ -21,7 +21,7 @@ class GlucoseReadingController extends Controller
 
         public function getData()
     {
-        $data = glucose_reading::pluck('GlucoseReading');
+        $data = glucose_reading::pluck('GlucoseLevel');
         return response()->json($data);
     }
 }

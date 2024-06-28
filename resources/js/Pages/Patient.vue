@@ -297,6 +297,32 @@ async function submitpatientForm() {
                         <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
                     </form>
+
+          <gradient-line-chart
+            id="chart-line"
+            title="Gradient Line Chart"
+            description="<i class='fa fa-arrow-up text-success'></i>
+      <span class='font-weight-bold'>4% more</span> in 2021"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
                 <!--
                 <form @submit.prevent="submitForm">
                         <div class="mb-4">
