@@ -1,74 +1,192 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 
-const cardItems = ref([])
+const usersPerPage = 5; // Number of users per page
+const currentPage = ref(1); // Current page of pagination
+const users = ref([]);
+const editingUser = ref(null); // To track which user is being edited
+const feedbackMessage = ref(''); // To provide feedback to the user
+const selectedRole = ref<number | null>(null); // Track the selected role
 
-const fetchCardItems = async () => {
+// Dynamically load Font Awesome
+const loadFontAwesome = () => {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css';
+  document.head.appendChild(link);
+};
+
+onMounted(async () => {
+  loadFontAwesome(); // Load Font Awesome when the component is mounted
+  await fetchUsers(); // Fetch users initially
+});
+
+const fetchUsers = async () => {
+    try {
+        const response = await axios.get('/users');
+        users.value = response.data;
+    } catch (error) {
+        feedbackMessage.value = 'Failed to fetch users';
+    }
+};
+
+const filterUsersByRole = (role) => {
+  selectedRole.value = role;
+  currentPage.value = 1; // Reset to first page when filtering
+};
+
+const startEditing = (user) => {
+  editingUser.value = { ...user }; // Create a copy of the user object to edit
+};
+
+const cancelEditing = () => {
+  editingUser.value = null;
+  feedbackMessage.value = ''; // Clear feedback message
+};
+
+const saveUser = async (user) => {
   try {
-    const response = await axios.get('/api/users/stats')
-    cardItems.value = response.data
+    const response = await axios.put(`/users/${user.id}`, { role: user.role });
+    console.log(response.data);
+    // Update the local users array
+    const index = users.value.findIndex((u) => u.id === user.id);
+    if (index !== -1) {
+      users.value[index] = response.data;
+    }
+    editingUser.value = null;
+    feedbackMessage.value = 'User updated successfully!';
   } catch (error) {
-    console.error('Error fetching card items:', error)
+    console.error('Error updating user:', error.response ? error.response.data : error.message);
+    feedbackMessage.value = `Error updating user: ${error.response ? error.response.data.message : error.message}`;
   }
-}
+};
 
-onMounted(() => {
-  fetchCardItems()
-})
+const deleteUser = async (user) => {
+  if (!confirm('Are you sure you want to delete this user?')) return;
+  try {
+    await axios.delete(`/users/${user.id}`);
+    users.value = users.value.filter((u) => u.id !== user.id);
+    feedbackMessage.value = 'User deleted successfully!';
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    feedbackMessage.value = 'Error deleting user.';
+  }
+};
+
+// Computed property to filter users by selected role
+const filteredUsers = computed(() => {
+  if (selectedRole.value === null) {
+    return users.value;
+  }
+  return users.value.filter(user => user.role === selectedRole.value);
+});
+
+// Computed property to paginate users
+const paginatedUsers = computed(() => {
+  const startIndex = (currentPage.value - 1) * usersPerPage;
+  return filteredUsers.value.slice(startIndex, startIndex + usersPerPage);
+});
+
+// Methods to navigate between pages
+const goToNextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const goToPrevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+// Computed property to calculate total pages
+const totalPages = computed(() => {
+  return Math.ceil(filteredUsers.value.length / usersPerPage);
+});
 </script>
 <template>
-  <div
-    v-for="(item, index) in cardItems"
-    :key="index"
-    class="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default dark:border-strokedark dark:bg-boxdark"
-  >
-    <div
-      class="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4"
-      v-html="item.icon"
-    ></div>
+  <div>
+    <h2 class="text-2xl font-semibold mb-4 text-center">USERS</h2>
+    <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+      <h4 class="mb-6 text-xl font-semibold text-black dark:text-white">User Table</h4>
 
-    <div class="mt-4 flex items-end justify-between">
-      <div>
-        <h4 class="text-title-md font-bold text-black dark:text-white">{{ item.total }}</h4>
-        <span class="text-sm font-medium">{{ item.title }}</span>
+      <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
+        {{ feedbackMessage }}
       </div>
 
-      <span
-        class="flex items-center gap-1 text-sm font-medium"
-        :class="{ 'text-meta-3': item.growthRate > 0, 'text-meta-5': item.growthRate < 0 }"
-      >
-        {{ item.growthRate }}%
-        <svg
-          v-if="item.growthRate > 0"
-          class="fill-meta-3"
-          width="10"
-          height="11"
-          viewBox="0 0 10 11"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M4.35716 2.47737L0.908974 5.82987L5.0443e-07 4.94612L5 0.0848689L10 4.94612L9.09103 5.82987L5.64284 2.47737L5.64284 10.0849L4.35716 10.0849L4.35716 2.47737Z"
-            fill=""
-          />
-        </svg>
+      <!-- Placards to filter users by role -->
+      <div class="flex justify-center space-x-4 mb-4">
+        <button @click="filterUsersByRole(null)" class="px-4 py-2 bg-blue-500 text-white rounded">All Users</button>
+        <button @click="filterUsersByRole(0)" class="px-4 py-2 bg-blue-500 text-white rounded">Role 0</button>
+        <button @click="filterUsersByRole(1)" class="px-4 py-2 bg-blue-500 text-white rounded">Role 1</button>
+        <button @click="filterUsersByRole(2)" class="px-4 py-2 bg-blue-500 text-white rounded">Role 2</button>
+      </div>
 
-        <svg
-          v-if="item.growthRate < 0"
-          class="fill-meta-5"
-          width="10"
-          height="11"
-          viewBox="0 0 10 11"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M5.64284 7.69237L9.09102 4.33987L10 5.22362L5 10.0849L-8.98488e-07 5.22362L0.908973 4.33987L4.35716 7.69237L4.35716 0.0848701L5.64284 0.0848704L5.64284 7.69237Z"
-            fill=""
-          />
-        </svg>
-      </span>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+          <thead class="bg-gray-2 dark:bg-meta-4">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
+            <tr v-for="(user, index) in paginatedUsers" :key="index">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
+                </div>
+                <div v-else>
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-save"></i>
+                  </button>
+                  <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div v-else>
+                  <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination controls -->
+      <div class="flex justify-end mt-4">
+        <button @click="goToPrevPage" :disabled="currentPage === 1" class="px-3 py-1 bg-gray-200 text-gray-700 rounded mr-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">Previous</button>
+        <span class="text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="goToNextPage" :disabled="currentPage === totalPages" class="px-3 py-1 bg-gray-200 text-gray-700 rounded ml-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">Next</button>
+      </div>
     </div>
   </div>
 </template>
