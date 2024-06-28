@@ -86,6 +86,44 @@ onMounted(() => {
     }
 });
 
+const glucoseReadingForm = ref({
+    Datetime: '',
+    GlucoseLevel: '',
+    Notes: '',
+});
+
+async function submitglucoseReadingForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(glucoseReadingForm.value).forEach(key => {
+            formData.append(key, glucoseReadingForm.value[key]);
+        });
+
+        const response = await axios.post('/api/submit-form', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            patientForm.value = {
+                Datetime: '',
+                GlucoseLevel:'',
+                Notes: '',                
+            };
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+}
+
+
+
+            
 
 const patientForm = ref({
     PhoneNo: '',
@@ -233,9 +271,33 @@ async function submitpatientForm() {
       </div>
 
       
-
+       
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
             <div>
+                <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="Date" class="block text-gray-700">Date:</label>
+                            <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
+                        </div>
+
+
+                    <div class="mb-4">
+                            <label for="GlucoseReading" class="block text-gray-700">GlucoseReading:</label>
+                            <input id="GlucoseLevel" type="number" min="0" max="1000" class="mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
+                        </div>
+                        
+
+                    <div class="mb-4">
+                            <label for="Notes" class="block text-gray-700">Notes:</label>
+                            <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
+                        </div>
+
+                        <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+                <!--
                 <form @submit.prevent="submitForm">
                         <div class="mb-4">
                             <label for="name" class="block text-gray-700">Name:</label>
@@ -270,7 +332,8 @@ async function submitpatientForm() {
                         </div>
                     
                         <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-                    </form>               
+                    </form>            
+                -->   
 </div>
 </div>
 </AppLayout>
