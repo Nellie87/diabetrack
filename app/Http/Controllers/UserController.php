@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserRoleChanged;
 
 class UserController extends Controller
 {
@@ -28,24 +30,19 @@ class UserController extends Controller
     // Method to update a user's role
     public function update(Request $request, $id)
     {
-        // Validate the request data
-        $request->validate([
-            'role' => 'required|string|max:255',
-        ]);
-
-        // Find the user by ID
         $user = User::find($id);
-
-        // If user not found, return error response
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+        if ($user) {
+            $user->role = $request->input('role');
+            $user->save();
+    
+            try {
+                // Send notification email
+                Mail::to($user->email)->send(new UserRoleChanged($user));
+                return response()->json(['message' => 'User updated successfully and email sent!']);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'User updated but email not sent: ' . $e->getMessage()]);
+            }
         }
-
-        // Update the user's role
-        $user->role = $request->input('role');
-        $user->save();
-
-        // Return the updated user
-        return response()->json($user);
+        return response()->json(['error' => 'User not found'], 404);
     }
 }
