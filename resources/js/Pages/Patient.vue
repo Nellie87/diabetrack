@@ -129,14 +129,6 @@ async function submitpatientForm() {
     }
 }
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/chart-data');
-        chartData.value = response.data;
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
 
 
 
@@ -162,8 +154,7 @@ async function submitpatientForm() {
         </div>
 
         <div class="col-lg-7">
-        <!-- line chart -->
-
+        <!-- 
         <div class="col-lg-4 col-md-6">
         <timeline-list
           class="h-100"
@@ -209,7 +200,8 @@ async function submitpatientForm() {
           />
         </timeline-list>
       </div>
-         
+    -->
+        <!-- 
         <div class="card z-index-2">
           <gradient-line-chart
             id="chart-line"
@@ -237,6 +229,7 @@ async function submitpatientForm() {
             }"
           />
         </div>
+    -->
       </div>
 
       
@@ -277,9 +270,6 @@ async function submitpatientForm() {
                         </div>
                     
                         <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-                        <div>
-                        <button @click="fetchData" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Chart</button>
-                        </div>
                     </form>               
 </div>
 </div>
