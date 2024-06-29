@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('glucose_readings', function (Blueprint $table) {
             $table->id('ReadingID')->primary();
+            $table->bigInteger('PatientID');
             $table->timestamps();
             $table->dateTime('Datetime');
             $table->integer('GlucoseLevel');

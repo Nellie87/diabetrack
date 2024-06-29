@@ -47,6 +47,7 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/patient', [PatientController::class, 'index'])->name('patient.index');
         Route::get('/sesh', [UserController::class, 'getProfile'])->name('patient.profile');
+        Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
         
     });
 

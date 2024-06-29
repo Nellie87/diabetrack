@@ -37,7 +37,12 @@ class GlucoseReadingController extends Controller
         public function getData()
     {
 
-    $readings = glucose_reading::select('GlucoseLevel', 'Datetime')->get();
+        $user = Auth::user();
+        $userId = (string) $user->id;
+
+        $readings = glucose_reading::where('PatientID', $userId)
+        ->select('GlucoseLevel', 'Datetime')
+        ->get();
 
    
     $formattedData = $readings->map(function($reading) {

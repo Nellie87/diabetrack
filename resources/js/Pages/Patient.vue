@@ -302,7 +302,7 @@ async function submitpatientForm() {
           <gradient-line-chart
             id="chart-line"
             title="Sugar Levels Overview"
-            apiUrl="http://127.0.0.1:8000/api/chart-data"
+            apiUrl="http://127.0.0.1:8000/chart-data"
             description="<i class='fa fa-arrow-up text-success'></i>
       <span class='font-weight-bold'>4% more</span> in 2021"
             :chart="{
