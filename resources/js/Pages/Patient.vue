@@ -170,6 +170,7 @@ async function submitpatientForm() {
 
 
 
+
 </script>
 
 
@@ -365,6 +366,7 @@ async function submitpatientForm() {
 </div>
 </div>
 </AppLayout>
+
 </template>
 
 
