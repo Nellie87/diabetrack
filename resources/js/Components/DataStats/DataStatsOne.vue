@@ -2,14 +2,12 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 
-const usersPerPage = 5; // Number of users per page
-const currentPage = ref(1); // Current page of pagination
+const usersPerPage = 5;
+const currentPage = ref(1);
 const users = ref([]);
-const editingUser = ref(null); // To track which user is being edited
-const feedbackMessage = ref(''); // To provide feedback to the user
-const selectedRole = ref<number | null>(null); // Track the selected role
+const editingUser = ref(null);
+const feedbackMessage = ref('');
 
-// Dynamically load Font Awesome
 const loadFontAwesome = () => {
   const link = document.createElement('link');
   link.rel = 'stylesheet';
@@ -18,39 +16,31 @@ const loadFontAwesome = () => {
 };
 
 onMounted(async () => {
-  loadFontAwesome(); // Load Font Awesome when the component is mounted
-  await fetchUsers(); // Fetch users initially
+  loadFontAwesome();
+  await fetchUsers();
 });
 
 const fetchUsers = async () => {
-    try {
-        const response = await axios.get('/users');
-        users.value = response.data;
-    } catch (error) {
-        feedbackMessage.value = 'Failed to fetch users';
-    }
+  try {
+    const response = await axios.get('/users');
+    users.value = response.data;
+  } catch (error) {
+    feedbackMessage.value = 'Failed to fetch users';
+  }
 };
-
-const filterUsersByRole = (role: number | null) => {
-  selectedRole.value = role;
-  currentPage.value = 1; // Reset to first page when filtering
-};
-
 
 const startEditing = (user) => {
-  editingUser.value = { ...user }; // Create a copy of the user object to edit
+  editingUser.value = { ...user };
 };
 
 const cancelEditing = () => {
   editingUser.value = null;
-  feedbackMessage.value = ''; // Clear feedback message
+  feedbackMessage.value = '';
 };
 
 const saveUser = async (user) => {
   try {
     const response = await axios.put(`/users/${user.id}`, { role: user.role });
-    console.log(response.data);
-    // Update the local users array
     const index = users.value.findIndex((u) => u.id === user.id);
     if (index !== -1) {
       users.value[index] = response.data;
@@ -75,22 +65,11 @@ const deleteUser = async (user) => {
   }
 };
 
-//Computed property to filter users by selected role -->
-const filteredUsers = computed(() => {
-  if (selectedRole.value === null) {
-    return users.value;
-  }
-  return users.value.filter(user => user.role === selectedRole.value);
-});
-
-//Computed property to paginate users -->
 const paginatedUsers = computed(() => {
   const startIndex = (currentPage.value - 1) * usersPerPage;
-  return filteredUsers.value.slice(startIndex, startIndex + usersPerPage);
+  return users.value.slice(startIndex, startIndex + usersPerPage);
 });
 
-
-// Methods to navigate between pages
 const goToNextPage = () => {
   if (currentPage.value < totalPages.value) {
     currentPage.value++;
@@ -103,92 +82,84 @@ const goToPrevPage = () => {
   }
 };
 
-// Computed property to calculate total pages
 const totalPages = computed(() => {
-  return Math.ceil(filteredUsers.value.length / usersPerPage);
+  return Math.ceil(users.value.length / usersPerPage);
 });
+
+// Get unique roles from users
+const uniqueRoles = computed(() => {
+  const roles = new Set(users.value.map(user => user.role));
+  return Array.from(roles);
+});
+
+// Filter users based on role
+const filteredUsers = (role) => {
+  return users.value.filter(user => user.role === role);
+};
 </script>
+
 <template>
   <div>
     <h2 class="text-2xl font-semibold mb-4 text-center">USERS</h2>
-    <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-      <h4 class="mb-6 text-xl font-semibold text-black dark:text-white">User Table</h4>
 
-      <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
-        {{ feedbackMessage }}
-      </div>
+    <!-- Iterate over each unique role -->
+    <div v-for="role in uniqueRoles" :key="role">
+      <h4 class="mb-6 text-xl font-semibold text-black dark:text-white">{{ role === 0 ? 'Admins' : role === 1 ? 'Patients' : role === 2 ? 'Doctors' : 'Unknown Role' }}</h4>
 
-      <!-- Placards to filter users by role -->
-      <div class="flex justify-center space-x-4 mb-4">
-        <button @click="filterUsersByRole(null)" class="px-4 py-2 bg-blue-500 text-black rounded">All Users</button>
-        <button @click="filterUsersByRole(0)" class="px-4 py-2 bg-blue-500 text-black rounded">Role 0</button>
-        <button @click="filterUsersByRole(1)" class="px-4 py-2 bg-blue-500 text-black rounded">Role 1</button>
-        <button @click="filterUsersByRole(2)" class="px-4 py-2 bg-blue-500 text-black rounded">Role 2</button>
-      </div>
+      <div class="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
+          {{ feedbackMessage }}
+        </div>
 
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-          <thead class="bg-gray-2 dark:bg-meta-4">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
-            <tr v-for="(user, index) in paginatedUsers" :key="index">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div v-if="editingUser && editingUser.id === user.id">
-                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
-                </div>
-                <div v-else>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+            <thead class="bg-gray-2 dark:bg-meta-4">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
+              <tr v-for="(user, index) in filteredUsers(role)" :key="index">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div v-if="editingUser && editingUser.id === user.id">
-                  <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-save"></i>
-                  </button>
-                  <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-                <div v-else>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
                   <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
                     <i class="fas fa-trash"></i>
                   </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
+    </div>
 
-      <!-- Pagination controls -->
-      <div class="flex justify-end mt-4">
-        <button @click="goToPrevPage" :disabled="currentPage === 1" class="px-3 py-1 bg-gray-200 text-gray-700 rounded mr-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">Previous</button>
-        <span class="text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button @click="goToNextPage" :disabled="currentPage === totalPages" class="px-3 py-1 bg-gray-200 text-gray-700 rounded ml-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">Next</button>
-      </div>
+    <!-- Pagination controls -->
+    <div class="flex justify-end mt-4">
+      <button @click="goToPrevPage" :disabled="currentPage === 1" class="px-3 py-1 bg-gray-200 text-gray-700 rounded mr-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">Previous</button>
+      <span class="text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="goToNextPage" :disabled="currentPage === totalPages" class="px-3 py-1 bg-gray-200 text-gray-700 rounded ml-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">Next</button>
     </div>
   </div>
 </template>
