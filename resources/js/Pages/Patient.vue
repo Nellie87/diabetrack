@@ -183,6 +183,7 @@ async function submitpatientForm() {
         </template>
 
         <!-- Main content -->
+         <!--
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -192,7 +193,7 @@ async function submitpatientForm() {
         </div>
 
         <div class="col-lg-7">
-        <!-- 
+        
         <div class="col-lg-4 col-md-6">
         <timeline-list
           class="h-100"
@@ -267,9 +268,9 @@ async function submitpatientForm() {
             }"
           />
         </div>
-    -->
+    
       </div>
-
+    -->
       
        
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
@@ -300,7 +301,8 @@ async function submitpatientForm() {
 
           <gradient-line-chart
             id="chart-line"
-            title="Gradient Line Chart"
+            title="Sugar Levels Overview"
+            apiUrl="http://127.0.0.1:8000/api/chart-data"
             description="<i class='fa fa-arrow-up text-success'></i>
       <span class='font-weight-bold'>4% more</span> in 2021"
             :chart="{

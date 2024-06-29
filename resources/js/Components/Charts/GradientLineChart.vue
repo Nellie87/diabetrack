@@ -1,18 +1,22 @@
 <template>
-  <div class="p-3 pb-0 card-header">
-    <h6>{{ title }}</h6>
-    <!-- eslint-disable vue/no-v-html -->
-    <p v-if="description" class="text-sm" v-html="description" />
-  </div>
-  <div class="p-3 card-body">
-    <div class="chart">
-      <canvas :id="id" class="chart-canvas" :height="height"></canvas>
+  <div>
+    <div class="p-3 pb-0 card-header">
+      <h6>{{ title }}</h6>
+      <p v-if="description" class="text-sm" v-html="description"></p>
+    </div>
+    <div class="p-3 card-body">
+      <div class="chart">
+        <canvas :id="id" class="chart-canvas" :height="height"></canvas>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { Chart, registerables } from 'chart.js';
+import 'chartjs-adapter-date-fns';
+import { parse, format } from 'date-fns';
+
 Chart.register(...registerables);
 
 export default {
@@ -34,15 +38,15 @@ export default {
       type: String,
       default: "",
     },
-    initialChartData: {
-      type: Object,
+    apiUrl: {
+      type: String,
       required: true,
     },
   },
 
   data() {
     return {
-      chartData: this.initialChartData, // Initialize with the initial chart data from props
+      chartData: null,
     };
   },
 
@@ -51,70 +55,76 @@ export default {
   },
 
   methods: {
-    fetchChartData() {
-      // Replace with your API endpoint
-      const apiUrl = 'http://127.0.0.1:8000/api/chart-data';
+    async fetchChartData() {
+      try {
+        const response = await fetch(this.apiUrl);
+        const data = await response.json();
+        console.log('Fetched data:', data);
 
-      fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-          console.log('Fetched data:', data); // Log the fetched data to inspect its structure
+        // Transform data into chart-compatible format
+        if (Array.isArray(data)) {
+          const chartData = {
+            labels: [],
+            datasets: [{
+              label: 'Glucose Level',
+              data: [],
+              borderColor: 'rgba(75, 192, 192, 1)',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              fill: true,
+            }],
+          };
 
-          // Transform data if necessary
-          if (Array.isArray(data)) {
-            data = {
-              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Example labels
-              datasets: [
-                {
-                  label: 'Fetched Data',
-                  data: data,
-                },
-              ],
-            };
-          }
+          data.forEach(item => {
+            // Parse datetime string into Date object
+            const date = parse(item.Datetime, 'MM-dd HH:mm', new Date());
 
-          // Validate the transformed data structure
-          if (data && data.labels && data.datasets && Array.isArray(data.datasets)) {
-            this.chartData = data;
-            this.renderChart();
-          } else {
-            console.error('Invalid data structure after transformation:', data);
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching chart data:', error);
-        });
+            // Add datetime to labels if not already added
+            if (!chartData.labels.find(label => label.getTime() === date.getTime())) {
+              chartData.labels.push(date);
+            }
+
+            // Add glucose level to data array
+            chartData.datasets[0].data.push({
+              x: date,
+              y: item.GlucoseLevel,
+            });
+          });
+
+          this.chartData = chartData;
+          this.renderChart();
+        } else {
+          console.error('Unexpected data format:', data);
+        }
+      } catch (error) {
+        console.error('Error fetching chart data:', error);
+      }
     },
 
     renderChart() {
-      var ctx = document.getElementById(this.id).getContext("2d");
+      if (!this.chartData) {
+        console.error('No chart data available to render');
+        return;
+      }
 
-      var gradientStroke1 = ctx.createLinearGradient(0, 230, 0, 50);
+      const ctx = document.getElementById(this.id).getContext("2d");
 
+      const gradientStroke1 = ctx.createLinearGradient(0, 230, 0, 50);
       gradientStroke1.addColorStop(1, "rgba(203,12,159,0.2)");
       gradientStroke1.addColorStop(0.2, "rgba(72,72,176,0.0)");
       gradientStroke1.addColorStop(0, "rgba(203,12,159,0)");
 
-      let chartStatus = Chart.getChart(this.id);
-      if (chartStatus != undefined) {
-        chartStatus.destroy();
+      const existingChart = Chart.getChart(this.id);
+      if (existingChart) {
+        existingChart.destroy();
       }
 
       new Chart(ctx, {
         type: "line",
         data: {
           labels: this.chartData.labels,
-          datasets: this.chartData.datasets.map((dataset, index) => ({
-            label: dataset.label,
-            tension: 0.4,
-            borderWidth: 0,
-            pointRadius: 0,
-            borderColor: index === 0 ? "#cb0c9f" : "#3A416F",
-            borderWidth: 3,
+          datasets: this.chartData.datasets.map((dataset) => ({
+            ...dataset,
             backgroundColor: gradientStroke1,
-            fill: true,
-            data: dataset.data,
-            maxBarThickness: 6,
           })),
         },
         options: {
@@ -122,7 +132,7 @@ export default {
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: false,
+              display: true,
             },
           },
           interaction: {
@@ -151,6 +161,23 @@ export default {
               },
             },
             x: {
+              type: 'time',
+              time: {
+                unit: 'minute', // Adjust based on your data granularity
+                round: 'minute',
+                displayFormats: {
+                  millisecond: 'MMM dd, HH:mm:ss.SSS',
+                  second: 'MMM dd, HH:mm:ss',
+                  minute: 'MMM dd, HH:mm',
+                  hour: 'MMM dd, HH:00',
+                  day: 'MMM dd', // Display format for day
+                  week: 'MMM dd', // Display format for week (e.g., 'Sep 4, 2023')
+                  month: 'MMM YYYY', // Display format for month
+                  quarter: '[Q]Q - YYYY', // Display format for quarter (e.g., 'Q3 - 2023')
+                  year: 'YYYY', // Display format for year
+                },
+               
+              },
               grid: {
                 drawBorder: false,
                 display: false,
@@ -177,3 +204,5 @@ export default {
   },
 };
 </script>
+
+

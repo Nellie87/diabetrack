@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\glucose_reading;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class GlucoseReadingController extends Controller
 {
@@ -21,7 +22,18 @@ class GlucoseReadingController extends Controller
 
         public function getData()
     {
-        $data = glucose_reading::pluck('GlucoseLevel');
-        return response()->json($data);
+
+    $readings = glucose_reading::select('GlucoseLevel', 'Datetime')->get();
+
+   
+    $formattedData = $readings->map(function($reading) {
+        return [
+            'GlucoseLevel' => $reading->GlucoseLevel,
+            'Datetime' => Carbon::parse($reading->Datetime)->format('m-d H:i'),
+        ];
+    });
+
+    // Return the formatted data as a JSON response
+    return response()->json($formattedData);
     }
 }
