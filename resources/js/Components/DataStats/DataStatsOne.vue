@@ -116,6 +116,10 @@ const getRoleLabel = (role: number): string => {
   }
 };
 
+// Function to calculate total users for each role
+const getTotalUsersByRole = (role: number): number => {
+  return users.value.filter(user => user.role === role).length;
+};
 </script>
 
 <template>
@@ -133,9 +137,9 @@ const getRoleLabel = (role: number): string => {
           selectedRole === role ? 'bg-blue-500 text-white' : 'bg-white'
         ]">
         <h3 class="text-xl font-semibold">
-          {{ role === '0' ? 'Admins' : role === '1' ? 'Patients' : role === '2' ? 'Doctors' : 'Unknown Role' }}
+          {{ getRoleLabel(role) }}
         </h3>
-        <p class="text-sm text-gray-600">Total no: {{ filteredUsers.length }}</p>
+        <p class="text-sm text-gray-600">Total no: {{ getTotalUsersByRole(role) }}</p>
       </div>
     </div>
 
