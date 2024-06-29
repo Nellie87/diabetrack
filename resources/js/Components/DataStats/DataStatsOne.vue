@@ -41,7 +41,7 @@ const cancelEditing = () => {
 
 const saveUser = async (user) => {
   try {
-    const response = await axios.put(`/users/${user.id}`, { role: user.role });
+    const response = await axios.put(`/users/${user.id}`, { role: parseInt(user.role) });
     const index = users.value.findIndex((u) => u.id === user.id);
     if (index !== -1) {
       users.value[index] = response.data;
@@ -102,6 +102,20 @@ const filteredUsers = computed(() => {
   }
   return users.value.filter(user => user.role === selectedRole.value);
 });
+
+// Helper function to get role label
+const getRoleLabel = (role: number): string => {
+  if (role === '0') {
+    return 'Admin';
+  } else if (role === '1') {
+    return 'Patient';
+  } else if (role === '2') {
+    return 'Doctor';
+  } else {
+    return 'Unknown Role';
+  }
+};
+
 </script>
 
 <template>
@@ -166,10 +180,14 @@ const filteredUsers = computed(() => {
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <div v-if="editingUser && editingUser.id === user.id">
-                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
+                  <select v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+                    <option :value='0'>Admin</option>
+                    <option :value='1'>Patient</option>
+                    <option :value='2'>Doctor</option>
+                  </select>
                 </div>
                 <div v-else>
-                  <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
+                  <div class="text-sm text-gray-900 dark:text-black">{{ getRoleLabel(user.role) }}</div>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
