@@ -4,6 +4,8 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { defineProps } from 'vue';
+
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -85,14 +87,38 @@ const showUserDetails = (user) => {
 const closeUserDetails = () => {
     selectedUser.value = null;
 };
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true
+  }
+});
+
+const getGreeting = () => {
+  const hours = new Date().getHours();
+  if (hours < 12) {
+    return 'Good morning';
+  } else if (hours < 18) {
+    return 'Good afternoon';
+  } else {
+    return 'Good evening';
+  }
+};
+
+const greeting = computed(() => getGreeting());
 </script>
 
 <template>
     <AppLayout title="Dashboard">
         <template #header>
+            <div>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Doctor Dashboard
             </h2>
+            </div>
+            <div>
+                <p><strong>{{ greeting }}</strong>,<strong> Dr.</strong> <strong>{{ user.name }}</strong>,</p>
+            </div>
         </template>
 
         <!-- Main content -->
