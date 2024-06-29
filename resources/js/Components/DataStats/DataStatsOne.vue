@@ -48,6 +48,7 @@ const saveUser = async (user) => {
     }
     editingUser.value = null;
     feedbackMessage.value = 'User updated successfully!';
+    await fetchUsers(); // Refresh the users after updating
   } catch (error) {
     console.error('Error updating user:', error.response ? error.response.data : error.message);
     feedbackMessage.value = `Error updating user: ${error.response ? error.response.data.message : error.message}`;
@@ -60,6 +61,7 @@ const deleteUser = async (user) => {
     await axios.delete(`/users/${user.id}`);
     users.value = users.value.filter((u) => u.id !== user.id);
     feedbackMessage.value = 'User deleted successfully!';
+    await fetchUsers(); // Refresh the users after deleting
   } catch (error) {
     console.error('Error deleting user:', error);
     feedbackMessage.value = 'Error deleting user.';
@@ -101,6 +103,7 @@ const filteredUsers = computed(() => {
   return users.value.filter(user => user.role === selectedRole.value);
 });
 </script>
+
 <template>
   <div>
     <h2 class="text-2xl font-semibold mb-4 text-center">USERS</h2>
@@ -146,16 +149,32 @@ const filteredUsers = computed(() => {
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
                 </td>
+               
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 dark:text-black">{{ selectedRole === 0 ? 'Admin' : selectedRole === 1 ? 'Patient' : selectedRole === 2 ? 'Doctor' : 'Unknown' }}</div>
+                  <div v-if="editingUser && editingUser.id === user.id">
+                    <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
+                  </div>
+                  <div v-else>
+                    <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <div v-if="editingUser && editingUser.id === user.id">
+                    <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
+                      <i class="fas fa-save"></i>
+                    </button>
+                    <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                  <div v-else>
+                    <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
