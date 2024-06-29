@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -48,4 +49,12 @@ class UserController extends Controller
         // Return the updated user
         return response()->json($user);
     }
+
+    public function getProfile()
+    {
+        $user = Auth::user();
+        $userId = (string) $user->id;
+        
+        return response() -> json($userId);
+        }
 }

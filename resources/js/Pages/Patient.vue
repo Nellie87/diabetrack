@@ -99,7 +99,7 @@ async function submitglucoseReadingForm() {
             formData.append(key, glucoseReadingForm.value[key]);
         });
 
-        const response = await axios.post('/api/submit-form', formData, {
+        const response = await axios.post('/submit-form', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

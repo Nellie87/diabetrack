@@ -16,7 +16,7 @@ Route::get('/user', function (Request $request) {
 // routes/api.php
 Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
 
-Route::post('/submit-form', [GlucoseReadingController::class, 'submit']);
+Route::post('/submit-form', [GlucoseReadingController::class, 'submit'])->middleware('auth');
 
 Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
 
