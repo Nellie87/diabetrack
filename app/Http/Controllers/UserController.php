@@ -10,11 +10,11 @@ use App\Mail\UserRoleChanged;
 class UserController extends Controller
 {
     // Method to fetch all users
-    public function index()
-    {
-        $users = User::all();
-        return response()->json($users);
-    }
+    // public function index()
+    // {
+    //     $users = User::all();
+    //     return response()->json($users);
+    // }
 //     public function index(Request $request)
 // {
 //     $role = $request->query('role');
@@ -25,6 +25,20 @@ class UserController extends Controller
 //     }
 //     return response()->json($users);
 // }
+public function index(Request $request)
+{
+    $role = $request->query('role');
+    
+    // Fetch users based on role condition
+    if ($role !== null) {
+        $users = User::where('role', $role)->get();
+    } else {
+        $users = User::all();
+    }
+    
+    return response()->json($users);
+}
+
 
 
     // Method to update a user's role

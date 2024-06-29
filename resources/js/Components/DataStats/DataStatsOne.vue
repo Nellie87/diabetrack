@@ -31,10 +31,11 @@ const fetchUsers = async () => {
     }
 };
 
-const filterUsersByRole = (role) => {
+const filterUsersByRole = (role: number | null) => {
   selectedRole.value = role;
   currentPage.value = 1; // Reset to first page when filtering
 };
+
 
 const startEditing = (user) => {
   editingUser.value = { ...user }; // Create a copy of the user object to edit
@@ -74,7 +75,7 @@ const deleteUser = async (user) => {
   }
 };
 
-// Computed property to filter users by selected role
+//Computed property to filter users by selected role -->
 const filteredUsers = computed(() => {
   if (selectedRole.value === null) {
     return users.value;
@@ -82,11 +83,12 @@ const filteredUsers = computed(() => {
   return users.value.filter(user => user.role === selectedRole.value);
 });
 
-// Computed property to paginate users
+//Computed property to paginate users -->
 const paginatedUsers = computed(() => {
   const startIndex = (currentPage.value - 1) * usersPerPage;
   return filteredUsers.value.slice(startIndex, startIndex + usersPerPage);
 });
+
 
 // Methods to navigate between pages
 const goToNextPage = () => {
@@ -118,10 +120,10 @@ const totalPages = computed(() => {
 
       <!-- Placards to filter users by role -->
       <div class="flex justify-center space-x-4 mb-4">
-        <button @click="filterUsersByRole(null)" class="px-4 py-2 bg-blue-500 text-white rounded">All Users</button>
-        <button @click="filterUsersByRole(0)" class="px-4 py-2 bg-blue-500 text-white rounded">Role 0</button>
-        <button @click="filterUsersByRole(1)" class="px-4 py-2 bg-blue-500 text-white rounded">Role 1</button>
-        <button @click="filterUsersByRole(2)" class="px-4 py-2 bg-blue-500 text-white rounded">Role 2</button>
+        <button @click="filterUsersByRole(null)" class="px-4 py-2 bg-blue-500 text-black rounded">All Users</button>
+        <button @click="filterUsersByRole(0)" class="px-4 py-2 bg-blue-500 text-black rounded">Role 0</button>
+        <button @click="filterUsersByRole(1)" class="px-4 py-2 bg-blue-500 text-black rounded">Role 1</button>
+        <button @click="filterUsersByRole(2)" class="px-4 py-2 bg-blue-500 text-black rounded">Role 2</button>
       </div>
 
       <div class="overflow-x-auto">

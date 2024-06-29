@@ -67,13 +67,14 @@ const feedbackMessage = ref('');
 
 const fetchUsers = async () => {
     try {
-        const response = await axios.get('/users');
+        const response = await axios.get('/users?role=1');
         console.log(response.data); // Debug the response
         users.value = response.data;
     } catch (error) {
         console.error('Error fetching users:', error);
     }
 };
+
 
 onMounted(async () => {
     await fetchUsers();
