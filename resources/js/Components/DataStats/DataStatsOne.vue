@@ -92,7 +92,7 @@ const totalPages = computed(() => {
 // Get unique roles from users
 const uniqueRoles = computed(() => {
   const roles = new Set(users.value.map(user => user.role));
-  return Array.from(roles);
+  return ['0', '1', '2']; // Always return predefined roles Admin, Patient, Doctor
 });
 
 // Filter users based on role
@@ -104,7 +104,7 @@ const filteredUsers = computed(() => {
 });
 
 // Helper function to get role label
-const getRoleLabel = (role: number): string => {
+const getRoleLabel = (role: string): string => {
   if (role === '0') {
     return 'Admin';
   } else if (role === '1') {
@@ -117,7 +117,7 @@ const getRoleLabel = (role: number): string => {
 };
 
 // Function to calculate total users for each role
-const getTotalUsersByRole = (role: number): number => {
+const getTotalUsersByRole = (role: string): number => {
   return users.value.filter(user => user.role === role).length;
 };
 </script>
@@ -128,6 +128,7 @@ const getTotalUsersByRole = (role: number): number => {
 
     <!-- Display role selection cards -->
     <div class="grid grid-cols-3 gap-4 mb-8">
+      <!-- Always render cards for Admin, Patient, and Doctor -->
       <div 
         v-for="role in uniqueRoles" 
         :key="role" 
@@ -211,6 +212,12 @@ const getTotalUsersByRole = (role: number): number => {
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
+              </td>
+            </tr>
+            <!-- Placeholder row if no users are found for the selected role -->
+            <tr v-if="filteredUsers.length === 0">
+              <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500 dark:text-gray-300">
+                No users found for {{ getRoleLabel(selectedRole.value) }}
               </td>
             </tr>
           </tbody>
