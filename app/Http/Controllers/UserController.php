@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRoleChanged;
 
@@ -59,4 +60,12 @@ public function index(Request $request)
         }
         return response()->json(['error' => 'User not found'], 404);
     }
+
+    public function getProfile()
+    {
+        $user = Auth::user();
+        $userId = (string) $user->id;
+        
+        return response() -> json($userId);
+        }
 }

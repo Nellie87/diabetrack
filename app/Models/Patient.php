@@ -17,9 +17,5 @@ class Patient extends Model
         'DoctorID',
     ];
 
-    public function getData(){
-        return $this->Gender;
-    }
-
     use HasFactory;
 }

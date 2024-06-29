@@ -6,7 +6,8 @@ use App\Http\Controllers\PasswordVerificationController;
 use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
-
+use App\Http\Controllers\GlucoseReadingController;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Models\Patient;
 use Inertia\Inertia;
@@ -35,6 +36,7 @@ Route::middleware([
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/verify-password', [PasswordVerificationController::class, 'verify'])->name('verify-password');
+    Route::post('/submit-form', [GlucoseReadingController::class, 'submit']);
 });
 
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
@@ -44,6 +46,9 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
 
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/patient', [PatientController::class, 'index'])->name('patient.index');
+        Route::get('/sesh', [UserController::class, 'getProfile'])->name('patient.profile');
+        Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
+        
     });
 
     Route::middleware(['auth:sanctum', 'verified'])->group(function () {

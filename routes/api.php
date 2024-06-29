@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\GlucoseReadingController;
 use App\Http\Controllers\UserController;
 
 
@@ -15,7 +16,7 @@ Route::get('/user', function (Request $request) {
 // routes/api.php
 Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
 
-Route::post('/submit-form', [FormController::class, 'submit']);
+Route::post('/submit-form', [GlucoseReadingController::class, 'submit'])->middleware('auth');
 
-Route::get('/chart-data', [FormController::class, 'getData']);
+Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
 

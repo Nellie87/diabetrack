@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('glucose_readings', function (Blueprint $table) {
             $table->id('ReadingID')->primary();
+            $table->bigInteger('PatientID');
             $table->timestamps();
-            $table->string('PatientID');
-            $table->date('Date');
-            $table->time('Time');
-            $table->float('GlucoseLevel');
+            $table->dateTime('Datetime');
+            $table->integer('GlucoseLevel');
             $table->text('Notes')->nullable();
         });
     }
