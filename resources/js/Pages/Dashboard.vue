@@ -102,9 +102,9 @@ onMounted(() => {
 
         <DefaultLayout>
                   <!-- ====== Table One Start -->
-      <div class="col-span-12 xl:col-span-8">
+      <!-- <div class="col-span-12 xl:col-span-8">
         <TableOne />
-      </div>
+      </div> -->
       <!-- ====== Table One End -->
 
     <div class="">

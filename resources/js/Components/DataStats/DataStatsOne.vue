@@ -110,76 +110,89 @@ const filteredUsers = computed(() => {
 
     <!-- Display role selection cards -->
     <div class="grid grid-cols-3 gap-4 mb-8">
-      <div v-for="role in uniqueRoles" :key="role" @click="selectedRole = role"
-           class="cursor-pointer rounded-lg p-4 bg-white shadow-md hover:shadow-lg transition duration-300 ease-in-out w-full sm:w-auto">
-        <h3 class="text-xl font-semibold">{{ role === 0 ? 'Admins' : role === 1 ? 'Patients' : role === 2 ? 'Doctors' : 'Unknown Role' }}</h3>
+      <div 
+        v-for="role in uniqueRoles" 
+        :key="role" 
+        @click="selectedRole = role"
+        :class="[
+          'cursor-pointer rounded-lg p-4 shadow-md hover:shadow-lg transition duration-300 ease-in-out w-full sm:w-auto',
+          selectedRole === role ? 'bg-blue-500 text-white' : 'bg-white'
+        ]">
+        <h3 class="text-xl font-semibold">
+          {{ role === '0' ? 'Admins' : role === '1' ? 'Patients' : role === '2' ? 'Doctors' : 'Unknown Role' }}
+        </h3>
+        <p class="text-sm text-gray-600">Total no: {{ filteredUsers.length }}</p>
       </div>
     </div>
 
     <!-- Display table for selected role -->
-    <div v-if="selectedRole !== null" class="overflow-hidden">
-      <div class="rounded-sm border border-stroke bg-white shadow-md dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-        <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
-          {{ feedbackMessage }}
-        </div>
+    <div v-if="selectedRole !== null" :class="{
+        'overflow-hidden rounded-sm border border-stroke shadow-md sm:px-7.5 xl:pb-1': true,
+        'bg-green-500': selectedRole === '0',
+        'bg-green-300': selectedRole === '1',
+        'bg-green-400': selectedRole === '2',
+        'bg-white-500': selectedRole !== '0' && selectedRole !== '1' && selectedRole !== '2'
+      }">
+      <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
+        {{ feedbackMessage }}
+      </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full divide-y divide-gray-200 dark:divide-gray-600">
-            <thead class="bg-gray-2 dark:bg-meta-4">
-              <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
-              <tr v-for="(user, index) in filteredUsers" :key="index">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
-                </td>
-               
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div v-if="editingUser && editingUser.id === user.id">
-                    <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
-                  </div>
-                  <div v-else>
-                    <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div v-if="editingUser && editingUser.id === user.id">
-                    <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
-                      <i class="fas fa-save"></i>
-                    </button>
-                    <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                  <div v-else>
-                    <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
-                      <i class="fas fa-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="overflow-x-auto">
+       
+        <table class="w-full divide-y divide-gray-200 dark:divide-gray-600">
+          <thead class="bg-gray-2 dark:bg-meta-4">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
+            <tr v-for="(user, index) in filteredUsers" :key="index">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
+                </div>
+                <div v-else>
+                  <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-save"></i>
+                  </button>
+                  <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div v-else>
+                  <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
