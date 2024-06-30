@@ -13,6 +13,15 @@ class DoctorController extends Controller
     {
         return Inertia::render('Doctor');
     }
+    // In your DoctorController
+public function show(Request $request)
+{
+    $user = $request->user();
+    return Inertia::render('Doctor', [
+        'user' => $user,
+    ]);
+}
+
 
     public function store(Request $request)
     {

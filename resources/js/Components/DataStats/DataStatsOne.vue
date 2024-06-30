@@ -1,74 +1,235 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted, computed } from 'vue';
+import axios from 'axios';
 
-const cardItems = ref([])
+const usersPerPage = 5;
+const currentPage = ref(1);
+const users = ref([]);
+const editingUser = ref(null);
+const feedbackMessage = ref('');
+const selectedRole = ref(null); // Track selected role for table display
 
-const fetchCardItems = async () => {
+const loadFontAwesome = () => {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css';
+  document.head.appendChild(link);
+};
+
+onMounted(async () => {
+  loadFontAwesome();
+  await fetchUsers();
+});
+
+const fetchUsers = async () => {
   try {
-    const response = await axios.get('/api/users/stats')
-    cardItems.value = response.data
+    const response = await axios.get('/users');
+    users.value = response.data;
   } catch (error) {
-    console.error('Error fetching card items:', error)
+    feedbackMessage.value = 'Failed to fetch users';
   }
-}
+};
 
-onMounted(() => {
-  fetchCardItems()
-})
+const startEditing = (user) => {
+  editingUser.value = { ...user };
+};
+
+const cancelEditing = () => {
+  editingUser.value = null;
+  feedbackMessage.value = '';
+};
+
+const saveUser = async (user) => {
+  try {
+    const response = await axios.put(`/users/${user.id}`, { role: parseInt(user.role) });
+    const index = users.value.findIndex((u) => u.id === user.id);
+    if (index !== -1) {
+      users.value[index] = response.data;
+    }
+    editingUser.value = null;
+    feedbackMessage.value = 'User updated successfully!';
+    await fetchUsers(); // Refresh the users after updating
+  } catch (error) {
+    console.error('Error updating user:', error.response ? error.response.data : error.message);
+    feedbackMessage.value = `Error updating user: ${error.response ? error.response.data.message : error.message}`;
+  }
+};
+
+const deleteUser = async (user) => {
+  if (!confirm('Are you sure you want to delete this user?')) return;
+  try {
+    await axios.delete(`/users/${user.id}`);
+    users.value = users.value.filter((u) => u.id !== user.id);
+    feedbackMessage.value = 'User deleted successfully!';
+    await fetchUsers(); // Refresh the users after deleting
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    feedbackMessage.value = 'Error deleting user.';
+  }
+};
+
+const paginatedUsers = computed(() => {
+  const startIndex = (currentPage.value - 1) * usersPerPage;
+  return users.value.slice(startIndex, startIndex + usersPerPage);
+});
+
+const goToNextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+  }
+};
+
+const goToPrevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--;
+  }
+};
+
+const totalPages = computed(() => {
+  return Math.ceil(users.value.length / usersPerPage);
+});
+
+// Get unique roles from users
+const uniqueRoles = computed(() => {
+  const roles = new Set(users.value.map(user => user.role));
+  return ['0', '1', '2']; // Always return predefined roles Admin, Patient, Doctor
+});
+
+// Filter users based on role
+const filteredUsers = computed(() => {
+  if (selectedRole.value === null) {
+    return [];
+  }
+  return users.value.filter(user => user.role === selectedRole.value);
+});
+
+// Helper function to get role label
+const getRoleLabel = (role: string): string => {
+  if (role === '0') {
+    return 'Admin';
+  } else if (role === '1') {
+    return 'Patient';
+  } else if (role === '2') {
+    return 'Doctor';
+  } else {
+    return 'Unknown Role';
+  }
+};
+
+// Function to calculate total users for each role
+const getTotalUsersByRole = (role: string): number => {
+  return users.value.filter(user => user.role === role).length;
+};
 </script>
-<template>
-  <div
-    v-for="(item, index) in cardItems"
-    :key="index"
-    class="rounded-sm border border-stroke bg-white py-6 px-7.5 shadow-default dark:border-strokedark dark:bg-boxdark"
-  >
-    <div
-      class="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4"
-      v-html="item.icon"
-    ></div>
 
-    <div class="mt-4 flex items-end justify-between">
-      <div>
-        <h4 class="text-title-md font-bold text-black dark:text-white">{{ item.total }}</h4>
-        <span class="text-sm font-medium">{{ item.title }}</span>
+<template>
+  <div>
+    <h2 class="text-2xl font-semibold mb-4 text-center">USERS</h2>
+
+    <!-- Display role selection cards -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+      <!-- Always render cards for Admin, Patient, and Doctor -->
+      <div 
+        v-for="role in uniqueRoles" 
+        :key="role" 
+        @click="selectedRole = role"
+        :class="[
+          'cursor-pointer rounded-lg p-4 shadow-md hover:shadow-lg transition duration-300 ease-in-out w-full sm:w-auto',
+          selectedRole === role ? 'bg-blue-500 text-white' : 'bg-white'
+        ]">
+        <h3 class="text-xl font-semibold">
+          {{ getRoleLabel(role) }}
+        </h3>
+        <p class="text-sm text-gray-600">Total no: {{ getTotalUsersByRole(role) }}</p>
+      </div>
+    </div>
+
+    <!-- Display table for selected role -->
+    <div v-if="selectedRole !== null" :class="{
+        'overflow-hidden rounded-sm border border-stroke shadow-md sm:px-7.5 xl:pb-1': true,
+        'bg-green-500': selectedRole === '0',
+        'bg-green-300': selectedRole === '1',
+        'bg-green-400': selectedRole === '2',
+        'bg-white-500': selectedRole !== '0' && selectedRole !== '1' && selectedRole !== '2'
+      }">
+      <div v-if="feedbackMessage" class="mb-4 p-2 bg-green-100 text-green-800 rounded">
+        {{ feedbackMessage }}
       </div>
 
-      <span
-        class="flex items-center gap-1 text-sm font-medium"
-        :class="{ 'text-meta-3': item.growthRate > 0, 'text-meta-5': item.growthRate < 0 }"
-      >
-        {{ item.growthRate }}%
-        <svg
-          v-if="item.growthRate > 0"
-          class="fill-meta-3"
-          width="10"
-          height="11"
-          viewBox="0 0 10 11"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M4.35716 2.47737L0.908974 5.82987L5.0443e-07 4.94612L5 0.0848689L10 4.94612L9.09103 5.82987L5.64284 2.47737L5.64284 10.0849L4.35716 10.0849L4.35716 2.47737Z"
-            fill=""
-          />
-        </svg>
+      <div class="overflow-x-auto">
+       
+        <table class="w-full divide-y divide-gray-200 dark:divide-gray-600">
+          <thead class="bg-gray-2 dark:bg-meta-4">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
+            <tr v-for="(user, index) in filteredUsers" :key="index">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <select v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white">
+                    <option :value='0'>Admin</option>
+                    <option :value='1'>Patient</option>
+                    <option :value='2'>Doctor</option>
+                  </select>
+                </div>
+                <div v-else>
+                  <div class="text-sm text-gray-900 dark:text-black">{{ getRoleLabel(user.role) }}</div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div v-if="editingUser && editingUser.id === user.id">
+                  <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-save"></i>
+                  </button>
+                  <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div v-else>
+                  <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <!-- Placeholder row if no users are found for the selected role -->
+            <tr v-if="filteredUsers.length === 0">
+              <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-gray-500 dark:text-gray-300">
+                No users found for {{ getRoleLabel(selectedRole.value) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        <svg
-          v-if="item.growthRate < 0"
-          class="fill-meta-5"
-          width="10"
-          height="11"
-          viewBox="0 0 10 11"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M5.64284 7.69237L9.09102 4.33987L10 5.22362L5 10.0849L-8.98488e-07 5.22362L0.908973 4.33987L4.35716 7.69237L4.35716 0.0848701L5.64284 0.0848704L5.64284 7.69237Z"
-            fill=""
-          />
-        </svg>
-      </span>
+    <!-- Pagination controls -->
+    <div class="flex justify-end mt-4">
+      <button @click="goToPrevPage" :disabled="currentPage === 1" class="px-3 py-1 bg-gray-200 text-gray-700 rounded mr-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }">Previous</button>
+      <span class="text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="goToNextPage" :disabled="currentPage === totalPages" class="px-3 py-1 bg-gray-200 text-gray-700 rounded ml-2" :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }">Next</button>
     </div>
   </div>
 </template>

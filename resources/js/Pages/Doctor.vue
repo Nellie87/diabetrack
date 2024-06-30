@@ -4,6 +4,7 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { defineProps } from 'vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -66,13 +67,14 @@ const feedbackMessage = ref('');
 
 const fetchUsers = async () => {
     try {
-        const response = await axios.get('/users');
+        const response = await axios.get('/users?role=1');
         console.log(response.data); // Debug the response
         users.value = response.data;
     } catch (error) {
         console.error('Error fetching users:', error);
     }
 };
+
 
 onMounted(async () => {
     await fetchUsers();
@@ -85,31 +87,86 @@ const showUserDetails = (user) => {
 const closeUserDetails = () => {
     selectedUser.value = null;
 };
+
+const searchQuery = ref('');
+
+const filteredUsers = computed(() => {
+    const query = searchQuery.value.toLowerCase();
+    return users.value.filter(user =>
+        user.name.toLowerCase().includes(query) || user.id.toString().includes(query)
+    );
+});
+
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true
+  }
+});
+
+const getGreeting = () => {
+  const hours = new Date().getHours();
+  if (hours < 12) {
+    return 'Good morning';
+  } else if (hours < 18) {
+    return 'Good afternoon';
+  } else {
+    return 'Good evening';
+  }
+};
+
+const greeting = computed(() => getGreeting());
 </script>
+
+<style>
+.blur {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+</style>
 
 <template>
     <AppLayout title="Dashboard">
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Doctor Dashboard
-            </h2>
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    Doctor Dashboard
+                </h2>
+            </div>
+            <div>
+                <p><strong>{{ greeting }}</strong>,<strong> Dr.</strong> <strong>{{ user.name }}</strong>,</p>
+            </div>
+            
         </template>
-
+        <div class="mt-4 flex justify-center">
+                <div class="relative w-full max-w-md">
+                    <input
+                        type="text"
+                        v-model="searchQuery"
+                        placeholder="Search by name or ID"
+                        class="px-4 py-2 pr-10 border rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                    <svg class="absolute right-3 top-3 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4a4 4 0 100 8 4 4 0 000-8zm2 10H6m2-4h-.01M8 12h.01M4 16h16" />
+                    </svg>
+                </div>
+            </div>
         <!-- Main content -->
-        <div :class="{ 'blur': isLocked }" class="py-12">
+        <!-- <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
                     <Welcome />
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- User table -->
         <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div v-for="(user, index) in users" :key="index" class="bg-white shadow-md rounded-md p-6">
+            <div v-for="(user, index) in filteredUsers" :key="index" class="bg-white shadow-md rounded-md p-6">
                 <div class="text-xl font-semibold mb-2">{{ user.name }}</div>
                 <div class="text-gray-600 mb-2">{{ user.email }}</div>
-                <div class="text-gray-600">Role {{ user.role }}</div>
+                <div class="text-gray-600">ID: {{ user.id }}</div>
+                <div class="text-gray-600">Role: {{ user.role }}</div>
                 <div class="mt-4 flex justify-end">
                     <button @click="showUserDetails(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
                         Show More
@@ -122,6 +179,7 @@ const closeUserDetails = () => {
         <div v-if="selectedUser" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <div class="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full">
                 <h3 class="text-xl font-semibold mb-4">User Details</h3>
+                <p><strong>ID:</strong> {{ selectedUser.id }}</p>
                 <p><strong>Name:</strong> {{ selectedUser.name }}</p>
                 <p><strong>Email:</strong> {{ selectedUser.email }}</p>
                 <p><strong>Role:</strong> {{ selectedUser.role }}</p>
@@ -135,10 +193,3 @@ const closeUserDetails = () => {
         </div>
     </AppLayout>
 </template>
-
-<style>
-.blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
-}
-</style>

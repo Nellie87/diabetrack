@@ -88,3 +88,4 @@ Route::get('scum', function(){
     return Patient::get();
 });
 
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
