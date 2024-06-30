@@ -326,7 +326,7 @@ async function submitpatientForm() {
               ],
             }"
           />
-                <!--
+                <!-- 
                 <form @submit.prevent="submitForm">
                         <div class="mb-4">
                             <label for="name" class="block text-gray-700">Name:</label>
