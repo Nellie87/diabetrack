@@ -107,7 +107,7 @@ async function submitglucoseReadingForm() {
 
         if (response.data.success) {
             alert('Form submitted successfully.');
-            patientForm.value = {
+            glucoseReadingForm.value = {
                 Datetime: '',
                 GlucoseLevel:'',
                 Notes: '',                
@@ -121,28 +121,22 @@ async function submitglucoseReadingForm() {
     }
 }
 
-
-
-            
-
-const patientForm = ref({
-    PhoneNo: '',
-    Gender: '',
-    Address: '',
-    EmergencyContactName: '',
-    EmergencyContactPhone: '',
-    DoctorID:'',
+const dietForm = ref({
+    Date: '',
+    MealType: '',
+    FoodItems: '',
+    Carbohydrates: '',
+    Notes: '',
 });
 
-
-async function submitpatientForm() {
+async function submitdietForm() {
     try {
         const formData = new FormData();
-        Object.keys(patientForm.value).forEach(key => {
-            formData.append(key, patientForm.value[key]);
+        Object.keys(dietForm.value).forEach(key => {
+            formData.append(key, dietForm.value[key]);
         });
 
-        const response = await axios.post('/api/submit-form', formData, {
+        const response = await axios.post('/submit-form2', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -150,13 +144,52 @@ async function submitpatientForm() {
 
         if (response.data.success) {
             alert('Form submitted successfully.');
-            patientForm.value = {
-                PhoneNo: '',
-                Gender: '',
-                Address: '',
-                Emergency_Contact_Name: '',
-                Emergency_Contact_Phone: '',
-                DoctorID: '',
+            dietForm.value = {
+                Date: '',
+                MealType: '',
+                FoodItems: '',
+                Carbohydrates: '',
+                Notes: '',               
+            };
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+
+}
+
+const medicationsForm = ref({
+    MedicationName: '',
+    Type: '',
+    Dosage: '',
+    Frequency: '',
+    StartDate: '',
+});
+
+async function submitmedicationForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(medicationsForm.value).forEach(key => {
+            formData.append(key, medicationsForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form3', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            medicationsForm.value = {
+                MedicationName: '',
+                Type: '',
+                Dosage: '',
+                Frequency: '',
+                StartDate: '',               
             };
         } else {
             alert('Submission failed. Please try again.');
@@ -166,8 +199,6 @@ async function submitpatientForm() {
         alert('An error occurred while submitting the form. Please try again.');
     }
 }
-
-
 
 
 </script>
@@ -325,43 +356,76 @@ async function submitpatientForm() {
               ],
             }"
           />
-                <!--
-                <form @submit.prevent="submitForm">
-                        <div class="mb-4">
-                            <label for="name" class="block text-gray-700">Name:</label>
-                            <input id="name" type="text" class="mt-1 block w-full">
+
+           <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="Date" class="block text-gray-700">Date:</label>
+                            <input id="Date" type="Date" class="mt-1 block w-full" v-model="dietForm.Date" />
                         </div>
-        
-                        <div class="mb-4">
-                            <label for="PhoneNo" class="block text-gray-700">Phone Number:</label>
-                            <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.PhoneNo">
+
+
+                    <div class="mb-4">
+                            <label for="MealType" class="block text-gray-700">Meal Type:</label>
+                            <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
                         </div>
-                        <div class="mb-4">
-                            <label for="Gender" class="block text-gray-700">Gender:</label>
-                            <input id="Gender" type="text" class="mt-1 block w-full" v-model="patientForm.Gender">
+                        
+
+                    <div class="mb-4">
+                            <label for="FoodItems" class="block text-gray-700">Food Items:</label>
+                            <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
                         </div>
-                        <div class="mb-4">
-                            <label for="Address" class="block text-gray-700">Adress:</label>
-                            <input id="Address" type="text" class="mt-1 block w-full" v-model="patientForm.Address">
-                        </div>
-                        <div class="mb-4">
-                            <label for="EmergencyContactName" class="block text-gray-700">Name of Emergency Contact:</label>
-                            <input id="EmergencyContactName" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactName">
+
+                    <div class="mb-4">
+                            <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
+                            <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
                         </div>
 
                         <div class="mb-4">
-                            <label for="EmergencyContactPhone" class="block text-gray-700">Phone of Emergency Contact:</label>
-                            <input id="EmergencyContactPhone" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactPhone">
-                            </div>
+                            <label for="Notes" class="block text-gray-700">Notes:</label>
+                            <input id="Notes" type="text" class="mt-1 block w-full" v-model="dietForm.Notes" />
+                        </div>
+
+                        <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+
+
+                    <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="MedicationName" class="block text-gray-700">Medicine Name:</label>
+                            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
+                        </div>
+
+
+                    <div class="mb-4">
+                            <label for="Type" class="block text-gray-700">Type:</label>
+                            <input id="Type" type="text" class="mt-1 block w-full" v-model="medicationsForm.Type" />
+                        </div>
+                        
+
+                    <div class="mb-4">
+                            <label for="Dosage" class="block text-gray-700">Amount taken in one dose:</label>
+                            <input id="Dosage" type="number" class="mt-1 block w-full" v-model="medicationsForm.Dosage" />
+                        </div>
+
+                    <div class="mb-4">
+                            <label for="Frequency" class="block text-gray-700">Frequency:</label>
+                            <input id="Frequency" type="number" class="mt-1 block w-full" v-model="medicationsForm.Frequency" />
+                        </div>
 
                         <div class="mb-4">
-                            <label for="DoctorID" class="block text-gray-700">Doctor:</label>
-                            <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.DoctorID">
+                            <label for="StartDate" class="block text-gray-700">Start Date:</label>
+                            <input id="StartDate" type="date" class="mt-1 block w-full" v-model="medicationsForm.StartDate" />
                         </div>
-                    
-                        <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-                    </form>            
-                -->   
+
+                        <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+                
 </div>
 </div>
 </AppLayout>

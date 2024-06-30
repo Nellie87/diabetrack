@@ -4,9 +4,11 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordVerificationController;
 use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
+use App\Http\Controllers\DietController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\GlucoseReadingController;
+use App\Http\Controllers\MedicationController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Models\Patient;
@@ -37,6 +39,8 @@ Route::middleware([
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/verify-password', [PasswordVerificationController::class, 'verify'])->name('verify-password');
     Route::post('/submit-form', [GlucoseReadingController::class, 'submit']);
+    Route::post('/submit-form2', [DietController::class, 'submit']);
+    Route::post('/submit-form3', [MedicationController::class, 'submit']);
 });
 
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])

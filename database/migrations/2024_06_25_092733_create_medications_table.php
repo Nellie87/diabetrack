@@ -16,10 +16,10 @@ return new class extends Migration
             $table->timestamps();
             $table->string('PatientID');
             $table->string('MedicationName');
-            $table->string('Dosage');
-            $table->string('Frequency');
+            $table->string('Type');
+            $table->integer('Dosage');
+            $table->integer('Frequency');
             $table->date('StartDate');
-            $table->date('EndDate')->nullable();
         });
     }
 
