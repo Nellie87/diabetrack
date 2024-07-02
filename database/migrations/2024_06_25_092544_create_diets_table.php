@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('DietID')->primary();
             $table->timestamps();
             $table->string('PatientID');
-            $table->date('Datetime');
+            $table->date('Date');
             $table->string('MealType');
             $table->text('FoodItems');
             $table->string('Carbohydrates');
