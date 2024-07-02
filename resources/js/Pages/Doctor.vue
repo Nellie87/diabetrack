@@ -165,10 +165,10 @@ console.log('Selected User:', selectedUser.value);
                 <div class="text-xl font-semibold mb-2">{{ user.name }}</div>
                 <div class="text-gray-600 mb-2">{{ user.email }}</div>
                 <div class="text-gray-600">ID: {{ user.id }}</div>
-                <div class="text-gray-600">Role: {{ user.role }}</div>
+                <!-- <div class="text-gray-600">Role: {{ user.role }}</div> -->
                 <div class="mt-4 flex justify-end">
                     <button @click="showUserDetails(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
-                        Show More
+                        View Data
                     </button>
                 </div>
             </div>
