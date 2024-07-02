@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRoleChanged;
+use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
@@ -68,4 +70,22 @@ public function index(Request $request)
         
         return response() -> json($userId);
         }
+        public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'role' => 'required|in:admin,patient,doctor', // Validate role input
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'password' => Hash::make($request->password ?? 'defaultpassword'), // Set default password if none provided
+        ]);
+
+        return response()->json(['success' => true, 'user' => $user]);
+    }
 }

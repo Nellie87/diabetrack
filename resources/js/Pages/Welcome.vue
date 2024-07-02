@@ -84,6 +84,7 @@ function handleImageError() {
 <div>
        <ServicesSection />
     </div>
+<!-- 
     <div>
     <SpecialitySection />
 </div>
@@ -92,7 +93,7 @@ function handleImageError() {
     </div>
     <div>
     <DoctorsSection />
-    </div>
+    </div> -->
     
   </div>
 

@@ -1,18 +1,13 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
-import GradientLineChart from "/resources/js/Components/Charts/GradientLineChart.vue";
-import TimelineList from "/resources/js/Components/TimelineList.vue";
-import TimelineItem from "/resources/js/Components/TimelineItem.vue";
-import { computed } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import { formatDate } from '@vueuse/core';
+import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
+import Modal from '@/Components/Modes.vue'; // Import the Modal component
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
-
 
 const props = defineProps({
     user: Object,
@@ -23,6 +18,10 @@ const password = ref('');
 
 let timeoutId = null;
 const lockTimeout = 300000; // 5 minutes in milliseconds
+
+const showModal = ref(false);
+const modalTitle = ref('');
+const modalMessage = ref('');
 
 // Lock screen function
 function lockScreen() {
@@ -107,10 +106,11 @@ async function submitglucoseReadingForm() {
 
         if (response.data.success) {
             alert('Form submitted successfully.');
+            checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
             glucoseReadingForm.value = {
                 Datetime: '',
-                GlucoseLevel:'',
-                Notes: '',                
+                GlucoseLevel: '',
+                Notes: '',
             };
         } else {
             alert('Submission failed. Please try again.');
@@ -170,6 +170,30 @@ const medicationsForm = ref({
 });
 
 async function submitmedicationForm() {
+function checkGlucoseLevel(level) {
+    if (level < 70) {
+        modalTitle.value = 'Low Glucose Level';
+        modalMessage.value = 'Your glucose level is low. Please consume fast-acting carbohydrates like juice or glucose tablets and recheck your levels.';
+    } else if (level >= 70 && level < 140) {
+        modalTitle.value = 'Normal Glucose Level';
+        modalMessage.value = 'Your glucose level is normal.';
+    } else {
+        modalTitle.value = 'High Glucose Level';
+        modalMessage.value = 'Your glucose level is high. Please consider adjusting your medication or diet, and consult your healthcare provider if needed.';
+    }
+    showModal.value = true;
+}
+
+const patientForm = ref({
+    PhoneNo: '',
+    Gender: '',
+    Address: '',
+    EmergencyContactName: '',
+    EmergencyContactPhone: '',
+    DoctorID: '',
+});
+
+async function submitpatientForm() {
     try {
         const formData = new FormData();
         Object.keys(medicationsForm.value).forEach(key => {
@@ -190,6 +214,14 @@ async function submitmedicationForm() {
                 Dosage: '',
                 Frequency: '',
                 StartDate: '',               
+
+patientForm.value = {
+                PhoneNo: '',
+                Gender: '',
+                Address: '',
+                EmergencyContactName: '',
+                EmergencyContactPhone: '',
+                DoctorID: '',
             };
         } else {
             alert('Submission failed. Please try again.');
@@ -200,12 +232,7 @@ async function submitmedicationForm() {
     }
 }
 
-
-
-
 </script>
-
-
 
 <template>
     <AppLayout title="Dashboard">
@@ -216,7 +243,6 @@ async function submitmedicationForm() {
         </template>
 
         <!-- Main content -->
-         <!--
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -225,104 +251,19 @@ async function submitmedicationForm() {
             </div>
         </div>
 
-        <div class="col-lg-7">
-        
-        <div class="col-lg-4 col-md-6">
-        <timeline-list
-          class="h-100"
-          title="Orders overview"
-          description="<i class='fa fa-arrow-up text-success' aria-hidden='true'></i>
-        <span class='font-weight-bold'>24%</span> this month"
-        >
-          <timeline-item
-            color="success"
-            icon="bell-55"
-            title="$2400 Design changes"
-            date-time="22 DEC 7:20 PM"
-          />
-          <TimelineItem
-            color="danger"
-            icon="html5"
-            title="New order #1832412"
-            date-time="21 DEC 11 PM"
-          />
-          <TimelineItem
-            color="info"
-            icon="cart"
-            title="Server payments for April"
-            date-time="21 DEC 9:34 PM"
-          />
-          <TimelineItem
-            color="warning"
-            icon="credit-card"
-            title="New card added for order #4395133"
-            date-time="20 DEC 2:20 AM"
-          />
-          <TimelineItem
-            color="primary"
-            icon="key-25"
-            title="Unlock packages for development"
-            date-time="18 DEC 4:54 AM"
-          />
-          <TimelineItem
-            color="info"
-            icon="check-bold"
-            title="Notifications unread"
-            date-time="15 DEC"
-          />
-        </timeline-list>
-      </div>
-    -->
-        <!-- 
-        <div class="card z-index-2">
-          <gradient-line-chart
-            id="chart-line"
-            title="Gradient Line Chart"
-            description="<i class='fa fa-arrow-up text-success'></i>
-      <span class='font-weight-bold'>4% more</span> in 2021"
-            :chart="{
-              labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              datasets: [
-                {
-                  label: 'Mobile Apps',
-                  data: [0, 0, 0, 0, 0, 0,],
-                },
-              ],
-            }"
-          />
-        </div>
-    
-      </div>
-    -->
-      
-       
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
             <div>
-                <form @submit.prevent="submitForm">
-
+                <form @submit.prevent="submitglucoseReadingForm">
+                    <div class="mb-4">
+                        <label for="Date" class="block text-gray-700">Date:</label>
+                        <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
+                    </div>
 
                     <div class="mb-4">
-                            <label for="Date" class="block text-gray-700">Date:</label>
-                            <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
-                        </div>
-
-
-                    <div class="mb-4">
-                            <label for="GlucoseReading" class="block text-gray-700">GlucoseReading:</label>
-                            <input id="GlucoseLevel" type="number" min="0" max="1000" class="mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
-                        </div>
+                        <label for="GlucoseReading" class="block text-gray-700">Glucose Reading:</label>
+                        <input id="GlucoseLevel" type="number" min="0" max="1000" class="mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
+                    </div>
                         
-
                     <div class="mb-4">
                             <label for="Notes" class="block text-gray-700">Notes:</label>
                             <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
@@ -432,8 +373,35 @@ async function submitmedicationForm() {
 </div>
 </AppLayout>
 
-</template>
+                        <label for="Notes" class="block text-gray-700">Notes:</label>
+                        <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
+                    </div>
 
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+                </form>
+
+                <gradient-line-chart
+                    id="chart-line"
+                    title="Sugar Levels Overview"
+                    apiUrl="http://127.0.0.1:8000/chart-data"
+                    description="<i class='fa fa-arrow-up text-success'></i>
+                    <span class='font-weight-bold'>4% more</span> in 2021"
+                    :chart="{
+                        labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                        datasets: [{ label: 'Mobile Apps', data: [0, 0, 0, 0, 0, 0] }]
+                    }"
+                />
+            </div>
+        </div>
+        
+        <modal
+            :show="showModal"
+            :title="modalTitle"
+            :message="modalMessage"
+            @close="showModal = false"
+        />
+    </AppLayout>
+</template>
 
 <style>
 .blur {

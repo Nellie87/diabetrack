@@ -14,6 +14,9 @@ import ChartOne from '/resources/js/Components/Charts/ChartOne.vue'
 import ChartThree from '/resources/js/Components/Charts/ChartThree.vue'
 import ChartTwo from '/resources/js/Components/Charts/ChartTwo.vue'
 
+import UserForm from '/resources/js/Components/UserForm.vue';
+
+
 const isLocked = ref(false);
 const password = ref('');
 
@@ -110,20 +113,27 @@ onMounted(() => {
     <div class="">
       <DataStatsOne />
     </div>
+    <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
+                    <UserForm />
+                </div>
+            </div>
+        </div>
 
     <!-- <div class="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5"> -->
-<div>
+
             <!-- ====== Chart One Start -->
       <ChartOne />
       <!-- ====== Chart One End -->
-</div>
-<div>
+
+<!-- <div> -->
       <!-- ====== Chart Two Start -->
-      <ChartTwo />
+      <!-- <ChartTwo /> -->
       <!-- ====== Chart Two End -->
 
       <!-- ====== Chart Three Start -->
-      <ChartThree />
+      <!-- <ChartThree /> -->
       <!-- ====== Chart Three End -->
 
      
@@ -131,7 +141,7 @@ onMounted(() => {
 
 
     
-    </div>
+    <!-- </div> -->
   </DefaultLayout>
     </AppLayout>
 </template>
