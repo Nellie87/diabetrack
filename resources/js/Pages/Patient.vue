@@ -4,7 +4,7 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
-import Modal from '@/Components/Modes.vue'; // Import the Modal component
+import Modal from '@/Components/Modal.vue'; // Import the Modal component
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -169,7 +169,6 @@ const medicationsForm = ref({
     StartDate: '',
 });
 
-async function submitmedicationForm() {
 function checkGlucoseLevel(level) {
     if (level < 70) {
         modalTitle.value = 'Low Glucose Level';
@@ -193,7 +192,7 @@ const patientForm = ref({
     DoctorID: '',
 });
 
-async function submitpatientForm() {
+async function submitmedicationForm() {
     try {
         const formData = new FormData();
         Object.keys(medicationsForm.value).forEach(key => {
@@ -213,9 +212,33 @@ async function submitpatientForm() {
                 Type: '',
                 Dosage: '',
                 Frequency: '',
-                StartDate: '',               
+                StartDate: '',
+            };
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+}
 
-patientForm.value = {
+async function submitpatientForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(patientForm.value).forEach(key => {
+            formData.append(key, patientForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form4', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            patientForm.value = {
                 PhoneNo: '',
                 Gender: '',
                 Address: '',
@@ -253,6 +276,7 @@ patientForm.value = {
 
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
             <div>
+
                 <form @submit.prevent="submitglucoseReadingForm">
                     <div class="mb-4">
                         <label for="Date" class="block text-gray-700">Date:</label>
@@ -272,7 +296,8 @@ patientForm.value = {
                         <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
                     </form>
-
+</div>
+</div>
           <gradient-line-chart
             id="chart-line"
             title="Sugar Levels Overview"
@@ -280,132 +305,123 @@ patientForm.value = {
             description="<i class='fa fa-arrow-up text-success'></i>
       <span class='font-weight-bold'>4% more</span> in 2021"
             :chart="{
-              labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              datasets: [
-                {
-                  label: 'Mobile Apps',
-                  data: [0, 0, 0, 0, 0, 0,],
-                },
-              ],
+              labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+              datasets: [{
+                label: 'My First dataset',
+                data: [65, 59, 80, 81, 56, 55],
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                lineTension: 0.1
+              }]
             }"
           />
+          <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
+          <!-- Modal usage example -->
 
-           <form @submit.prevent="submitForm">
+        <div>
+          <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <h2 class="text-xl font-semibold mb-4">Form Example</h2>
+            <form @submit.prevent="submitdietForm">
+              <div class="mb-4">
+                <label for="Date" class="block text-gray-700">Date:</label>
+                <input id="Date" type="date" class="mt-1 block w-full" v-model="dietForm.Date" />
+              </div>
 
+              <div class="mb-4">
+                <label for="MealType" class="block text-gray-700">Meal Type:</label>
+                <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
+              </div>
 
-                    <div class="mb-4">
-                            <label for="Date" class="block text-gray-700">Date:</label>
-                            <input id="Date" type="Date" class="mt-1 block w-full" v-model="dietForm.Date" />
-                        </div>
+              <div class="mb-4">
+                <label for="FoodItems" class="block text-gray-700">Food Items:</label>
+                <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
+              </div>
 
+              <div class="mb-4">
+                <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
+                <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
+              </div>
 
-                    <div class="mb-4">
-                            <label for="MealType" class="block text-gray-700">Meal Type:</label>
-                            <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
-                        </div>
-                        
+              <div class="mb-4">
+                <label for="Notes" class="block text-gray-700">Notes:</label>
+                <input id="Notes" type="text" class="mt-1 block w-full" v-model="dietForm.Notes" />
+              </div>
 
-                    <div class="mb-4">
-                            <label for="FoodItems" class="block text-gray-700">Food Items:</label>
-                            <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
-                        </div>
-
-                    <div class="mb-4">
-                            <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
-                            <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="Notes" class="block text-gray-700">Notes:</label>
-                            <input id="Notes" type="text" class="mt-1 block w-full" v-model="dietForm.Notes" />
-                        </div>
-
-                        <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-
-                    </form>
-
-
-                    <form @submit.prevent="submitForm">
-
-
-                    <div class="mb-4">
-                            <label for="MedicationName" class="block text-gray-700">Medicine Name:</label>
-                            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
-                        </div>
-
-
-                    <div class="mb-4">
-                            <label for="Type" class="block text-gray-700">Type:</label>
-                            <input id="Type" type="text" class="mt-1 block w-full" v-model="medicationsForm.Type" />
-                        </div>
-                        
-
-                    <div class="mb-4">
-                            <label for="Dosage" class="block text-gray-700">Amount taken in one dose:</label>
-                            <input id="Dosage" type="number" class="mt-1 block w-full" v-model="medicationsForm.Dosage" />
-                        </div>
-
-                    <div class="mb-4">
-                            <label for="Frequency" class="block text-gray-700">Frequency:</label>
-                            <input id="Frequency" type="number" class="mt-1 block w-full" v-model="medicationsForm.Frequency" />
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="StartDate" class="block text-gray-700">Start Date:</label>
-                            <input id="StartDate" type="date" class="mt-1 block w-full" v-model="medicationsForm.StartDate" />
-                        </div>
-
-                        <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-
-                    </form>
-                
-</div>
-</div>
-</AppLayout>
-
-                        <label for="Notes" class="block text-gray-700">Notes:</label>
-                        <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
-                    </div>
-
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-                </form>
-
-                <gradient-line-chart
-                    id="chart-line"
-                    title="Sugar Levels Overview"
-                    apiUrl="http://127.0.0.1:8000/chart-data"
-                    description="<i class='fa fa-arrow-up text-success'></i>
-                    <span class='font-weight-bold'>4% more</span> in 2021"
-                    :chart="{
-                        labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{ label: 'Mobile Apps', data: [0, 0, 0, 0, 0, 0] }]
-                    }"
-                />
-            </div>
+              <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+            </form>
+          </div>
         </div>
-        
-        <modal
-            :show="showModal"
-            :title="modalTitle"
-            :message="modalMessage"
-            @close="showModal = false"
-        />
+        <!-- end of modal -->
+      
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+        <h2 class="text-xl font-semibold mb-4">Patient Medication Form</h2>
+        <form @submit.prevent="submitmedicationForm">
+          <div class="mb-4">
+            <label for="MedicationName" class="block text-gray-700">Medication Name:</label>
+            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="Type" class="block text-gray-700">Type:</label>
+            <input id="Type" type="text" class="mt-1 block w-full" v-model="medicationsForm.Type" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="Dosage" class="block text-gray-700">Dosage:</label>
+            <input id="Dosage" type="text" class="mt-1 block w-full" v-model="medicationsForm.Dosage" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="Frequency" class="block text-gray-700">Frequency:</label>
+            <input id="Frequency" type="text" class="mt-1 block w-full" v-model="medicationsForm.Frequency" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="StartDate" class="block text-gray-700">Start Date:</label>
+            <input id="StartDate" type="date" class="mt-1 block w-full" v-model="medicationsForm.StartDate" />
+          </div>
+      
+          <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+        </form>
+      </div>
+        <!-- end of modal -->
+      
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+          <h2 class="text-xl font-semibold mb-4">Patient Information Form</h2>
+          <form @submit.prevent="submitpatientForm">
+            <div class="mb-4">
+              <label for="PhoneNo" class="block text-gray-700">Phone Number:</label>
+              <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.PhoneNo" />
+            </div>
+      
+            <div class="mb-4">
+              <label for="Gender" class="block text-gray-700">Gender:</label>
+              <input id="Gender" type="text" class="mt-1 block w-full" v-model="patientForm.Gender" />
+            </div>
+      
+            <div class="mb-4">
+              <label for="Address" class="block text-gray-700">Address:</label>
+              <input id="Address" type="text" class="mt-1 block w-full" v-model="patientForm.Address" />
+            </div>
+      
+            <div class="mb-4">
+              <label for="EmergencyContactName" class="block text-gray-700">Emergency Contact Name:</label>
+              <input id="EmergencyContactName" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactName" />
+            </div>
+      
+            <div class="mb-4">
+              <label for="EmergencyContactPhone" class="block text-gray-700">Emergency Contact Phone:</label>
+              <input id="EmergencyContactPhone" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactPhone" />
+            </div>
+      
+            <div class="mb-4">
+              <label for="DoctorID" class="block text-gray-700">Doctor ID:</label>
+              <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.DoctorID" />
+            </div>
+      
+            <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+          </form>
+        </div>
+        <!-- end of modal -->
     </AppLayout>
 </template>
-
-<style>
-.blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
-}
-</style>
