@@ -15,7 +15,7 @@
 <script>
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
-import { parse, format } from 'date-fns';
+import { parse } from 'date-fns';
 
 Chart.register(...registerables);
 
@@ -89,6 +89,10 @@ export default {
               y: item.GlucoseLevel,
             });
           });
+
+          // Sort the data by date
+          chartData.labels.sort((a, b) => a - b);
+          chartData.datasets[0].data.sort((a, b) => a.x - b.x);
 
           this.chartData = chartData;
           this.renderChart();
@@ -176,7 +180,6 @@ export default {
                   quarter: '[Q]Q - YYYY', // Display format for quarter (e.g., 'Q3 - 2023')
                   year: 'YYYY', // Display format for year
                 },
-               
               },
               grid: {
                 drawBorder: false,
@@ -204,5 +207,3 @@ export default {
   },
 };
 </script>
-
-
