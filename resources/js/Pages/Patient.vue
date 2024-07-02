@@ -105,6 +105,7 @@ async function submitglucoseReadingForm() {
         });
 
         if (response.data.success) {
+            alert('Form submitted successfully.');
             checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
             glucoseReadingForm.value = {
                 Datetime: '',
@@ -120,6 +121,55 @@ async function submitglucoseReadingForm() {
     }
 }
 
+const dietForm = ref({
+    Date: '',
+    MealType: '',
+    FoodItems: '',
+    Carbohydrates: '',
+    Notes: '',
+});
+
+async function submitdietForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(dietForm.value).forEach(key => {
+            formData.append(key, dietForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form2', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            dietForm.value = {
+                Date: '',
+                MealType: '',
+                FoodItems: '',
+                Carbohydrates: '',
+                Notes: '',               
+            };
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+
+}
+
+const medicationsForm = ref({
+    MedicationName: '',
+    Type: '',
+    Dosage: '',
+    Frequency: '',
+    StartDate: '',
+});
+
+async function submitmedicationForm() {
 function checkGlucoseLevel(level) {
     if (level < 70) {
         modalTitle.value = 'Low Glucose Level';
@@ -146,11 +196,11 @@ const patientForm = ref({
 async function submitpatientForm() {
     try {
         const formData = new FormData();
-        Object.keys(patientForm.value).forEach(key => {
-            formData.append(key, patientForm.value[key]);
+        Object.keys(medicationsForm.value).forEach(key => {
+            formData.append(key, medicationsForm.value[key]);
         });
 
-        const response = await axios.post('/api/submit-form', formData, {
+        const response = await axios.post('/submit-form3', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -158,7 +208,14 @@ async function submitpatientForm() {
 
         if (response.data.success) {
             alert('Form submitted successfully.');
-            patientForm.value = {
+            medicationsForm.value = {
+                MedicationName: '',
+                Type: '',
+                Dosage: '',
+                Frequency: '',
+                StartDate: '',               
+
+patientForm.value = {
                 PhoneNo: '',
                 Gender: '',
                 Address: '',
@@ -174,6 +231,7 @@ async function submitpatientForm() {
         alert('An error occurred while submitting the form. Please try again.');
     }
 }
+
 </script>
 
 <template>
@@ -207,6 +265,114 @@ async function submitpatientForm() {
                     </div>
                         
                     <div class="mb-4">
+                            <label for="Notes" class="block text-gray-700">Notes:</label>
+                            <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
+                        </div>
+
+                        <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+
+          <gradient-line-chart
+            id="chart-line"
+            title="Sugar Levels Overview"
+            apiUrl="http://127.0.0.1:8000/chart-data"
+            description="<i class='fa fa-arrow-up text-success'></i>
+      <span class='font-weight-bold'>4% more</span> in 2021"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
+
+           <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="Date" class="block text-gray-700">Date:</label>
+                            <input id="Date" type="Date" class="mt-1 block w-full" v-model="dietForm.Date" />
+                        </div>
+
+
+                    <div class="mb-4">
+                            <label for="MealType" class="block text-gray-700">Meal Type:</label>
+                            <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
+                        </div>
+                        
+
+                    <div class="mb-4">
+                            <label for="FoodItems" class="block text-gray-700">Food Items:</label>
+                            <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
+                        </div>
+
+                    <div class="mb-4">
+                            <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
+                            <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="Notes" class="block text-gray-700">Notes:</label>
+                            <input id="Notes" type="text" class="mt-1 block w-full" v-model="dietForm.Notes" />
+                        </div>
+
+                        <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+
+
+                    <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="MedicationName" class="block text-gray-700">Medicine Name:</label>
+                            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
+                        </div>
+
+
+                    <div class="mb-4">
+                            <label for="Type" class="block text-gray-700">Type:</label>
+                            <input id="Type" type="text" class="mt-1 block w-full" v-model="medicationsForm.Type" />
+                        </div>
+                        
+
+                    <div class="mb-4">
+                            <label for="Dosage" class="block text-gray-700">Amount taken in one dose:</label>
+                            <input id="Dosage" type="number" class="mt-1 block w-full" v-model="medicationsForm.Dosage" />
+                        </div>
+
+                    <div class="mb-4">
+                            <label for="Frequency" class="block text-gray-700">Frequency:</label>
+                            <input id="Frequency" type="number" class="mt-1 block w-full" v-model="medicationsForm.Frequency" />
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="StartDate" class="block text-gray-700">Start Date:</label>
+                            <input id="StartDate" type="date" class="mt-1 block w-full" v-model="medicationsForm.StartDate" />
+                        </div>
+
+                        <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+                
+</div>
+</div>
+</AppLayout>
+
                         <label for="Notes" class="block text-gray-700">Notes:</label>
                         <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
                     </div>

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('diet', function (Blueprint $table) {
+        Schema::create('diets', function (Blueprint $table) {
             $table->id('DietID')->primary();
             $table->timestamps();
             $table->string('PatientID');
-            $table->date('Date');
-            $table->string('MenuType');
+            $table->date('Datetime');
+            $table->string('MealType');
             $table->text('FoodItems');
             $table->string('Carbohydrates');
             $table->text('Notes')->nullable();
