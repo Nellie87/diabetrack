@@ -125,6 +125,14 @@ export default {
           datasets: this.chartData.datasets.map((dataset) => ({
             ...dataset,
             backgroundColor: gradientStroke1,
+            tension: 0.1,
+            borderWidth: 0,
+            pointRadius: 0,
+            borderColor: "#cb0c9f",
+            // eslint-disable-next-line no-dupe-keys
+            borderWidth: 3,
+            maxBarThickness: 6,
+            fill: true,
           })),
         },
         options: {
