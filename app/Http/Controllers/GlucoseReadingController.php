@@ -35,23 +35,25 @@ class GlucoseReadingController extends Controller
     }
 
     public function getData()
-    {
-        $user = Auth::user();
-        $userId = $user->id;
-    
-        $readings = glucose_reading::where('PatientID', $userId)
-            ->select('GlucoseLevel', 'Datetime')
-            ->orderBy('Datetime', 'asc') // Order by Datetime in ascending order
-            ->get();
-    
-        $formattedData = $readings->map(function($reading) {
-            return [
-                'GlucoseLevel' => $reading->GlucoseLevel,
-                'Datetime' => Carbon::parse($reading->Datetime)->format('m-d H:i'),
-            ];
-        });
-    
-        // Return the formatted data as a JSON response
-        return response()->json($formattedData);
-    }
+{
+    $user = Auth::user();
+    $userId = $user->id;
+
+    // Select all fields ('*') instead of just 'GlucoseLevel' and 'Datetime'
+    $readings = glucose_reading::where('PatientID', $userId)
+        ->orderBy('Datetime', 'asc')
+        ->get();
+
+    $formattedData = $readings->map(function($reading) {
+        return [
+            'GlucoseLevel' => $reading->GlucoseLevel,
+            'Datetime' => Carbon::parse($reading->Datetime)->format('m-d H:i'),
+            'Notes' => $reading->Notes, // Include 'Notes' field in the response
+        ];
+    });
+
+    // Return the formatted data as a JSON response
+    return response()->json($formattedData);
+}
+
 }

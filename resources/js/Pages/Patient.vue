@@ -6,6 +6,7 @@ import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
 // import Modal from '@/Components/Modal.vue'; // Import the Modal component
 import Modal from '@/Components/Modes.vue'; // Import the Modal component
+import GlucoseReadingTable from '@/Components/Tables/GlucoseReadingTable.vue';
 
 
 const page = usePage();
@@ -270,6 +271,31 @@ const activeTab = ref('glucoseReading');
 function changeTab(tab) {
     activeTab.value = tab;
 }
+
+const glucoseReadings = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+const fetchGlucoseReadings = () => {
+  loading.value = true;
+  axios.get('/glucose/readings')
+    .then(response => {
+      glucoseReadings.value = response.data;
+      error.value = null; // Clear any previous errors
+    })
+    .catch(err => {
+      console.error('Error fetching glucose readings:', err);
+      error.value = 'Failed to fetch glucose readings. Please try again later.';
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+// import { onMounted } from 'vue';
+onMounted(fetchGlucoseReadings);
+
+{ glucoseReadings, loading, error }
 </script>
 
 <template>
@@ -349,6 +375,10 @@ function changeTab(tab) {
           <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
           <!-- Modal usage example -->
            </div>
+           <div>
+    <h2 class="text-lg font-bold mb-4">Glucose Readings</h2>
+    <glucose-reading-table :glucose-readings="glucoseReadings" />
+  </div>
                         </div>
 
                         <!-- Diet Form -->
