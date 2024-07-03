@@ -213,7 +213,8 @@ async function submitpatientForm() {
                 Type: '',
                 Dosage: '',
                 Frequency: '',
-                StartDate: '',               
+                StartDate: '',    
+            }           
 
 patientForm.value = {
                 PhoneNo: '',
@@ -230,7 +231,7 @@ patientForm.value = {
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form. Please try again.');
     }
-}
+}};
 
 </script>
 
@@ -373,34 +374,6 @@ patientForm.value = {
 </div>
 </AppLayout>
 
-                        <label for="Notes" class="block text-gray-700">Notes:</label>
-                        <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
-                    </div>
-
-                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-                </form>
-
-                <gradient-line-chart
-                    id="chart-line"
-                    title="Sugar Levels Overview"
-                    apiUrl="http://127.0.0.1:8000/chart-data"
-                    description="<i class='fa fa-arrow-up text-success'></i>
-                    <span class='font-weight-bold'>4% more</span> in 2021"
-                    :chart="{
-                        labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{ label: 'Mobile Apps', data: [0, 0, 0, 0, 0, 0] }]
-                    }"
-                />
-            </div>
-        </div>
-        
-        <modal
-            :show="showModal"
-            :title="modalTitle"
-            :message="modalMessage"
-            @close="showModal = false"
-        />
-    </AppLayout>
 </template>
 
 <style>
