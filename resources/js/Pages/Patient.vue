@@ -255,29 +255,51 @@ async function submitpatientForm() {
     }
 }
 
+// Active tab state
+const activeTab = ref('glucoseReading');
+
+// Function to change the active tab
+function changeTab(tab) {
+    activeTab.value = tab;
+}
 </script>
 
 <template>
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Patient 
+                Patient Forms
             </h2>
         </template>
+
+        <!-- Navigation bar -->
+        <div class="py-4 bg-gray-100">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex space-x-4">
+                <button @click="changeTab('glucoseReading')" :class="{ 'bg-blue-500 text-white': activeTab === 'glucoseReading', 'bg-white text-gray-800': activeTab !== 'glucoseReading' }" class="px-4 py-2 rounded">
+                    Glucose Reading
+                </button>
+                <button @click="changeTab('diet')" :class="{ 'bg-blue-500 text-white': activeTab === 'diet', 'bg-white text-gray-800': activeTab !== 'diet' }" class="px-4 py-2 rounded">
+                    Diet
+                </button>
+                <button @click="changeTab('medication')" :class="{ 'bg-blue-500 text-white': activeTab === 'medication', 'bg-white text-gray-800': activeTab !== 'medication' }" class="px-4 py-2 rounded">
+                    Medication
+                </button>
+                <button @click="changeTab('patient')" :class="{ 'bg-blue-500 text-white': activeTab === 'patient', 'bg-white text-gray-800': activeTab !== 'patient' }" class="px-4 py-2 rounded">
+                    Patient Info
+                </button>
+            </div>
+        </div>
 
         <!-- Main content -->
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <Welcome />
-                </div>
-            </div>
-        </div>
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
 
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
-            <div>
-
-                <form @submit.prevent="submitglucoseReadingForm">
+                        <!-- Glucose Reading Form -->
+                        <div v-show="activeTab === 'glucoseReading'">
+                            <h3 class="text-lg font-semibold mb-4">Glucose Reading Form</h3>
+                            <form @submit.prevent="submitglucoseReadingForm">
                     <div class="mb-4">
                         <label for="Date" class="block text-gray-700">Date:</label>
                         <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
@@ -296,14 +318,13 @@ async function submitpatientForm() {
                         <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
                     </form>
-</div>
-</div>
-          <gradient-line-chart
+                    <div>
+                    <gradient-line-chart
             id="chart-line"
             title="Sugar Levels Overview"
             apiUrl="http://127.0.0.1:8000/chart-data"
             description="<i class='fa fa-arrow-up text-success'></i>
-      <span class='font-weight-bold'>4% more</span> in 2021"
+      <span class='font-weight-bold'></span> "
             :chart="{
               labels: ['January', 'February', 'March', 'April', 'May', 'June'],
               datasets: [{
@@ -317,11 +338,13 @@ async function submitpatientForm() {
           />
           <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
           <!-- Modal usage example -->
+           </div>
+                        </div>
 
-        <div>
-          <div class="bg-white rounded-lg shadow-md p-6 mb-4">
-            <h2 class="text-xl font-semibold mb-4">Form Example</h2>
-            <form @submit.prevent="submitdietForm">
+                        <!-- Diet Form -->
+                        <div v-show="activeTab === 'diet'">
+                            <h3 class="text-lg font-semibold mb-4">Diet Form</h3>
+                            <form @submit.prevent="submitdietForm">
               <div class="mb-4">
                 <label for="Date" class="block text-gray-700">Date:</label>
                 <input id="Date" type="date" class="mt-1 block w-full" v-model="dietForm.Date" />
@@ -349,13 +372,12 @@ async function submitpatientForm() {
 
               <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
             </form>
-          </div>
-        </div>
-        <!-- end of modal -->
-      
-        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
-        <h2 class="text-xl font-semibold mb-4">Patient Medication Form</h2>
-        <form @submit.prevent="submitmedicationForm">
+                        </div>
+
+                        <!-- Medication Form -->
+                        <div v-show="activeTab === 'medication'">
+                            <h3 class="text-lg font-semibold mb-4">Medication Form</h3>
+                            <form @submit.prevent="submitmedicationForm">
           <div class="mb-4">
             <label for="MedicationName" class="block text-gray-700">Medication Name:</label>
             <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
@@ -383,13 +405,14 @@ async function submitpatientForm() {
       
           <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
         </form>
-      </div>
-        <!-- end of modal -->
-      
-        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
-          <h2 class="text-xl font-semibold mb-4">Patient Information Form</h2>
-          <form @submit.prevent="submitpatientForm">
-            <div class="mb-4">
+                        </div>
+
+                        <!-- Patient Form -->
+                        <div v-show="activeTab === 'patient'">
+                            <h3 class="text-lg font-semibold mb-4">Patient Information Form</h3>
+                            <form @submit.prevent="submitpatientForm">
+
+                            <div class="mb-4">
               <label for="PhoneNo" class="block text-gray-700">Phone Number:</label>
               <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.PhoneNo" />
             </div>
@@ -421,7 +444,29 @@ async function submitpatientForm() {
       
             <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
           </form>
+                        </div>
+
+                        <!-- Lock Screen Modal -->
+                        <div v-show="isLocked" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
+                            <div class="bg-white p-6 rounded-lg shadow-lg">
+                                <h3 class="text-lg font-semibold mb-4">Screen Locked</h3>
+                                <p class="mb-4">Enter your password to unlock the screen.</p>
+                                <input v-model="password" type="password" placeholder="Password" class="mb-4 p-2 border border-gray-300 rounded" />
+                                <button @click="unlock" class="px-4 py-2 bg-blue-500 text-white rounded">Unlock</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- end of modal -->
+
+        <!-- Modal Component for glucose level messages -->
+        <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false"></Modal>
     </AppLayout>
 </template>
+
+<style scoped>
+.blur {
+    filter: blur(4px);
+}
+</style>
