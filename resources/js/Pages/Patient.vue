@@ -174,6 +174,7 @@ const medicationsForm = ref({
 
 
 
+
 async function submitmedicationForm() {
     try {
         const formData = new FormData();
@@ -203,6 +204,7 @@ async function submitmedicationForm() {
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form. Please try again.');
     }
+    
 };
 
 </script>
@@ -216,7 +218,12 @@ async function submitmedicationForm() {
             </h2>
         </template>
         <!-- Main content -->
-        
+        <div id="app">
+    <button @click="toggleSideNav" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Toggle Notifications</button>
+    
+    <!-- Include the NotificationsSideNav component -->
+    <NotificationsPanel v-if="toggleSideNav" />
+  </div>
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">              
             <div>
                 
