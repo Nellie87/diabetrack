@@ -4,6 +4,8 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
+import BarChart from '/resources/js/Components/Charts/BarChart.vue';
+import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
 import Modal from '@/Components/Modes.vue'; // Import the Modal component
 
 const page = usePage();
@@ -106,8 +108,7 @@ async function submitglucoseReadingForm() {
 
         if (response.data.success) {
             alert('Form submitted successfully.');
-            checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
-            glucoseReadingForm.value = {
+                glucoseReadingForm.value = {
                 Datetime: '',
                 GlucoseLevel: '',
                 Notes: '',
@@ -169,31 +170,9 @@ const medicationsForm = ref({
     StartDate: '',
 });
 
+
+
 async function submitmedicationForm() {
-function checkGlucoseLevel(level) {
-    if (level < 70) {
-        modalTitle.value = 'Low Glucose Level';
-        modalMessage.value = 'Your glucose level is low. Please consume fast-acting carbohydrates like juice or glucose tablets and recheck your levels.';
-    } else if (level >= 70 && level < 140) {
-        modalTitle.value = 'Normal Glucose Level';
-        modalMessage.value = 'Your glucose level is normal.';
-    } else {
-        modalTitle.value = 'High Glucose Level';
-        modalMessage.value = 'Your glucose level is high. Please consider adjusting your medication or diet, and consult your healthcare provider if needed.';
-    }
-    showModal.value = true;
-}
-
-const patientForm = ref({
-    PhoneNo: '',
-    Gender: '',
-    Address: '',
-    EmergencyContactName: '',
-    EmergencyContactPhone: '',
-    DoctorID: '',
-});
-
-async function submitpatientForm() {
     try {
         const formData = new FormData();
         Object.keys(medicationsForm.value).forEach(key => {
@@ -215,15 +194,6 @@ async function submitpatientForm() {
                 Frequency: '',
                 StartDate: '',    
             }           
-
-patientForm.value = {
-                PhoneNo: '',
-                Gender: '',
-                Address: '',
-                EmergencyContactName: '',
-                EmergencyContactPhone: '',
-                DoctorID: '',
-            };
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -231,7 +201,7 @@ patientForm.value = {
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form. Please try again.');
     }
-}};
+};
 
 </script>
 
@@ -244,17 +214,10 @@ patientForm.value = {
         </template>
 
         <!-- Main content -->
-        <div :class="{ 'blur': isLocked }" class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <Welcome />
-                </div>
-            </div>
-        </div>
-
+        
         <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
             <div>
-                <form @submit.prevent="submitglucoseReadingForm">
+                <form @submit.prevent="submitForm">
                     <div class="mb-4">
                         <label for="Date" class="block text-gray-700">Date:</label>
                         <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
@@ -278,8 +241,6 @@ patientForm.value = {
             id="chart-line"
             title="Sugar Levels Overview"
             apiUrl="http://127.0.0.1:8000/chart-data"
-            description="<i class='fa fa-arrow-up text-success'></i>
-      <span class='font-weight-bold'>4% more</span> in 2021"
             :chart="{
               labels: [
                 'Apr',
@@ -335,6 +296,31 @@ patientForm.value = {
 
                     </form>
 
+                    <BarChart
+            id="chart-bar"
+            title="Carbs Overview"
+            apiUrl="http://127.0.0.1:8000/chart-datas"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
+
 
                     <form @submit.prevent="submitForm">
 
@@ -369,6 +355,31 @@ patientForm.value = {
                         <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
                     </form>
+
+                    <ProgressDoughnutChart
+            id="chart-circle"
+            title="Carbs Overview"
+            apiUrl="http://127.0.0.1:8000/chart-datas1"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
                 
 </div>
 </div>

@@ -34,4 +34,30 @@ class DietController extends Controller
         
         return response()->json(['success' => 'Form submitted successfully!', 'diet' => $diet]);
     }
+
+    public function getData()
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+    
+        $readings = Diet::where('PatientID', $userId)
+            ->select('Carbohydrates','Date')
+            ->get();
+    
+        // Map to convert carbohydrate names to specified values
+        $carbMapping = [
+            'Bread' => 233,
+            'Rice' => 533,
+        ];
+    
+        // Transform the readings
+        $transformedReadings = $readings->map(function ($item) use ($carbMapping) {
+            $carbName = $item->Carbohydrates;
+            $item->GlucoseConsumed = $carbMapping[$carbName] ?? null;
+            return $item;
+        });
+    
+        return response()->json($transformedReadings);
+    }
+    
 }

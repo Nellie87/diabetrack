@@ -34,4 +34,23 @@ class MedicationController extends Controller
         // Optionally, return a JSON response
         return response()->json(['success' => 'Form submitted successfully!', 'diet' => $diet]);
     }
+
+    public function getData()
+    {
+        $user = Auth::user();
+        $userId = $user->id;
+    
+        $readings = Medication::where('PatientID', $userId)
+            ->select('Dosage', 'Frequency')
+            ->get();
+    
+        $formattedData = $readings->map(function($reading) {
+            return [
+                'task_name' => $reading->Dosage,
+                'progress' => $reading->Frequency,
+            ];
+        });
+    
+        return response()->json($formattedData);
+    }
 }
