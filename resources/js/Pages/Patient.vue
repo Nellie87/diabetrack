@@ -6,6 +6,8 @@ import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
 import BarChart from '/resources/js/Components/Charts/BarChart.vue';
 import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
+import ProgressBar from '/resources/js/Components/ProgressBar.vue';
+import NotificationsPanel from '/resources/js/Components/NotificationPanel.vue';
 import Modal from '@/Components/Modes.vue'; // Import the Modal component
 
 const page = usePage();
@@ -207,16 +209,17 @@ async function submitmedicationForm() {
 
 <template>
     <AppLayout title="Dashboard">
+        <NotificationsPanel/>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Patient 
             </h2>
         </template>
-
         <!-- Main content -->
         
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">                
+        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">              
             <div>
+                
                 <form @submit.prevent="submitForm">
                     <div class="mb-4">
                         <label for="Date" class="block text-gray-700">Date:</label>
@@ -261,6 +264,8 @@ async function submitmedicationForm() {
               ],
             }"
           />
+        
+        
 
            <form @submit.prevent="submitForm">
 
@@ -380,11 +385,13 @@ async function submitmedicationForm() {
               ],
             }"
           />
+
+          <ProgressBar/>
                 
 </div>
 </div>
-</AppLayout>
 
+</AppLayout>
 </template>
 
 <style>
