@@ -190,7 +190,7 @@ console.log('Selected User:', selectedUser.value);
                     title="Sugar Levels Overview"
                     apiUrl="http://127.0.0.1:8000/chart-data"
                     description="<i class='fa fa-arrow-up text-success'></i>
-                    <span class='font-weight-bold'>4% more</span> in 2021"
+                    <span class='font-weight-bold'> </span> "
                     :chart="{
                         labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         datasets: [{ label: 'Mobile Apps', data: [0, 0, 0, 0, 0, 0] }]

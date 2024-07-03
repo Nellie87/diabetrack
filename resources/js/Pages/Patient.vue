@@ -4,7 +4,9 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
-import Modal from '@/Components/Modal.vue'; // Import the Modal component
+// import Modal from '@/Components/Modal.vue'; // Import the Modal component
+import Modal from '@/Components/Modes.vue'; // Import the Modal component
+
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -105,7 +107,6 @@ async function submitglucoseReadingForm() {
         });
 
         if (response.data.success) {
-            alert('Form submitted successfully.');
             checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
             glucoseReadingForm.value = {
                 Datetime: '',
@@ -120,6 +121,24 @@ async function submitglucoseReadingForm() {
         alert('An error occurred while submitting the form. Please try again.');
     }
 }
+
+
+// Function to check glucose level and show modal with appropriate message
+function checkGlucoseLevel(level) {
+    if (level < 70) {
+        modalTitle.value = 'Low Glucose Level';
+        modalMessage.value = 'Your glucose level is low. Please consume fast-acting carbohydrates like juice or glucose tablets and recheck your levels.';
+    } else if (level >= 70 && level < 140) {
+        modalTitle.value = 'Normal Glucose Level';
+        modalMessage.value = 'Your glucose level is normal.';
+    } else {
+        modalTitle.value = 'High Glucose Level';
+        modalMessage.value = 'Your glucose level is high. Please consider adjusting your medication or diet, and consult your healthcare provider if needed.';
+    }
+    showModal.value = true;
+}
+
+
 
 const dietForm = ref({
     Date: '',
@@ -169,19 +188,8 @@ const medicationsForm = ref({
     StartDate: '',
 });
 
-function checkGlucoseLevel(level) {
-    if (level < 70) {
-        modalTitle.value = 'Low Glucose Level';
-        modalMessage.value = 'Your glucose level is low. Please consume fast-acting carbohydrates like juice or glucose tablets and recheck your levels.';
-    } else if (level >= 70 && level < 140) {
-        modalTitle.value = 'Normal Glucose Level';
-        modalMessage.value = 'Your glucose level is normal.';
-    } else {
-        modalTitle.value = 'High Glucose Level';
-        modalMessage.value = 'Your glucose level is high. Please consider adjusting your medication or diet, and consult your healthcare provider if needed.';
-    }
-    showModal.value = true;
-}
+
+
 
 const patientForm = ref({
     PhoneNo: '',
@@ -314,8 +322,10 @@ function changeTab(tab) {
                             <label for="Notes" class="block text-gray-700">Notes:</label>
                             <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
                         </div>
-
-                        <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Submit
+                        </button>
+                        <!-- <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button> -->
 
                     </form>
                     <div>
@@ -461,8 +471,12 @@ function changeTab(tab) {
         </div>
 
         <!-- Modal Component for glucose level messages -->
-        <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false"></Modal>
-    </AppLayout>
+        <modal
+            :show="showModal"
+            :title="modalTitle"
+            :message="modalMessage"
+            @close="showModal = false"
+        />    </AppLayout>
 </template>
 
 <style scoped>
