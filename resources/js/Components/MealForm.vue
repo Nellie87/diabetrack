@@ -20,7 +20,7 @@
         <label for="serving">Serving:</label>
         <select v-model="item.selectedServing" required>
           <option v-for="serving in item.servings" :key="serving.measure" :value="serving">
-            {{ serving.measure}}
+            {{ serving.measure }}
           </option>
         </select>
         
@@ -32,6 +32,12 @@
         <label for="description">Description:</label>
         <textarea v-model="description" id="description" required></textarea>
       </div>
+
+      <div class="mb-4">
+        <label for="Datetime" class="block text-gray-700">Datetime:</label>
+        <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="Datetime" />
+      </div>
+      
       <button type="submit">Add {{ mealType }} Meal</button>
     </form>
   </div>
@@ -54,6 +60,7 @@ const mealItems = ref([
   { food_name: '', quantity: 1, selectedServing: null, servings: [] }
 ]);
 const description = ref('');
+const Datetime = ref('');
 const suggestions = ref([[]]);
 
 const addMealItem = () => {
@@ -117,15 +124,28 @@ const selectSuggestion = (index, suggestion) => {
   fetchServings(index, suggestion.food_name);
 };
 
-const submitMeal = () => {
-  emit('meal-added', {
-    type: props.mealType,
-    items: mealItems.value,
-    description: description.value
-  });
-  mealItems.value = [{ food_name: '', quantity: 1, selectedServing: null, servings: [] }];
-  description.value = '';
-  suggestions.value = [[]];
+const submitMeal = async () => {
+  const mealData = {
+    meal_type: props.mealType,
+    description: description.value,
+    items: mealItems.value.map(item => ({
+      food_name: item.food_name,
+      quantity: item.quantity,
+      serving: item.selectedServing,
+    })),
+    datetime: Datetime.value,
+  };
+
+  try {
+    const response = await axios.post('/meals', mealData);
+    emit('meal-added', response.data);
+    mealItems.value = [{ food_name: '', quantity: 1, selectedServing: null, servings: [] }];
+    description.value = '';
+    Datetime.value = '';
+    suggestions.value = [[]];
+  } catch (error) {
+    console.error('Error submitting meal:', error);
+  }
 };
 </script>
 
