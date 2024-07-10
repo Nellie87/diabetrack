@@ -63,6 +63,7 @@ onMounted(() => {
 const users = ref([]);
 const selectedUser = ref(null);
 const feedbackMessage = ref('');
+const messageContent = ref('');
 
 const fetchUsers = async () => {
     try {
@@ -83,6 +84,24 @@ const showUserDetails = (user) => {
 
 const closeUserDetails = () => {
     selectedUser.value = null;
+};
+
+const sendMessage = async () => {
+    try {
+        const response = await axios.post('/send-message', {
+            email: selectedUser.value.email,
+            message: messageContent.value,
+        });
+        if (response.data.success) {
+            feedbackMessage.value = 'Message sent successfully!';
+            messageContent.value = '';
+        } else {
+            feedbackMessage.value = 'Failed to send message. Please try again.';
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+        feedbackMessage.value = 'An error occurred. Please try again.';
+    }
 };
 
 const searchQuery = ref('');
@@ -125,10 +144,16 @@ const hardcodedChartData = {
 console.log('Selected User:', selectedUser.value);
 </script>
 
+
 <style>
 .blur {
     filter: blur(5px);
     transition: filter 0.3s ease-in-out;
+}
+
+.modal-content {
+    max-height: 80vh; /* Set a maximum height for the modal content */
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 </style>
 
@@ -165,7 +190,6 @@ console.log('Selected User:', selectedUser.value);
                 <div class="text-xl font-semibold mb-2">{{ user.name }}</div>
                 <div class="text-gray-600 mb-2">{{ user.email }}</div>
                 <div class="text-gray-600">ID: {{ user.id }}</div>
-                <!-- <div class="text-gray-600">Role: {{ user.role }}</div> -->
                 <div class="mt-4 flex justify-end">
                     <button @click="showUserDetails(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
                         View Data
@@ -176,7 +200,7 @@ console.log('Selected User:', selectedUser.value);
 
         <!-- Modal for showing user details -->
         <div v-if="selectedUser" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full">
+            <div class="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full modal-content">
                 <h3 class="text-xl font-semibold mb-4">User Details</h3>
                 <p><strong>ID:</strong> {{ selectedUser.id }}</p>
                 <p><strong>Name:</strong> {{ selectedUser.name }}</p>
@@ -196,6 +220,16 @@ console.log('Selected User:', selectedUser.value);
                         datasets: [{ label: 'Mobile Apps', data: [0, 0, 0, 0, 0, 0] }]
                     }"
                 />
+
+                <!-- Messaging section -->
+                <div class="mt-4">
+                    <label for="message" class="block text-sm font-medium text-gray-700">Message:</label>
+                    <textarea id="message" v-model="messageContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
+                    <div class="mt-2 flex justify-end">
+                        <button @click="sendMessage" class="bg-green-500 text-white px-3 py-1 rounded">Send</button>
+                    </div>
+                    <div v-if="feedbackMessage" class="mt-2 text-green-500">{{ feedbackMessage }}</div>
+                </div>
 
                 <div class="mt-4 flex justify-end">
                     <button @click="closeUserDetails" class="bg-red-500 text-white px-3 py-1 rounded">
