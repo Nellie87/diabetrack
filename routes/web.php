@@ -97,3 +97,8 @@ Route::get('scum', function(){
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 
 Route::post('/users', [UserController::class, 'store'])->name('users.store');
+// Route for submitting glucose readings
+Route::post('/glucose/submit', [GlucoseReadingController::class, 'submit']);
+
+// Route for fetching glucose readings
+Route::get('/glucose/readings', [GlucoseReadingController::class, 'getData']);

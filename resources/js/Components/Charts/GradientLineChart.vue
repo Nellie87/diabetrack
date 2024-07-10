@@ -11,7 +11,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { Chart, registerables } from 'chart.js';
 import 'chartjs-adapter-date-fns';
@@ -42,6 +41,10 @@ export default {
       type: String,
       required: true,
     },
+    pollInterval: {
+      type: Number,
+      default: 30000, // Default polling interval in milliseconds (30 seconds)
+    },
   },
 
   data() {
@@ -51,7 +54,8 @@ export default {
   },
 
   mounted() {
-    this.fetchChartData();
+    this.fetchChartData(); // Initial fetch
+    this.setupPolling(); // Start polling
   },
 
   methods: {
@@ -211,6 +215,12 @@ export default {
           },
         },
       });
+    },
+
+    setupPolling() {
+      setInterval(() => {
+        this.fetchChartData();
+      }, this.pollInterval);
     },
   },
 };
