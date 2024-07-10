@@ -4,7 +4,13 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
+
+import BarChart from '/resources/js/Components/Charts/BarChart.vue';
+import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
+import ProgressBar from '/resources/js/Components/ProgressBar.vue';
+import NotificationsPanel from '/resources/js/Components/NotificationPanel.vue';
 // import Modal from '@/Components/Modal.vue'; // Import the Modal component
+
 import Modal from '@/Components/Modes.vue'; // Import the Modal component
 import GlucoseReadingTable from '@/Components/Tables/GlucoseReadingTable.vue';
 
@@ -108,12 +114,15 @@ async function submitglucoseReadingForm() {
         });
 
         if (response.data.success) {
+            alert('Form submitted successfully.');
+                glucoseReadingForm.value = {
             checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
             glucoseReadingForm.value = {
                 Datetime: '',
                 GlucoseLevel: '',
                 Notes: '',
             };
+            window.location.reload();
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -171,6 +180,7 @@ async function submitdietForm() {
                 Carbohydrates: '',
                 Notes: '',               
             };
+            window.location.reload();
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -192,14 +202,6 @@ const medicationsForm = ref({
 
 
 
-const patientForm = ref({
-    PhoneNo: '',
-    Gender: '',
-    Address: '',
-    EmergencyContactName: '',
-    EmergencyContactPhone: '',
-    DoctorID: '',
-});
 
 async function submitmedicationForm() {
     try {
@@ -221,6 +223,9 @@ async function submitmedicationForm() {
                 Type: '',
                 Dosage: '',
                 Frequency: '',
+                StartDate: '',    
+            }     
+            window.location.reload();      
                 StartDate: '',
             };
         } else {
@@ -262,7 +267,8 @@ async function submitpatientForm() {
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form. Please try again.');
     }
-}
+    
+};
 
 // Active tab state
 const activeTab = ref('glucoseReading');
@@ -300,11 +306,23 @@ onMounted(fetchGlucoseReadings);
 
 <template>
     <AppLayout title="Dashboard">
+        <NotificationsPanel/>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Patient Forms
             </h2>
         </template>
+        <!-- Main content -->
+        <div id="app">
+    <button @click="toggleSideNav" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Toggle Notifications</button>
+    
+    <!-- Include the NotificationsSideNav component -->
+    <NotificationsPanel v-if="toggleSideNav" />
+  </div>
+        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">              
+            <div>
+                
+                <form @submit.prevent="submitForm">
 
         <!-- Navigation bar -->
         <div class="py-4 bg-gray-100">
@@ -359,6 +377,7 @@ onMounted(fetchGlucoseReadings);
             id="chart-line"
             title="Sugar Levels Overview"
             apiUrl="http://127.0.0.1:8000/chart-data"
+
             description="<i class='fa fa-arrow-up text-success'></i>
       <span class='font-weight-bold'></span> "
             :chart="{
@@ -372,6 +391,32 @@ onMounted(fetchGlucoseReadings);
               }]
             }"
           />
+        
+        
+
+           <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="Date" class="block text-gray-700">Date:</label>
+                            <input id="Date" type="Date" class="mt-1 block w-full" v-model="dietForm.Date" />
+                        </div>
+
+
+                    <div class="mb-4">
+                            <label for="MealType" class="block text-gray-700">Meal Type:</label>
+                            <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
+                        </div>
+                        
+
+                    <div class="mb-4">
+                            <label for="FoodItems" class="block text-gray-700">Food Items:</label>
+                            <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
+                        </div>
+
+                    <div class="mb-4">
+                            <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
+                            <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
           <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
           <!-- Modal usage example -->
            </div>
@@ -413,6 +458,45 @@ onMounted(fetchGlucoseReadings);
               <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
             </form>
                         </div>
+
+                        <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+
+                    
+
+                    <BarChart
+            id="chart-bar"
+            title="Carbs Overview"
+            apiUrl="http://127.0.0.1:8000/chart-datas"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
+
+
+                    <form @submit.prevent="submitForm">
+
+
+                    <div class="mb-4">
+                            <label for="MedicationName" class="block text-gray-700">Medicine Name:</label>
+                            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
 
                         <!-- Medication Form -->
                         <div v-show="activeTab === 'medication'">
@@ -495,6 +579,42 @@ onMounted(fetchGlucoseReadings);
                                 <button @click="unlock" class="px-4 py-2 bg-blue-500 text-white rounded">Unlock</button>
                             </div>
                         </div>
+
+                        <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+
+                    </form>
+
+                    <ProgressDoughnutChart
+            id="chart-circle"
+            title="Carbs Overview"
+            apiUrl="http://127.0.0.1:8000/chart-datas1"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
+
+          <ProgressBar/>
+                
+</div>
+</div>
+
+</AppLayout>
                     </div>
                 </div>
             </div>
