@@ -115,6 +115,7 @@ async function submitglucoseReadingForm() {
                 GlucoseLevel: '',
                 Notes: '',
             };
+            window.location.reload();
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -154,6 +155,7 @@ async function submitdietForm() {
                 Carbohydrates: '',
                 Notes: '',               
             };
+            window.location.reload();
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -196,7 +198,8 @@ async function submitmedicationForm() {
                 Dosage: '',
                 Frequency: '',
                 StartDate: '',    
-            }           
+            }     
+            window.location.reload();      
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -307,6 +310,8 @@ async function submitmedicationForm() {
                         <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
                     </form>
+
+                    
 
                     <BarChart
             id="chart-bar"

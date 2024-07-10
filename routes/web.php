@@ -41,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/submit-form', [GlucoseReadingController::class, 'submit']);
     Route::post('/submit-form2', [DietController::class, 'submit']);
     Route::post('/submit-form3', [MedicationController::class, 'submit']);
+    Route::post('/submit-form4', [MedicationController::class, 'convert']);
+    Route::post('/search', [MedicationController::class, 'search']);
+
 });
 
 Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
@@ -50,6 +53,7 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
 
     Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/patient', [PatientController::class, 'index'])->name('patient.index');
+        Route::get('/patient2', [PatientController::class, 'index2'])->name('patient.index2');
         Route::get('/sesh', [UserController::class, 'getProfile'])->name('patient.profile');
         Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
         Route::get('/chart-datas', [DietController::class, 'getData']);
