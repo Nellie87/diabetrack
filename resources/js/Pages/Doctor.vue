@@ -64,6 +64,11 @@ const users = ref([]);
 const selectedUser = ref(null);
 const feedbackMessage = ref('');
 const messageContent = ref('');
+const messageHistory = ref([]);
+const replyContent = ref('');
+const showReply = ref(false); // Toggle to show or hide reply section
+const replyToMessageId = ref(null); // Track the ID of the message being replied to
+
 
 const fetchUsers = async () => {
     try {
@@ -74,16 +79,30 @@ const fetchUsers = async () => {
     }
 };
 
+const fetchMessageHistory = async (userId) => {
+    try {
+        const response = await axios.get(`/messages/${userId}`);
+        messageHistory.value = response.data;
+    } catch (error) {
+        console.error('Error fetching message history:', error);
+        messageHistory.value = []; // Clear message history on error
+    }
+};
+
 onMounted(async () => {
     await fetchUsers();
 });
 
-const showUserDetails = (user) => {
+const showUserDetails = async (user) => {
     selectedUser.value = { ...user };
+    await fetchMessageHistory(user.id);
 };
 
 const closeUserDetails = () => {
     selectedUser.value = null;
+    messageHistory.value = []; // Clear message history when closing details
+    replyContent.value = ''; // Clear reply content
+    showReply.value = false; // Hide reply section when closing details
 };
 
 const sendMessage = async () => {
@@ -95,13 +114,51 @@ const sendMessage = async () => {
         if (response.data.success) {
             feedbackMessage.value = 'Message sent successfully!';
             messageContent.value = '';
+            // Fetch updated message history after sending message
+            await fetchMessageHistory(selectedUser.value.id);
         } else {
             feedbackMessage.value = 'Failed to send message. Please try again.';
         }
     } catch (error) {
-        console.error('Error sending message:', error);
+        console.error('Error sending message:', error.response); // Log error response
         feedbackMessage.value = 'An error occurred. Please try again.';
     }
+};
+
+const replyToMessage = async (message) => {
+    console.log('Replying to message:', message);
+    replyToMessageId.value = message.id; // Ensure message.id is correctly assigned
+    showReply.value = true; // Confirm showReply toggles correctly
+    replyContent.value = ''; // Ensure replyContent is properly initialized
+};
+
+const sendReply = async () => {
+    try {
+        const response = await axios.post('/send-reply', {
+            email: selectedUser.value.email,
+            message: replyContent.value,
+            userId: user.value.id, // Send user ID along with the reply
+            timestamp: new Date().toISOString() // Capture current timestamp
+        });
+        if (response.data.success) {
+            feedbackMessage.value = 'Reply sent successfully!';
+            replyContent.value = '';
+            replyToMessageId.value = null; // Reset reply to message ID after sending reply
+            // Fetch updated message history after sending reply
+            await fetchMessageHistory(selectedUser.value.id);
+        } else {
+            feedbackMessage.value = 'Failed to send reply. Please try again.';
+        }
+    } catch (error) {
+        console.error('Error sending reply:', error.response); // Log error response
+        feedbackMessage.value = 'An error occurred. Please try again.';
+    }
+};
+
+
+const cancelReply = () => {
+    replyContent.value = ''; // Clear reply content
+    showReply.value = false; // Hide reply section
 };
 
 const searchQuery = ref('');
@@ -143,19 +200,6 @@ const hardcodedChartData = {
 // Debugging output
 console.log('Selected User:', selectedUser.value);
 </script>
-
-
-<style>
-.blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
-}
-
-.modal-content {
-    max-height: 80vh; /* Set a maximum height for the modal content */
-    overflow-y: auto; /* Enable vertical scrolling */
-}
-</style>
 
 <template>
     <AppLayout title="Dashboard">
@@ -200,7 +244,7 @@ console.log('Selected User:', selectedUser.value);
 
         <!-- Modal for showing user details -->
         <div v-if="selectedUser" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div class="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full modal-content">
+            <div class="bg-white rounded-lg p-8 shadow-lg max-w-lg w-full max-h-full overflow-y-auto">
                 <h3 class="text-xl font-semibold mb-4">User Details</h3>
                 <p><strong>ID:</strong> {{ selectedUser.id }}</p>
                 <p><strong>Name:</strong> {{ selectedUser.name }}</p>
@@ -213,22 +257,44 @@ console.log('Selected User:', selectedUser.value);
                     id="chart-line"
                     title="Sugar Levels Overview"
                     apiUrl="http://127.0.0.1:8000/chart-data"
-                    description="<i class='fa fa-arrow-up text-success'></i>
-                    <span class='font-weight-bold'> </span> "
-                    :chart="{
-                        labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [{ label: 'Mobile Apps', data: [0, 0, 0, 0, 0, 0] }]
-                    }"
-                />
+                    :chart-data="hardcodedChartData"
+                ></gradient-line-chart>
 
-                <!-- Messaging section -->
-                <div class="mt-4">
-                    <label for="message" class="block text-sm font-medium text-gray-700">Message:</label>
-                    <textarea id="message" v-model="messageContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
+                <!-- Send message section -->
+                <div class="mt-8">
+                    <label for="messageContent" class="block text-sm font-medium text-gray-700">Send Message:</label>
+                    <textarea id="messageContent" v-model="messageContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
                     <div class="mt-2 flex justify-end">
                         <button @click="sendMessage" class="bg-green-500 text-white px-3 py-1 rounded">Send</button>
                     </div>
                     <div v-if="feedbackMessage" class="mt-2 text-green-500">{{ feedbackMessage }}</div>
+                </div>
+
+                <!-- Message history section -->
+                <div class="mt-4">
+                    <h4 class="text-lg font-semibold">Message History</h4>
+                    <div v-if="selectedUser && messageHistory.length > 0 && selectedUser.id === selectedUser.id" class="mt-2 space-y-4">
+                        <div v-for="message in messageHistory" :key="message.id" class="border p-4 rounded">
+                            <p><strong>From:</strong> {{ message.from_id }}</p>
+                            <p><strong>To:</strong> {{ message.to_id }}</p>
+                            <p><strong>Date:</strong> {{ new Date(message.created_at).toLocaleString() }}</p>
+                            <p><strong>Message:</strong> {{ message.content }}</p>
+                            <div class="mt-2">
+                                <button @click="replyToMessage(message)" class="bg-blue-500 text-white px-3 py-1 rounded">Reply</button>
+                            </div>
+                            <!-- Reply section -->
+                            <div v-if="replyToMessageId === message.id" class="border p-4 rounded mt-4">
+                                <label for="replyContent" class="block text-sm font-medium text-gray-700">Reply:</label>
+                                <textarea id="replyContent" v-model="replyContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
+                                <div class="mt-2 flex justify-end">
+                                    <button @click="sendReply" class="bg-green-500 text-white px-3 py-1 rounded">Send Reply</button>
+                                    <button @click="cancelReply" class="bg-gray-400 text-white px-3 py-1 rounded ml-2">Cancel</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-else-if="selectedUser && messageHistory.length === 0">No messages found.</div>
+                    <div v-else class="mt-2 text-gray-500">Select a user to view messages.</div>
                 </div>
 
                 <div class="mt-4 flex justify-end">

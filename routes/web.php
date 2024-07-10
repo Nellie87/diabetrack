@@ -106,4 +106,8 @@ Route::post('/glucose/submit', [GlucoseReadingController::class, 'submit']);
 // Route for fetching glucose readings
 Route::get('/glucose/readings', [GlucoseReadingController::class, 'getData']);
 
+// Route::post('/send-message', [MessageController::class, 'sendMessage']);
+Route::get('/messages/{userId}', [MessageController::class, 'getMessageHistory']);
 Route::post('/send-message', [MessageController::class, 'sendMessage']);
+
+
