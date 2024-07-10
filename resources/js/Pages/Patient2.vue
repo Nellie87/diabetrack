@@ -6,6 +6,7 @@ import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
 import BarChart from '/resources/js/Components/Charts/BarChart.vue';
 import MealForm from 'C:/xampp/htdocs/diabetrack/resources/js/Components/MealForm.vue';
+import MealSearch from 'C:/xampp/htdocs/diabetrack/resources/js/Components/MealSearch.vue';
 import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
 import ProgressBar from '/resources/js/Components/ProgressBar.vue';
 import NotificationsPanel from '/resources/js/Components/NotificationPanel.vue';
@@ -184,6 +185,11 @@ const addMeal = (meal) => {
         <strong>{{ meal.type }}:</strong> {{ meal.meal }} - {{ meal.description }}
       </li>
     </ul>
+  </div>
+
+  <div id="app">
+    <h1>Meal Planner</h1>
+    <MealSearch />
   </div>
 
  </AppLayout>
