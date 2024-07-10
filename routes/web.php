@@ -4,7 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordVerificationController;
 use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
-use App\Http\Controllers\DietController;
+use App\Http\Controllers\MealsController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\GlucoseReadingController;
@@ -39,10 +39,11 @@ Route::middleware([
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/verify-password', [PasswordVerificationController::class, 'verify'])->name('verify-password');
     Route::post('/submit-form', [GlucoseReadingController::class, 'submit']);
-    Route::post('/submit-form2', [DietController::class, 'submit']);
+    Route::post('/submit-form2', [MealsController::class, 'submit']);
     Route::post('/submit-form3', [MedicationController::class, 'submit']);
     Route::post('/submit-form4', [MedicationController::class, 'convert']);
     Route::post('/search', [MedicationController::class, 'search']);
+    Route::post('/meals', [MealsController::class, 'submit']);
 
 });
 
@@ -56,7 +57,7 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
         Route::get('/patient2', [PatientController::class, 'index2'])->name('patient.index2');
         Route::get('/sesh', [UserController::class, 'getProfile'])->name('patient.profile');
         Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
-        Route::get('/chart-datas', [DietController::class, 'getData']);
+        Route::get('/chart-datas', [MealsController::class, 'getData']);
         Route::get('/chart-datas1', [MedicationController::class, 'getData']);
         
     });

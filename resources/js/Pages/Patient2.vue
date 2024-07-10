@@ -147,7 +147,7 @@ const addMeal = (meal) => {
                         <button @click="submitfoodForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
                     </form>
-
+<!--
                     <BarChart
             id="chart-bar"
             title="Carbs Overview"
@@ -172,6 +172,7 @@ const addMeal = (meal) => {
               ],
             }"
           />
+                -->
 
           <div id="app">
     <h1>Meal Planner</h1>

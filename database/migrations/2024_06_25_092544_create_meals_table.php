@@ -9,17 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
-        Schema::create('diets', function (Blueprint $table) {
-            $table->id('DietID')->primary();
+        Schema::create('meals', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('PatientID');
+            $table->string('meal_type');
+            $table->text('description');
+            $table->json('items');
+            $table->timestamp('datetime'); // Ensure datetime is stored as a timestamp
             $table->timestamps();
-            $table->string('PatientID');
-            $table->date('Date');
-            $table->string('MealType');
-            $table->text('FoodItems');
-            $table->string('Carbohydrates');
-            $table->text('Notes')->nullable();
         });
     }
 
