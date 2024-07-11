@@ -68,8 +68,19 @@ const messageHistory = ref([]);
 const replyContent = ref('');
 const showReply = ref(false); // Toggle to show or hide reply section
 const replyToMessageId = ref(null); // Track the ID of the message being replied to
+const selectedMessageForReply = ref(null); // Track selected message for reply
 
-
+const toggleReplySection = (message) => {
+    if (selectedMessageForReply.value === message.id && showReply.value) {
+        // Close reply section if already open
+        selectedMessageForReply.value = null;
+        showReply.value = false;
+    } else {
+        // Open reply section for the selected message
+        selectedMessageForReply.value = message.id;
+        showReply.value = true;
+    }
+};
 const fetchUsers = async () => {
     try {
         const response = await axios.get('/users?role=1');
@@ -135,17 +146,16 @@ const replyToMessage = async (message) => {
 };
 
 
-const sendReply = async () => {
+const sendReply = async (messageId) => {
     try {
         const response = await axios.post('/send-reply', {
             email: selectedUser.value.email,
             message: replyContent.value,
-            parent_id: replyToMessageId.value, // Ensure this is included
+            parent_id: messageId, // Pass messageId as parent_id
         });
         if (response.data.success) {
             feedbackMessage.value = 'Reply sent successfully!';
             replyContent.value = ''; // Clear reply content after successful send
-            replyToMessageId.value = null; // Reset replyToMessageId
             // Fetch updated message history after sending reply
             await fetchMessageHistory(selectedUser.value.id);
         } else {
@@ -273,37 +283,43 @@ console.log('Selected User:', selectedUser.value);
                     <div v-if="feedbackMessage" class="mt-2 text-green-500">{{ feedbackMessage }}</div>
                 </div>
 
-            <!-- Message history section -->
-<div class="mt-4">
-    <h4 class="text-lg font-semibold">Message History</h4>
-    <div v-if="selectedUser && messageHistory.length > 0 && selectedUser.id === selectedUser.id" class="mt-2 space-y-4">
-        <div v-for="message in messageHistory" :key="message.id" class="border p-4 rounded">
-            <div class="flex">
-                <!-- Left side: Message -->
-                <div class="flex-1">
-                    <p><strong>From:</strong> {{ message.from_id }}</p>
-                    <p><strong>To:</strong> {{ message.to_id }}</p>
-                    <p><strong>Date:</strong> {{ new Date(message.created_at).toLocaleString() }}</p>
-                    <p><strong>Message:</strong> {{ message.content }}</p>
+          <!-- Message history section -->
+    <div class="mt-4">
+        <h4 class="text-lg font-semibold">Message History</h4>
+        <div v-if="selectedUser && messageHistory.length > 0 && selectedUser.id === selectedUser.id" class="mt-2 space-y-4">
+            <div v-for="message in messageHistory" :key="message.id" class="border p-4 rounded">
+                <div class="flex">
+                    <!-- Left side: Message -->
+                    <div class="flex-1">
+                        <p><strong>From:</strong> {{ message.from_id }}</p>
+                        <p><strong>To:</strong> {{ message.to_id }}</p>
+                        <p><strong>Date:</strong> {{ new Date(message.created_at).toLocaleString() }}</p>
+                        <p><strong>Message:</strong> {{ message.content }}</p>
+                    </div>
+                    <!-- Right side: Replies -->
+                    <div v-if="message.replies && message.replies.length > 0" class="ml-4 flex-1">
+                        <div v-for="reply in message.replies" :key="reply.id" class="border p-4 rounded">
+                            <p><strong>From:</strong> {{ reply.from_id }}</p>
+                            <p><strong>To:</strong> {{ reply.to_id }}</p>
+                            <p><strong>Date:</strong> {{ new Date(reply.created_at).toLocaleString() }}</p>
+                            <p><strong>Reply:</strong> {{ reply.content }}</p>
+                        </div>
+                    </div>
                 </div>
-                <!-- Right side: Replies -->
-                <div v-if="message.replies && message.replies.length > 0" class="ml-4 flex-1">
-                    <div v-for="reply in message.replies" :key="reply.id" class="border p-4 rounded">
-                        <p><strong>From:</strong> {{ reply.from_id }}</p>
-                        <p><strong>To:</strong> {{ reply.to_id }}</p>
-                        <p><strong>Date:</strong> {{ new Date(reply.created_at).toLocaleString() }}</p>
-                        <p><strong>Reply:</strong> {{ reply.content }}</p>
+                <div class="mt-2">
+                    <!-- Reply button and reply section -->
+                    <button @click="toggleReplySection(message)" class="bg-blue-500 text-white px-3 py-1 rounded">Reply</button>
+                    <div v-if="showReply && selectedMessageForReply === message.id">
+                        <textarea v-model="replyContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
+                        <div class="mt-2 flex justify-end">
+                            <button @click="sendReply(message.id)" class="bg-green-500 text-white px-3 py-1 rounded">Send Reply</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="mt-2">
-                <button @click="replyToMessage(message)" class="bg-blue-500 text-white px-3 py-1 rounded">Reply</button>
-            </div>
         </div>
+        <div v-else class="mt-2 text-gray-600">No messages found.</div>
     </div>
-    <div v-else class="mt-2 text-gray-600">No messages found.</div>
-</div>
-
 
 
                 <!-- Reply message section -->
