@@ -109,5 +109,7 @@ Route::get('/glucose/readings', [GlucoseReadingController::class, 'getData']);
 // Route::post('/send-message', [MessageController::class, 'sendMessage']);
 Route::get('/messages/{userId}', [MessageController::class, 'getMessageHistory']);
 Route::post('/send-message', [MessageController::class, 'sendMessage']);
+Route::post('/send-reply', [MessageController::class, 'sendReply']);
+Route::get('/message-history/{userId}', [MessageController::class, 'fetchMessageHistory'])->name('message-history');
 
 

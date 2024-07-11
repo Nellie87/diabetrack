@@ -116,8 +116,6 @@ async function submitglucoseReadingForm() {
         if (response.data.success) {
             alert('Form submitted successfully.');
                 glucoseReadingForm.value = {
-            checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
-            glucoseReadingForm.value = {
                 Datetime: '',
                 GlucoseLevel: '',
                 Notes: '',
@@ -130,22 +128,6 @@ async function submitglucoseReadingForm() {
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form. Please try again.');
     }
-}
-
-
-// Function to check glucose level and show modal with appropriate message
-function checkGlucoseLevel(level) {
-    if (level < 70) {
-        modalTitle.value = 'Low Glucose Level';
-        modalMessage.value = 'Your glucose level is low. Please consume fast-acting carbohydrates like juice or glucose tablets and recheck your levels.';
-    } else if (level >= 70 && level < 140) {
-        modalTitle.value = 'Normal Glucose Level';
-        modalMessage.value = 'Your glucose level is normal.';
-    } else {
-        modalTitle.value = 'High Glucose Level';
-        modalMessage.value = 'Your glucose level is high. Please consider adjusting your medication or diet, and consult your healthcare provider if needed.';
-    }
-    showModal.value = true;
 }
 
 
@@ -225,9 +207,7 @@ async function submitmedicationForm() {
                 Frequency: '',
                 StartDate: '',    
             }     
-            window.location.reload();      
-                StartDate: '',
-            };
+            
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -319,7 +299,7 @@ onMounted(fetchGlucoseReadings);
     <!-- Include the NotificationsSideNav component -->
     <NotificationsPanel v-if="toggleSideNav" />
   </div>
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">              
+        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8"/>              
             <div>
                 
                 <form @submit.prevent="submitForm">
@@ -341,11 +321,14 @@ onMounted(fetchGlucoseReadings);
                 </button>
             </div>
         </div>
+        </form>
+    </div>
+        
+        
 
         <!-- Main content -->
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
 
                         <!-- Glucose Reading Form -->
@@ -369,9 +352,11 @@ onMounted(fetchGlucoseReadings);
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Submit
                         </button>
-                        <!-- <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button> -->
-
-                    </form>
+                        </form>
+                        </div>
+                    </div>
+          </div>              <!-- <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button> -->
+                 
                     <div>
                     <gradient-line-chart
             id="chart-line"
@@ -417,14 +402,17 @@ onMounted(fetchGlucoseReadings);
                     <div class="mb-4">
                             <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
                             <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
+                            </div>
+                            </form>
           <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
           <!-- Modal usage example -->
            </div>
            <div>
+            
     <h2 class="text-lg font-bold mb-4">Glucose Readings</h2>
     <glucose-reading-table :glucose-readings="glucoseReadings" />
   </div>
-                        </div>
+                        
 
                         <!-- Diet Form -->
                         <div v-show="activeTab === 'diet'">
@@ -461,7 +449,6 @@ onMounted(fetchGlucoseReadings);
 
                         <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
 
-                    </form>
 
                     
 
@@ -497,7 +484,7 @@ onMounted(fetchGlucoseReadings);
                     <div class="mb-4">
                             <label for="MedicationName" class="block text-gray-700">Medicine Name:</label>
                             <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
-
+</div>
                         <!-- Medication Form -->
                         <div v-show="activeTab === 'medication'">
                             <h3 class="text-lg font-semibold mb-4">Medication Form</h3>
@@ -531,7 +518,7 @@ onMounted(fetchGlucoseReadings);
         </form>
                         </div>
 
-                        <!-- Patient Form -->
+                        <!-- Patient Form 
                         <div v-show="activeTab === 'patient'">
                             <h3 class="text-lg font-semibold mb-4">Patient Information Form</h3>
                             <form @submit.prevent="submitpatientForm">
@@ -569,6 +556,7 @@ onMounted(fetchGlucoseReadings);
             <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
           </form>
                         </div>
+                    -->
 
                         <!-- Lock Screen Modal -->
                         <div v-show="isLocked" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
@@ -608,25 +596,11 @@ onMounted(fetchGlucoseReadings);
               ],
             }"
           />
+          </div>
 
           <ProgressBar/>
-                
-</div>
-</div>
-
+            
 </AppLayout>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Component for glucose level messages -->
-        <modal
-            :show="showModal"
-            :title="modalTitle"
-            :message="modalMessage"
-            @close="showModal = false"
-        />    </AppLayout>
 </template>
 
 <style scoped>

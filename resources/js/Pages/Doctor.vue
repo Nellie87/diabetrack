@@ -125,35 +125,39 @@ const sendMessage = async () => {
     }
 };
 
+
+
 const replyToMessage = async (message) => {
     console.log('Replying to message:', message);
-    replyToMessageId.value = message.id; // Ensure message.id is correctly assigned
-    showReply.value = true; // Confirm showReply toggles correctly
-    replyContent.value = ''; // Ensure replyContent is properly initialized
+    replyToMessageId.value = message.id; // Set the ID of the message being replied to
+    showReply.value = true; // Show the reply section
+    replyContent.value = ''; // Clear the reply content textarea
 };
+
 
 const sendReply = async () => {
     try {
         const response = await axios.post('/send-reply', {
             email: selectedUser.value.email,
             message: replyContent.value,
-            userId: user.value.id, // Send user ID along with the reply
-            timestamp: new Date().toISOString() // Capture current timestamp
+            parent_id: replyToMessageId.value, // Ensure this is included
         });
         if (response.data.success) {
             feedbackMessage.value = 'Reply sent successfully!';
-            replyContent.value = '';
-            replyToMessageId.value = null; // Reset reply to message ID after sending reply
+            replyContent.value = ''; // Clear reply content after successful send
+            replyToMessageId.value = null; // Reset replyToMessageId
             // Fetch updated message history after sending reply
             await fetchMessageHistory(selectedUser.value.id);
         } else {
             feedbackMessage.value = 'Failed to send reply. Please try again.';
         }
     } catch (error) {
-        console.error('Error sending reply:', error.response); // Log error response
+        console.error('Error sending reply:', error.response);
         feedbackMessage.value = 'An error occurred. Please try again.';
     }
 };
+
+
 
 
 const cancelReply = () => {
@@ -200,7 +204,6 @@ const hardcodedChartData = {
 // Debugging output
 console.log('Selected User:', selectedUser.value);
 </script>
-
 <template>
     <AppLayout title="Dashboard">
         <template #header>
@@ -270,37 +273,52 @@ console.log('Selected User:', selectedUser.value);
                     <div v-if="feedbackMessage" class="mt-2 text-green-500">{{ feedbackMessage }}</div>
                 </div>
 
-                <!-- Message history section -->
-                <div class="mt-4">
-                    <h4 class="text-lg font-semibold">Message History</h4>
-                    <div v-if="selectedUser && messageHistory.length > 0 && selectedUser.id === selectedUser.id" class="mt-2 space-y-4">
-                        <div v-for="message in messageHistory" :key="message.id" class="border p-4 rounded">
-                            <p><strong>From:</strong> {{ message.from_id }}</p>
-                            <p><strong>To:</strong> {{ message.to_id }}</p>
-                            <p><strong>Date:</strong> {{ new Date(message.created_at).toLocaleString() }}</p>
-                            <p><strong>Message:</strong> {{ message.content }}</p>
-                            <div class="mt-2">
-                                <button @click="replyToMessage(message)" class="bg-blue-500 text-white px-3 py-1 rounded">Reply</button>
-                            </div>
-                            <!-- Reply section -->
-                            <div v-if="replyToMessageId === message.id" class="border p-4 rounded mt-4">
-                                <label for="replyContent" class="block text-sm font-medium text-gray-700">Reply:</label>
-                                <textarea id="replyContent" v-model="replyContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
-                                <div class="mt-2 flex justify-end">
-                                    <button @click="sendReply" class="bg-green-500 text-white px-3 py-1 rounded">Send Reply</button>
-                                    <button @click="cancelReply" class="bg-gray-400 text-white px-3 py-1 rounded ml-2">Cancel</button>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Message history section -->
+<div class="mt-4">
+    <h4 class="text-lg font-semibold">Message History</h4>
+    <div v-if="selectedUser && messageHistory.length > 0 && selectedUser.id === selectedUser.id" class="mt-2 space-y-4">
+        <div v-for="message in messageHistory" :key="message.id" class="border p-4 rounded">
+            <div class="flex">
+                <!-- Left side: Message -->
+                <div class="flex-1">
+                    <p><strong>From:</strong> {{ message.from_id }}</p>
+                    <p><strong>To:</strong> {{ message.to_id }}</p>
+                    <p><strong>Date:</strong> {{ new Date(message.created_at).toLocaleString() }}</p>
+                    <p><strong>Message:</strong> {{ message.content }}</p>
+                </div>
+                <!-- Right side: Replies -->
+                <div v-if="message.replies && message.replies.length > 0" class="ml-4 flex-1">
+                    <div v-for="reply in message.replies" :key="reply.id" class="border p-4 rounded">
+                        <p><strong>From:</strong> {{ reply.from_id }}</p>
+                        <p><strong>To:</strong> {{ reply.to_id }}</p>
+                        <p><strong>Date:</strong> {{ new Date(reply.created_at).toLocaleString() }}</p>
+                        <p><strong>Reply:</strong> {{ reply.content }}</p>
                     </div>
-                    <div v-else-if="selectedUser && messageHistory.length === 0">No messages found.</div>
-                    <div v-else class="mt-2 text-gray-500">Select a user to view messages.</div>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button @click="replyToMessage(message)" class="bg-blue-500 text-white px-3 py-1 rounded">Reply</button>
+            </div>
+        </div>
+    </div>
+    <div v-else class="mt-2 text-gray-600">No messages found.</div>
+</div>
+
+
+
+                <!-- Reply message section -->
+                <div v-if="replyToMessageId" class="mt-4">
+                    <h4 class="text-lg font-semibold">Reply to Message</h4>
+                    <label for="replyContent" class="block text-sm font-medium text-gray-700">Reply Content:</label>
+                    <textarea id="replyContent" v-model="replyContent" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
+                    <div class="mt-2 flex justify-end">
+                        <button @click="sendReply" class="bg-green-500 text-white px-3 py-1 rounded">Send Reply</button>
+                    </div>
+                    <div v-if="feedbackMessage" class="mt-2 text-green-500">{{ feedbackMessage }}</div>
                 </div>
 
                 <div class="mt-4 flex justify-end">
-                    <button @click="closeUserDetails" class="bg-red-500 text-white px-3 py-1 rounded">
-                        Close
-                    </button>
+                    <button @click="selectedUser = null" class="bg-red-500 text-white px-3 py-1 rounded">Close</button>
                 </div>
             </div>
         </div>
