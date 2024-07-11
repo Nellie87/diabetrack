@@ -137,16 +137,6 @@ const addMeal = (meal) => {
             </h2>
         </template>
         <FoodSearch/>
-
-        <form @submit.prevent="submitForm">
-                    <div class="mb-4">
-                        <label for="Food" class="block text-gray-700">Enter Food Item:</label>
-                        <input id="Food" type="text" class="mt-1 block w-full" v-model="foodForm.Food" />
-                    </div>
-
-                        <button @click="submitfoodForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-
-                    </form>
 <!--
                     <BarChart
             id="chart-bar"
@@ -204,9 +194,9 @@ const addMeal = (meal) => {
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
-  text-align: center;
-  margin: 40px auto;
-  max-width: 600px;
+  text-align: left;
+  margin: 20px auto;
+  max-width: 1000px;
 }
 ul {
   list-style-type: none;

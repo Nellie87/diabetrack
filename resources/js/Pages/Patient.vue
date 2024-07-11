@@ -116,8 +116,6 @@ async function submitglucoseReadingForm() {
         if (response.data.success) {
             alert('Form submitted successfully.');
                 glucoseReadingForm.value = {
-            checkGlucoseLevel(glucoseReadingForm.value.GlucoseLevel); // Check the glucose level after successful submission
-            glucoseReadingForm.value = {
                 Datetime: '',
                 GlucoseLevel: '',
                 Notes: '',
@@ -130,22 +128,6 @@ async function submitglucoseReadingForm() {
         console.error('Error submitting form:', error);
         alert('An error occurred while submitting the form. Please try again.');
     }
-}
-
-
-// Function to check glucose level and show modal with appropriate message
-function checkGlucoseLevel(level) {
-    if (level < 70) {
-        modalTitle.value = 'Low Glucose Level';
-        modalMessage.value = 'Your glucose level is low. Please consume fast-acting carbohydrates like juice or glucose tablets and recheck your levels.';
-    } else if (level >= 70 && level < 140) {
-        modalTitle.value = 'Normal Glucose Level';
-        modalMessage.value = 'Your glucose level is normal.';
-    } else {
-        modalTitle.value = 'High Glucose Level';
-        modalMessage.value = 'Your glucose level is high. Please consider adjusting your medication or diet, and consult your healthcare provider if needed.';
-    }
-    showModal.value = true;
 }
 
 
@@ -225,9 +207,7 @@ async function submitmedicationForm() {
                 Frequency: '',
                 StartDate: '',    
             }     
-            window.location.reload();      
-                StartDate: '',
-            };
+            
         } else {
             alert('Submission failed. Please try again.');
         }
@@ -306,25 +286,24 @@ onMounted(fetchGlucoseReadings);
 
 <template>
     <AppLayout title="Dashboard">
-        <NotificationsPanel/>
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Patient Forms
+                Welcome User
             </h2>
         </template>
-        <!-- Main content -->
+        <!-- Main content 
         <div id="app">
     <button @click="toggleSideNav" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Toggle Notifications</button>
     
-    <!-- Include the NotificationsSideNav component -->
+     Include the NotificationsSideNav component 
     <NotificationsPanel v-if="toggleSideNav" />
-  </div>
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">              
-            <div>
+        </div>
+        -->
+
+            <div class="py-4 container-fluid">
                 
                 <form @submit.prevent="submitForm">
 
-        <!-- Navigation bar -->
         <div class="py-4 bg-gray-100">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex space-x-4">
                 <button @click="changeTab('glucoseReading')" :class="{ 'bg-blue-500 text-white': activeTab === 'glucoseReading', 'bg-white text-gray-800': activeTab !== 'glucoseReading' }" class="px-4 py-2 rounded">
@@ -341,16 +320,19 @@ onMounted(fetchGlucoseReadings);
                 </button>
             </div>
         </div>
+        </form>
+    </div>
+    
+    <div class="mt-4 row">
 
         <!-- Main content -->
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 bg-white border-b border-gray-200">
 
                         <!-- Glucose Reading Form -->
                         <div v-show="activeTab === 'glucoseReading'">
-                            <h3 class="text-lg font-semibold mb-4">Glucose Reading Form</h3>
+                            <h3 class="text-lg font-semibold mb-4">Enter Glucose Readings</h3>
                             <form @submit.prevent="submitglucoseReadingForm">
                     <div class="mb-4">
                         <label for="Date" class="block text-gray-700">Date:</label>
@@ -359,7 +341,7 @@ onMounted(fetchGlucoseReadings);
 
                     <div class="mb-4">
                         <label for="GlucoseReading" class="block text-gray-700">Glucose Reading:</label>
-                        <input id="GlucoseLevel" type="number" min="0" max="1000" class="mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
+                        <input id="GlucoseLevel" placeholder="Enter your glucose readings(mg/dl)" type="number" min="0" max="1000" class="mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
                     </div>
                         
                     <div class="mb-4">
@@ -369,10 +351,14 @@ onMounted(fetchGlucoseReadings);
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                             Submit
                         </button>
-                        <!-- <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button> -->
-
-                    </form>
-                    <div>
+                        </form>
+                        </div>
+                    </div>
+          </div>              <!-- <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button> -->
+                 
+          <div class="col-lg-7">
+        <!-- line chart -->
+        <div class="card z-index-2">
                     <gradient-line-chart
             id="chart-line"
             title="Sugar Levels Overview"
@@ -391,115 +377,26 @@ onMounted(fetchGlucoseReadings);
               }]
             }"
           />
-        
-        
+          </div>
 
-           <form @submit.prevent="submitForm">
-
-
-                    <div class="mb-4">
-                            <label for="Date" class="block text-gray-700">Date:</label>
-                            <input id="Date" type="Date" class="mt-1 block w-full" v-model="dietForm.Date" />
-                        </div>
-
-
-                    <div class="mb-4">
-                            <label for="MealType" class="block text-gray-700">Meal Type:</label>
-                            <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
-                        </div>
-                        
-
-                    <div class="mb-4">
-                            <label for="FoodItems" class="block text-gray-700">Food Items:</label>
-                            <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
-                        </div>
-
-                    <div class="mb-4">
-                            <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
-                            <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
           <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
           <!-- Modal usage example -->
            </div>
+           </div>
            <div>
+            
     <h2 class="text-lg font-bold mb-4">Glucose Readings</h2>
     <glucose-reading-table :glucose-readings="glucoseReadings" />
   </div>
-                        </div>
+                        
 
                         <!-- Diet Form -->
-                        <div v-show="activeTab === 'diet'">
-                            <h3 class="text-lg font-semibold mb-4">Diet Form</h3>
-                            <form @submit.prevent="submitdietForm">
-              <div class="mb-4">
-                <label for="Date" class="block text-gray-700">Date:</label>
-                <input id="Date" type="date" class="mt-1 block w-full" v-model="dietForm.Date" />
-              </div>
-
-              <div class="mb-4">
-                <label for="MealType" class="block text-gray-700">Meal Type:</label>
-                <input id="MealType" type="text" class="mt-1 block w-full" v-model="dietForm.MealType" />
-              </div>
-
-              <div class="mb-4">
-                <label for="FoodItems" class="block text-gray-700">Food Items:</label>
-                <input id="FoodItems" type="text" class="mt-1 block w-full" v-model="dietForm.FoodItems" />
-              </div>
-
-              <div class="mb-4">
-                <label for="Carbohydrates" class="block text-gray-700">Carbohydrates:</label>
-                <input id="Carbohydrates" type="text" class="mt-1 block w-full" v-model="dietForm.Carbohydrates" />
-              </div>
-
-              <div class="mb-4">
-                <label for="Notes" class="block text-gray-700">Notes:</label>
-                <input id="Notes" type="text" class="mt-1 block w-full" v-model="dietForm.Notes" />
-              </div>
-
-              <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-            </form>
+                        <div v-show="activeTab === 'Diet'">
+                                           
                         </div>
 
-                        <button @click="submitdietForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-
-                    </form>
-
-                    
-
-                    <BarChart
-            id="chart-bar"
-            title="Carbs Overview"
-            apiUrl="http://127.0.0.1:8000/chart-datas"
-            :chart="{
-              labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              datasets: [
-                {
-                  label: 'Mobile Apps',
-                  data: [0, 0, 0, 0, 0, 0,],
-                },
-              ],
-            }"
-          />
-
-
-                    <form @submit.prevent="submitForm">
-
-
-                    <div class="mb-4">
-                            <label for="MedicationName" class="block text-gray-700">Medicine Name:</label>
-                            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
-
                         <!-- Medication Form -->
-                        <div v-show="activeTab === 'medication'">
+                        <div v-show="activeTab === 'Medication'">
                             <h3 class="text-lg font-semibold mb-4">Medication Form</h3>
                             <form @submit.prevent="submitmedicationForm">
           <div class="mb-4">
@@ -529,9 +426,9 @@ onMounted(fetchGlucoseReadings);
       
           <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
         </form>
-                        </div>
+    </div>
 
-                        <!-- Patient Form -->
+                        <!-- Patient Form 
                         <div v-show="activeTab === 'patient'">
                             <h3 class="text-lg font-semibold mb-4">Patient Information Form</h3>
                             <form @submit.prevent="submitpatientForm">
@@ -569,6 +466,7 @@ onMounted(fetchGlucoseReadings);
             <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
           </form>
                         </div>
+                    -->
 
                         <!-- Lock Screen Modal -->
                         <div v-show="isLocked" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
@@ -579,58 +477,49 @@ onMounted(fetchGlucoseReadings);
                                 <button @click="unlock" class="px-4 py-2 bg-blue-500 text-white rounded">Unlock</button>
                             </div>
                         </div>
-
-                        <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
-
-                    </form>
-
-                    <ProgressDoughnutChart
-            id="chart-circle"
-            title="Carbs Overview"
-            apiUrl="http://127.0.0.1:8000/chart-datas1"
-            :chart="{
-              labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              datasets: [
-                {
-                  label: 'Mobile Apps',
-                  data: [0, 0, 0, 0, 0, 0,],
-                },
-              ],
-            }"
-          />
-
-          <ProgressBar/>
-                
-</div>
-</div>
-
+          </div>  
 </AppLayout>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal Component for glucose level messages -->
-        <modal
-            :show="showModal"
-            :title="modalTitle"
-            :message="modalMessage"
-            @close="showModal = false"
-        />    </AppLayout>
 </template>
 
 <style scoped>
 .blur {
     filter: blur(4px);
 }
+.linechartdiv{
+    background-color: #ffffff;
+    color: #424242;
+    border: 1px solid #ece7e7;
+    padding: 10px;
+    margin: 10px;
+
+}
+.card {
+    box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);
+}
+.z-index-2 {
+    z-index: 2 !important;
+}
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0, 0, 0, 0.125);
+    border-radius: 1rem;
+}
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+.container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
+    width: 100%;
+    padding-right: var(--bs-gutter-x, 1.5rem);
+    padding-left: var(--bs-gutter-x, 1.5rem);
+    margin-right: auto;
+    margin-left: auto;
+}
+
 </style>
