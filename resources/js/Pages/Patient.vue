@@ -4,7 +4,9 @@ import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
-
+import HeaderSection from '/resources/js/Components/HeaderSection.vue';
+import HeroSection2 from '/resources/js/Components/HeroSection2.vue';
+import ServicesSection from '/resources/js/Components/ServicesSection.vue';
 import BarChart from '/resources/js/Components/Charts/BarChart.vue';
 import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
 import ProgressBar from '/resources/js/Components/ProgressBar.vue';
@@ -285,6 +287,63 @@ onMounted(fetchGlucoseReadings);
 </script>
 
 <template>
+    <AppLayout>
+        <HeroSection2/>
+        <div class="py-4 container-fluid">
+            <div class="mt-4 row">
+                <div class="mb-4 col-lg-5 mb-lg-0">
+                    <div class="p-3 card-body">
+                        <h3 class="text-lg font-semibold mb-4">Enter Glucose Readings:</h3>
+                        <form class="form" @submit.prevent="submitglucoseReadingForm">
+                            <div class="form-group">
+                            <div class="mb-4">
+                                <label for="Date" class="block text-gray-700">Date:</label>
+                                <input id="Datetime" type="datetime-local" class="form-control mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
+                            </div>
+                            <div class="mb-4">
+                                <label for="GlucoseReading" class="block text-gray-700">Glucose Reading:</label>
+                                <input id="GlucoseLevel" placeholder="(mg/dl)" type="number" min="0" max="1000" class="form-control mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
+                            </div>
+                            </div>
+                        
+                            <div class="mb-4">
+                                <label for="Notes" class="block text-gray-700">Notes:</label>
+                                <input id="Notes" type="text" class="form-control mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
+                            </div>
+                           <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Submit
+                           </button>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card z-index-2">
+                        <gradient-line-chart
+                            id="chart-line"
+                            title="Sugar Levels Overview"
+                            apiUrl="http://127.0.0.1:8000/chart-data"
+
+                            description="<i class='fa fa-arrow-up text-success'></i>
+                            <span class='font-weight-bold'></span> "
+                            :chart="{
+                            labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                            datasets: [{
+                            label: 'My First dataset',
+                            data: [65, 59, 80, 81, 56, 55],
+                            fill: false,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            lineTension: 0.1
+                            }]
+                            }"
+                        />
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </AppLayout>
+    <!--
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -298,7 +357,7 @@ onMounted(fetchGlucoseReadings);
      Include the NotificationsSideNav component 
     <NotificationsPanel v-if="toggleSideNav" />
         </div>
-        -->
+        
 
             <div class="py-4 container-fluid">
                 
@@ -325,12 +384,12 @@ onMounted(fetchGlucoseReadings);
     
     <div class="mt-4 row">
 
-        <!-- Main content -->
+         Main content 
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div class="p-6 bg-white border-b border-gray-200">
 
-                        <!-- Glucose Reading Form -->
+                         Glucose Reading Form 
                         <div v-show="activeTab === 'glucoseReading'">
                             <h3 class="text-lg font-semibold mb-4">Enter Glucose Readings</h3>
                             <form @submit.prevent="submitglucoseReadingForm">
@@ -354,10 +413,9 @@ onMounted(fetchGlucoseReadings);
                         </form>
                         </div>
                     </div>
-          </div>              <!-- <button @click="submitglucoseReadingForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button> -->
-                 
+          </div>                              
           <div class="col-lg-7">
-        <!-- line chart -->
+         line chart 
         <div class="card z-index-2">
                     <gradient-line-chart
             id="chart-line"
@@ -380,7 +438,7 @@ onMounted(fetchGlucoseReadings);
           </div>
 
           <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
-          <!-- Modal usage example -->
+           Modal usage example 
            </div>
            </div>
            <div>
@@ -390,12 +448,12 @@ onMounted(fetchGlucoseReadings);
   </div>
                         
 
-                        <!-- Diet Form -->
+                         Diet Form 
                         <div v-show="activeTab === 'Diet'">
                                            
                         </div>
 
-                        <!-- Medication Form -->
+                        Medication Form 
                         <div v-show="activeTab === 'Medication'">
                             <h3 class="text-lg font-semibold mb-4">Medication Form</h3>
                             <form @submit.prevent="submitmedicationForm">
@@ -428,7 +486,7 @@ onMounted(fetchGlucoseReadings);
         </form>
     </div>
 
-                        <!-- Patient Form 
+                         Patient Form 
                         <div v-show="activeTab === 'patient'">
                             <h3 class="text-lg font-semibold mb-4">Patient Information Form</h3>
                             <form @submit.prevent="submitpatientForm">
@@ -466,10 +524,10 @@ onMounted(fetchGlucoseReadings);
             <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
           </form>
                         </div>
-                    -->
+                    
 
-                        <!-- Lock Screen Modal -->
-                        <div v-show="isLocked" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
+                         Lock Screen Modal 
+                                                 <div v-show="isLocked" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
                             <div class="bg-white p-6 rounded-lg shadow-lg">
                                 <h3 class="text-lg font-semibold mb-4">Screen Locked</h3>
                                 <p class="mb-4">Enter your password to unlock the screen.</p>
@@ -479,6 +537,7 @@ onMounted(fetchGlucoseReadings);
                         </div>
           </div>  
 </AppLayout>
+-->
 </template>
 
 <style scoped>
@@ -514,12 +573,79 @@ onMounted(fetchGlucoseReadings);
     padding-top: 1.5rem !important;
     padding-bottom: 1.5rem !important;
 }
+.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--bs-gutter-y)* -1);
+    margin-right: calc(var(--bs-gutter-x)* -0.5);
+    margin-left: calc(var(--bs-gutter-x)* -0.5);
+}
 .container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
     width: 100%;
     padding-right: var(--bs-gutter-x, 1.5rem);
     padding-left: var(--bs-gutter-x, 1.5rem);
     margin-right: auto;
     margin-left: auto;
+    background-color: #f0f8ff;
+}
+.mb-xl-0 {
+        margin-bottom: 0 !important;
+    }
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+.col-xl-3 {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+    .col-sm-6 {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+
+.mt-4 {
+    margin-top: 1.5rem !important;
 }
 
+.mb-lg-0 {
+        margin-bottom: 0 !important;
+    }
+
+.col-lg-5 {
+        flex: 0 0 auto;
+        width: 41.66666667%;
+    }
+    
+    .p-3 {
+    padding: 1rem !important;
+}
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+.col-lg-7 {
+        flex: 0 0 auto;
+        width: 58.33333333%;
+    }
+
+.form-control {
+    border: 1px solid #ccc;
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-family: muli-bold;
+    background: 0 0;
+}
+.form-group {
+    display: flex;
+}
+form {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
 </style>
