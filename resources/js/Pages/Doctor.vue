@@ -342,7 +342,7 @@ console.log('Selected User:', selectedUser.value);
         </div>
 
         <!-- Lock Screen Modal -->
-        <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75">
+        <!-- <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75">
             <div class="bg-white p-6 rounded-md shadow-md w-full max-w-sm mx-4">
                 <h3 class="text-xl font-semibold mb-4">Screen Locked</h3>
                 <p class="mb-4">Enter your password to unlock:</p>
@@ -359,6 +359,6 @@ console.log('Selected User:', selectedUser.value);
                     </button>
                 </div>
             </div>
-        </div>
+        </div> -->
     </AppLayout>
 </template>

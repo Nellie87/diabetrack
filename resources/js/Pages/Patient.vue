@@ -305,11 +305,117 @@ onMounted(() => {
   // Fetch initial data
 });
 
+const showUserDetails = async (user) => {
+    selectedUser.value = { ...user };
+    await fetchMessageHistory(user.id);
+};
+
+const closeUserDetails = () => {
+    selectedUser.value = null;
+    messageHistory.value = []; // Clear message history when closing details
+    replyContent.value = ''; // Clear reply content
+    showReply.value = false; // Hide reply section when closing details
+};
+
+const users = ref([]);
+const feedbackMessage = ref('');
+const messageContent = ref('');
+const messageHistory = ref([]);
+const replyContent = ref({});
+const showReply = ref({});
+const replyToMessageId = ref(null);
+
+const fetchUsers = async () => {
+  try {
+    const response = await axios.get('/users');
+    users.value = response.data;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+};
+
+const fetchMessageHistory = async () => {
+  try {
+    const response = await axios.get(`/message-history/2`); // Fetch history for user ID 2
+    messageHistory.value = response.data.messages.map((message) => {
+      message.replies = response.data.replies[message.id] || [];
+      return message;
+    });
+  } catch (error) {
+    console.error('Error fetching message history:', error.response);
+    messageHistory.value = [];
+  }
+};
+
+const sendMessage = async () => {
+  try {
+    const recipientId = 2; // User ID 2
+
+    const response = await axios.post('/send-message', {
+      email: 'smilesmemory@gmail.com', // Replace with the actual email if available
+      message: messageContent.value,
+      recipient_id: recipientId,
+    });
+
+    if (response.data.success) {
+      feedbackMessage.value = 'Message sent successfully!';
+      messageContent.value = '';
+      // Fetch updated message history after sending message
+      await fetchMessageHistory();
+    } else {
+      feedbackMessage.value = 'Failed to send message. Please try again.';
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+    feedbackMessage.value = 'An error occurred. Please try again.';
+  }
+};
+
+const sendReply = async (messageId) => {
+  try {
+    const response = await axios.post('/send-reply', {
+      email: 'smilesmemory@gmail.com', // Replace with the actual email if available
+      message: replyContent.value[messageId],
+      parent_id: messageId,
+    });
+    if (response.data.success) {
+      feedbackMessage.value = 'Reply sent successfully!';
+      replyContent.value[messageId] = '';
+      // Fetch updated message history after sending reply
+      await fetchMessageHistory();
+    } else {
+      feedbackMessage.value = 'Failed to send reply. Please try again.';
+    }
+  } catch (error) {
+    console.error('Error sending reply:', error.response);
+    feedbackMessage.value = 'An error occurred. Please try again.';
+  }
+};
+
+const toggleReplySection = (message) => {
+  showReply.value[message.id] = !showReply.value[message.id];
+  if (showReply.value[message.id]) {
+    if (!replyContent.value[message.id]) {
+      replyContent.value[message.id] = '';
+    }
+  }
+};
+
+const cancelReply = (messageId) => {
+  replyContent.value[messageId] = '';
+  showReply.value[messageId] = false;
+};
+
+onMounted(async () => {
+  await fetchUsers();
+  await fetchMessageHistory(); // Fetch initial message history for user ID 2
+});
+
 </script>
 
 <template>
     <AppLayout title="Dashboard">
-      <NotificationsPanel />
+      <!-- <NotificationsPanel /> -->
       <template #header>
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
           Patient Forms
@@ -318,7 +424,7 @@ onMounted(() => {
   
       <div id="app">
         <button @click="toggleSideNav" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Toggle Notifications</button>
-        <NotificationsPanel v-if="toggleSideNav" />
+        <!-- <NotificationsPanel v-if="toggleSideNav" /> -->
       </div>
   
       <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-1 gap-6 lg:gap-8 p-6 lg:p-8">
@@ -429,7 +535,9 @@ onMounted(() => {
                 }"
               />
             </div>
-  
+  </div>
+  </div>
+      </div>
             <!-- Medication Form -->
             <div v-show="activeTab === 'medication'">
               <h3 class="text-lg font-semibold mb-4">Medication Form</h3>
@@ -524,9 +632,57 @@ onMounted(() => {
               </form>
             </div> -->
 
-            
+             <!-- Send Message Section -->
+  <h4 class="text-xl font-semibold mt-6 mb-4">Send a New Message</h4>
+  <textarea v-model="messageContent" placeholder="Enter your message" class="w-full p-2 border rounded-md" rows="4"></textarea>
+  <div class="mt-2 flex justify-end">
+    <button @click="sendMessage" class="bg-blue-500 text-white px-3 py-1 rounded">
+      Send Message
+    </button>
+  </div>
+  <p v-if="feedbackMessage" class="mt-4 text-green-500">{{ feedbackMessage }}</p>
+
+  <!-- Message History Section -->
+  <h4 class="text-xl font-semibold mt-6 mb-4">Message History</h4>
+  <div class="overflow-y-auto max-h-64">
+    <ul>
+      <li v-for="message in messageHistory" :key="message.id" class="mb-4 p-4 border rounded-md">
+        <p class="mb-2">{{ message.content }}</p>
+        <p class="text-sm text-gray-600 mb-2">{{ new Date(message.created_at).toLocaleString() }}</p>
+
+        <!-- Replies Section -->
+        <div v-if="message.replies && message.replies.length > 0" class="ml-4 pl-4 border-l">
+          <h5 class="font-semibold mb-2">Replies:</h5>
+          <ul>
+            <li v-for="reply in message.replies" :key="reply.id" class="mb-2">
+              <p class="mb-1">{{ reply.content }}</p>
+              <p class="text-sm text-gray-600">{{ new Date(reply.created_at).toLocaleString() }}</p>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Reply Button -->
+        <div class="mt-4 flex justify-end">
+          <button @click="toggleReplySection(message)" class="bg-blue-500 text-white px-3 py-1 rounded">
+            {{ showReply[message.id] ? 'Hide Reply' : 'Reply' }}
+          </button>
+        </div>
+
+        <!-- Reply Form -->
+        <div v-if="showReply[message.id]" class="mt-4">
+          <textarea v-model="replyContent[message.id]" placeholder="Enter your reply" class="w-full p-2 border rounded-md" rows="4"></textarea>
+          <div class="mt-2 flex justify-end space-x-2">
+            <button @click="sendReply(message.id)" class="bg-blue-500 text-white px-3 py-1 rounded">
+              Send Reply
+            </button>
+            <button @click="cancelReply(message.id)" class="bg-gray-500 text-white px-3 py-1 rounded">
+              Cancel
+            </button>
           </div>
         </div>
-      </div>
+      </li>
+    </ul>
+  </div>
+     
     </AppLayout>
   </template>
