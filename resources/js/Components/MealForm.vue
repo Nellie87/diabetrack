@@ -3,8 +3,8 @@
     <h2>{{ mealType }} Meal</h2>
     <form @submit.prevent="submitMeal">
       <div v-for="(item, index) in mealItems" :key="index" class="meal-item">
-        <label for="meal">Meal:</label>
-        <input type="text" v-model="item.food_name" @input="fetchSuggestions(index)" required />
+        <label for="meal">Meal Item:</label>
+        <input type="text" class="form-control" v-model="item.food_name" @input="fetchSuggestions(index)" required />
         
         <div v-if="suggestions[index].length">
           <ul>
@@ -14,28 +14,28 @@
           </ul>
         </div>
         
-        <label for="quantity">Quantity:</label>
-        <input type="number" v-model="item.quantity" required />
-        
         <label for="serving">Serving:</label>
-        <select v-model="item.selectedServing" required>
+        <select v-model="item.selectedServing" required class="form-control">
           <option v-for="serving in item.servings" :key="serving.measure" :value="serving">
             {{ serving.measure }}
           </option>
         </select>
-        
+
+        <label for="quantity">Quantity:</label>
+        <input type="number" class="form-control" v-model="item.quantity" required />
+                
         <button type="button" @click="removeMealItem(index)">Remove</button>
       </div>
       
       <button type="button" @click="addMealItem">Add Another Item</button>
       <div>
         <label for="description">Description:</label>
-        <textarea v-model="description" id="description" required></textarea>
+        <textarea v-model="description" class="form-control" id="description" required></textarea>
       </div>
 
       <div class="mb-4">
         <label for="Datetime" class="block text-gray-700">Datetime:</label>
-        <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="Datetime" />
+        <input id="Datetime"  type="datetime-local" class="form-control mt-1 block w-full" v-model="Datetime" />
       </div>
       
       <button type="submit">Add {{ mealType }} Meal</button>
@@ -150,9 +150,25 @@ const submitMeal = async () => {
 </script>
 
 <style scoped>
-form {
-  margin-bottom: 20px;
+.form-control {
+    border: 1px solid #ccc;
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-family: muli-bold;
+    background: 0 0;
 }
+.form-group {
+    display: flex;
+}
+form {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
 .meal-item {
   margin-bottom: 15px;
 }

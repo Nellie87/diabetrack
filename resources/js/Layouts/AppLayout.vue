@@ -110,9 +110,12 @@ const goBack = () => {
 const navLinks= [
         {text:'Diabetrack' },
         { text: 'Home', url: '/' },
-        {text: 'Profile', url:'/profile'},
+        {text: 'Profile', url:'/user/profile'},
         { text: 'About', url: '/about' },
-        { text: 'Contact', url: '/contact' }
+        { text: 'Contact', url: '/contact' },
+        {text: 'Diets', url: '/diet'},
+        {text: 'Medications', url: '/patient3'},
+        {text: 'Glucose Info', url: '/patient'}
       ]
 </script>
 

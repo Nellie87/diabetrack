@@ -3,6 +3,7 @@ import { ref, watch, onMounted, computed } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { usePage } from '@inertiajs/vue3';
+import HeroSection2 from '/resources/js/Components/HeroSection2.vue';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
 import BarChart from '/resources/js/Components/Charts/BarChart.vue';
 import MealForm from 'C:/xampp/htdocs/diabetrack/resources/js/Components/MealForm.vue';
@@ -11,6 +12,7 @@ import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.v
 import ProgressBar from '/resources/js/Components/ProgressBar.vue';
 import NotificationsPanel from '/resources/js/Components/NotificationPanel.vue';
 import Modal from '@/Components/Modes.vue';
+import HeroSection from '@/Components/HeroSection.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -126,10 +128,85 @@ const addMeal = (meal) => {
   meals.value.push(meal);
 };
 }
-
+const myVariable = ref(false);
+function showItem(){
+    myVariable.value = true;
+    localStorage.setItem('myvariable', 'true');
+}
+const myVariable1 = ref(false);
+function showItem1(){
+    myVariable1.value = true;
+    localStorage.setItem('myvariable1', 'true');
+}
+const myVariable2 = ref(false);
+function showItem2(){
+    myVariable2.value = true;
+    localStorage.setItem('myvariable2', 'true');
+}
 </script>
 
 <template>
+    <AppLayout>
+        <HeroSection2/>
+        <div class="py-4 container-fluid">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Food Log
+            </h2>
+            <div>
+                <button type="button" @click="showItem">Add Breakfast Meal</button>
+                <div v-if="myVariable==true" id="app">
+                <h1>Meal Planner</h1>
+                <MealForm mealType="Breakfast" @meal-added="addMeal" />
+                </div>
+            </div>
+            <div>
+                <button type="button" @click="showItem1">Add Lunch Meal</button>
+                <div v-if="myVariable1==true" id="app">
+                <h1>Meal Planner</h1>
+                <MealForm mealType="Lunch" @meal-added="addMeal" />
+                </div>
+            </div>
+            <div>
+                <button type="button" @click="showItem2">Add Dinner Meal</button>
+                <div v-if="myVariable2==true" id="app">
+                <h1>Meal Planner</h1>
+                <MealForm mealType="Dinner" @meal-added="addMeal" />
+                </div>
+            </div>   
+            <div>
+                <BarChart
+            id="chart-bar"
+            title="Carbs Overview"
+            apiUrl="http://127.0.0.1:8000/chart-datas"
+            :chart="{
+              labels: [
+                'Apr',
+                'May',
+                'Jun',
+                'Jul',
+                'Aug',
+                'Sep',
+                'Oct',
+                'Nov',
+                'Dec',
+              ],
+              datasets: [
+                {
+                  label: 'Mobile Apps',
+                  data: [0, 0, 0, 0, 0, 0,],
+                },
+              ],
+            }"
+          />
+            </div>         
+        </div>
+        <!--
+        <MealForm mealType="Lunch" @meal-added="addMeal" />
+        <MealForm mealType="Dinner" @meal-added="addMeal" />-->
+
+    </AppLayout>
+</template>
+    <!--
  <AppLayout title="Dashboard">
     <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -162,7 +239,7 @@ const addMeal = (meal) => {
               ],
             }"
           />
-                -->
+                
 
           <div id="app">
     <h1>Meal Planner</h1>
@@ -184,28 +261,115 @@ const addMeal = (meal) => {
   </div>
 
  </AppLayout>
+-->
 
-</template>
-
-<style>
+<style scoped>
 .blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
+    filter: blur(4px);
 }
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  text-align: left;
-  margin: 20px auto;
-  max-width: 1000px;
+.linechartdiv{
+    background-color: #ffffff;
+    color: #424242;
+    border: 1px solid #ece7e7;
+    padding: 10px;
+    margin: 10px;
+
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+.card {
+    box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);
 }
-li {
-  background-color: #f4f4f4;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 4px;
+.z-index-2 {
+    z-index: 2 !important;
 }
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0, 0, 0, 0.125);
+    border-radius: 1rem;
+}
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--bs-gutter-y)* -1);
+    margin-right: calc(var(--bs-gutter-x)* -0.5);
+    margin-left: calc(var(--bs-gutter-x)* -0.5);
+}
+.container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
+    width: 100%;
+    padding-right: var(--bs-gutter-x, 1.5rem);
+    padding-left: var(--bs-gutter-x, 1.5rem);
+    margin-right: auto;
+    margin-left: auto;
+    background-color: #f0f8ff;
+}
+.mb-xl-0 {
+        margin-bottom: 0 !important;
+    }
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+.col-xl-3 {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+    .col-sm-6 {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.mb-lg-0 {
+        margin-bottom: 0 !important;
+    }
+
+.col-lg-5 {
+        flex: 0 0 auto;
+        width: 41.66666667%;
+    }
+    
+    .p-3 {
+    padding: 1rem !important;
+}
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+.col-lg-7 {
+        flex: 0 0 auto;
+        width: 58.33333333%;
+    }
+
+.form-control {
+    border: 1px solid #ccc;
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-family: muli-bold;
+    background: 0 0;
+}
+.form-group {
+    display: flex;
+}
+form {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
 </style>
+
