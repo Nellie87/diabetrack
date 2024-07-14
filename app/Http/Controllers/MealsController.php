@@ -39,18 +39,19 @@ class MealsController extends Controller
         $userId = $user->id;
     
         $readings = Meal::where('PatientID', $userId)
-            ->select('Carbohydrates','Date')
+            ->select('meal_type','Date')
             ->get();
     
         // Map to convert carbohydrate names to specified values
         $carbMapping = [
-            'Bread' => 233,
-            'Rice' => 533,
+            'Breakfast' => 233,
+            'Lunch' => 533,
         ];
     
         // Transform the readings
         $transformedReadings = $readings->map(function ($item) use ($carbMapping) {
-            $carbName = $item->Carbohydrates;
+            $carbName = $item->meal_type;
+            $item->Date = Carbon::parse($item->Date)->format('Y-m-d H:i:s'); // Format as needed
             $item->GlucoseConsumed = $carbMapping[$carbName] ?? null;
             return $item;
         });

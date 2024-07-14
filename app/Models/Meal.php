@@ -14,7 +14,7 @@ class Meal extends Model
         'meal_type',
         'description',
         'items',
-        'datetime',
+        'Date',
     ];
 
     protected $casts = [

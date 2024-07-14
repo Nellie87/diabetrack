@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('meal_type');
             $table->text('description');
             $table->json('items');
-            $table->timestamp('datetime'); // Ensure datetime is stored as a timestamp
+            $table->timestamp('Date'); // Ensure datetime is stored as a timestamp
             $table->timestamps();
         });
     }

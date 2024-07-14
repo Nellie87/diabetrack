@@ -76,11 +76,11 @@ export default {
 
           data.forEach(item => {
             // Parse datetime string into Date object
-            const date = parse(item.Date, 'yyyy-MM-dd', new Date());
+            const date = parse(item.Date, 'MM-dd HH:mm', new Date());
 
             // Add date and glucose level to the data array
             chartData.datasets[0].data.push({
-              x: date,
+              x: item.Date,
               y: item.GlucoseConsumed,
             });
           });
@@ -130,14 +130,41 @@ export default {
             mode: "index",
           },
           scales: {
+            y: {
+              grid: {
+                drawBorder: false,
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                borderDash: [5, 5],
+              },
+              ticks: {
+                display: true,
+                padding: 10,
+                color: "#b2b9bf",
+                font: {
+                  size: 11,
+                  family: "Open Sans",
+                  style: "normal",
+                  lineHeight: 2,
+                },
+              },
+            },
             x: {
               type: 'time',
               time: {
-                unit: 'day', // Adjust based on your data granularity
-                round: 'day',
-                tooltipFormat: 'MMM dd, yyyy', // Format for the tooltip
+                unit: 'minute', 
+                round: 'minute',
                 displayFormats: {
-                  day: 'MMM dd', // Display format for day
+                  millisecond: 'MMM dd, HH:mm:ss.SSS',
+                  second: 'MMM dd, HH:mm:ss',
+                  minute: 'MMM dd, HH:mm',
+                  hour: 'MMM dd, HH:00',
+                  day: 'MMM dd', 
+                  week: 'MMM dd', 
+                  month: 'MMM YYYY', 
+                  quarter: '[Q]Q - YYYY', 
+                  year: 'YYYY', 
                 },
               },
               grid: {
@@ -151,26 +178,6 @@ export default {
                 display: true,
                 color: "#b2b9bf",
                 padding: 20,
-                font: {
-                  size: 11,
-                  family: "Open Sans",
-                  style: "normal",
-                  lineHeight: 2,
-                },
-              },
-            },
-            y: {
-              grid: {
-                drawBorder: false,
-                display: true,
-                drawOnChartArea: true,
-                drawTicks: false,
-                borderDash: [5, 5],
-              },
-              ticks: {
-                display: true,
-                padding: 10,
-                color: "#b2b9bf",
                 font: {
                   size: 11,
                   family: "Open Sans",
