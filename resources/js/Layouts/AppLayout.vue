@@ -106,23 +106,88 @@ const confirmLogout = () => {
 const goBack = () => {
     window.history.back();
 };
+
+const navLinks= [
+        {text:'Diabetrack' },
+        { text: 'Home', url: '/' },
+        {text: 'Profile', url:'/profile'},
+        { text: 'About', url: '/about' },
+        { text: 'Contact', url: '/contact' }
+      ]
 </script>
 
 <template>
-    <div>
-        <div class="min-h-screen bg-gray-100" style="padding-top: 4rem;">
-            <nav class="bg-white border-b border-gray-100">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="flex justify-between h-16">
-                        <SideNav :links="navLinks" />
-                    </div>
-
-
+   <div id="app">
+        <div class="layout">
+            <SideNav :links="navLinks" />
+            <main class="main-content" :class="{ 'blur': isLocked }" >
+            <slot/>
+            </main>
+    </div>
+  </div>
+     <!-- Lock screen overlay with centered square GIF -->
+    <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 backdrop-blur-md">
+        <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+               <h2 class="text-2xl font-semibold mb-4">Screen is Locked</h2>
+               <div class="square-gif-container">
+                         <!-- Replace with your own GIF URL and apply class for square form -->
+                         <img src="/videos/waiting.gif" class="square-gif rounded-md mb-4" alt="Locked Screen GIF">
                 </div>
-
-            </nav>
-
+                <input v-model="password" type="password" placeholder="Enter password to continue" class="w-full px-3 py-2 border rounded-md mb-4">
+                <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md justify-center items-center">Unlock</button>
         </div>
+    </div>
+  <!-- Lock screen button -->
+        <div class="fixed bottom-4 right-4">
+            <button @click="manualLock" class="bg-red-500 text-white px-4 py-2 rounded-md">Lock Screen</button>
+        </div>
+
+        
+</template>
+
+<style>
+.layout {
+  display: flex;
+}
+.main-content {
+  flex: 1;
+  background-color: #fff;
+}
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+.blur {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+nav {
+    display: block;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+/* CSS for square aspect ratio */
+.square-gif-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px; /* Adjust container width */
+    height: 200px; /* Adjust container height */
+}
+
+.square-gif {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Ensure the GIF fills the square without stretching */
+}
+</style>
         <!--
 
         
@@ -137,7 +202,7 @@ const goBack = () => {
                                 <!-- Back Button 
                 <Button class="me-2" type="button" @click.prevent="goBack">
                     Back
-                </Button>
+                Button>
                             </div>
                              <!-- Main content 
         <div :class="{ 'blur': isLocked }" class="py-12">
@@ -147,31 +212,6 @@ const goBack = () => {
                 </div>
             </div>
         </div>
-
-  <!-- Lock screen overlay with centered square GIF 
-<div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 backdrop-blur-md">
-    <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
-        <h2 class="text-2xl font-semibold mb-4">Screen is Locked</h2>
-        <div class="square-gif-container">
-            <!-- Replace with your own GIF URL and apply class for square form 
-            <img src="/videos/waiting.gif" class="square-gif rounded-md mb-4" alt="Locked Screen GIF">
-        </div>
-        <input v-model="password" type="password" placeholder="Enter password to continue" class="w-full px-3 py-2 border rounded-md mb-4">
-        <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md justify-center items-center">Unlock</button>
-    </div>
-</div>
-
-
-
-
-
-        <!-- Lock screen button 
-        <div class="fixed bottom-4 right-4">
-            <button @click="manualLock" class="bg-red-500 text-white px-4 py-2 rounded-md">Lock Screen</button>
-        </div>
-
-
-
 
                             <!-- Navigation Links 
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
@@ -330,16 +370,16 @@ const goBack = () => {
                     </div>
                 </div>
 
-                <!-- Responsive Navigation Menu -->
+                <!-- Responsive Navigation Menu 
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
                       <!-- <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
-                        </ResponsiveNavLink> -->
-                        <!-- Back Button -->
+                        </ResponsiveNavLink>
+                        <!-- Back Button 
                 <!-- <SecondaryButton class="me-2" type="button" @click.prevent="goBack">
                     Back
-                </SecondaryButton> -->
+                </SecondaryButton> 
                     </div>
 
                     <!-- Responsive Settings Options 
@@ -434,39 +474,10 @@ const goBack = () => {
                 </div>
             </header>
 
-            <!-- Page Content -->
+            <!-- Page Content
             <main>
                 <slot />
             </main>
-        </div>
+        
     </div>
-</template>
-
-<style>
-.blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
-}
-nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-/* CSS for square aspect ratio */
-.square-gif-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 300px; /* Adjust container width */
-    height: 200px; /* Adjust container height */
-}
-
-.square-gif {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: cover; /* Ensure the GIF fills the square without stretching */
-}
-</style>
+    -->

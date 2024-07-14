@@ -1,4 +1,4 @@
-<!-- SideNav.vue -->
+
 <template>
     <div class="sidenav">
       <ul>
@@ -24,12 +24,11 @@
   
   <style scoped>
   .sidenav {
-    width: 250px;
-    height: 100%;
-    position: fixed;
+    width: 200px;
+    position: relative;
     left: 0;
     top: 0;
-    background-color: #111;
+    background-color: #e3e3e3;
     padding-top: 20px;
   }
   
