@@ -54,9 +54,30 @@ class MealsController extends Controller
     public function getData()
     {
         $user = Auth::user();
-        $userId = $user->id;
+        $userId = $user->id; 
     
         $readings = Meal::where('PatientID', $userId)
+            ->where('meal_type','Breakfast')
+            ->select('Carbohydrates','Date')
+            ->get();
+
+
+        $transformedReadings = $readings->map(function ($item) {
+            $carbName = $item->Carbohydrates;
+            $item->Date = Carbon::parse($item->Date)->format('Y-m-d H:i:s');
+            return $item;
+        });
+    
+        return response()->json($transformedReadings);
+    }
+
+    public function getData1()
+    {
+        $user = Auth::user();
+        $userId = $user->id; 
+    
+        $readings = Meal::where('PatientID', $userId)
+            ->where('meal_type','Lunch')
             ->select('Carbohydrates','Date')
             ->get();
 
@@ -73,33 +94,21 @@ class MealsController extends Controller
     public function getData2()
     {
         $user = Auth::user();
-        $userId = $user->id;
-
+        $userId = $user->id; 
+    
         $readings = Meal::where('PatientID', $userId)
-                ->where('meal_type', 'Breakfast')
-                ->select('meal_type', 'Date', 'items')
-                ->get();  
-        
+            ->where('meal_type','Dinner')
+            ->select('Carbohydrates','Date')
+            ->get();
 
-        $items = $readings->pluck('items');
 
-        $foodNames = [];
-        foreach ($items as $subArray) {
-            foreach ($subArray as $item) {
-                $foodNames[] = $item['food_name'];
-            }
-        }
-
-        $foodQuantity = [];
-        foreach ($items as $subArrays) {
-            foreach ($subArrays as $item2) {
-                $foodQuantity[] = $item2['quantity'];
-            }
-        }
-
-        $processedData = $this->convert($foodNames,$foodQuantity);
-
-        return response()->json($processedData);
+        $transformedReadings = $readings->map(function ($item) {
+            $carbName = $item->Carbohydrates;
+            $item->Date = Carbon::parse($item->Date)->format('Y-m-d H:i:s');
+            return $item;
+        });
+    
+        return response()->json($transformedReadings);
     }
 
     public function convert($itemName,$itemQuantity)

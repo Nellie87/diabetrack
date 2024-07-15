@@ -293,7 +293,7 @@ onMounted(fetchGlucoseReadings);
             <div class="mt-4 row">
                 <div class="mb-4 col-lg-5 mb-lg-0">
                     <div class="p-3 card-body">
-                        <h3 class="text-lg font-semibold mb-4">Enter Glucose Readings:</h3>
+                        <h3 class="text-lg font-semibold mb-4">Enter Medicine Information:</h3>
                         <form @submit.prevent="submitForm">
                             <div class="mb-4">
                                 <label for="MedicationName" class="block text-gray-700">Medication Name:</label>
@@ -329,7 +329,7 @@ onMounted(fetchGlucoseReadings);
                     <div class="card z-index-2">
                         <CircleChart
                             id="chart-line"
-                            title="Sugar Levels Overview"
+                            title="Medicines Overview"
                             apiUrl="http://127.0.0.1:8000/chart-datas1"
 
                             description="<i class='fa fa-arrow-up text-success'></i>
