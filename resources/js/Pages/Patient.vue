@@ -336,7 +336,7 @@ const fetchUsers = async () => {
 
 const fetchMessageHistory = async () => {
   try {
-    const response = await axios.get(`/message-history/2`); // Fetch history for user ID 2
+    const response = await axios.get(`/message-history/3`); // Fetch history for user ID 2
     messageHistory.value = response.data.messages.map((message) => {
       message.replies = response.data.replies[message.id] || [];
       return message;
@@ -410,7 +410,6 @@ onMounted(async () => {
   await fetchUsers();
   await fetchMessageHistory(); // Fetch initial message history for user ID 2
 });
-
 </script>
 
 <template>
