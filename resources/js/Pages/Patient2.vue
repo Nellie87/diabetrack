@@ -175,10 +175,11 @@ function showItem2(){
             </div>   
             <div class="col-lg-7">
                 <div class="card z-index-2">
+                    <!--
                     <BarChart
                     id="chart-bar"
-                    title="Carbs Overview"
-                    apiUrl="http://127.0.0.1:8000/chart-datas"
+                    title="Breakfast Chart"
+                    apiUrl="http://127.0.0.1:8000/chart2"
                     :chart="{
                     labels: [
                         'Apr',
@@ -199,6 +200,7 @@ function showItem2(){
                     ],
                     }"
                     />
+                -->
                 </div>
             </div>         
         </div>

@@ -12,11 +12,27 @@ class MealsController extends Controller
 {
     public function submit(Request $request)
     {
+        $items = $request['items'];
+
+        $sum = 0;
+        foreach ($items as $item) {
+            $itemName = $item['food_name'];
+            $itemQuantity = $item['quantity'];
+        
+            $processedData = $this->convert($itemName, $itemQuantity);
+            foreach ($processedData as $value) {
+                if (is_numeric($value)) { 
+                 $sum += $value;
+                } else {
+                    }
+                }
+          }
+
         $validatedData = $request->validate([
             'meal_type' => 'required|string|max:255',
             'description' => 'required|string',
             'items' => 'required|array',
-            'datetime' => 'required|date', 
+            'Date' => 'required|date', 
         ]);
 
         $user = Auth::user();
@@ -26,6 +42,7 @@ class MealsController extends Controller
         $diet = new Meal();
         $diet -> fill($validatedData);
         $diet->PatientID = $userId; 
+        $diet->Carbohydrates = $sum;
 
         
         $diet->save();
@@ -86,24 +103,28 @@ class MealsController extends Controller
                 $foodQuantity[] = $item2['quantity'];
             }
         }
+
         $processedData = $this->convert($foodNames,$foodQuantity);
 
         return response()->json($processedData);
     }
 
-    public function convert($foodNames,$foodQuantity)
+    public function convert($itemName,$itemQuantity)
     {
-        $foodName = $foodNames[0];
-        $foodQuant = $foodQuantity[0];
-
+        $foodName=$itemName;
+        $foodQuant=$itemQuantity;
+        
         $carbohydrates = $this->fetchCarbohydrateData($foodName);
 
-        if ($carbohydrates !== null) {
-            return response()->json($foodQuant*$carbohydrates);
-        } else {
-            return response()->json($foodName);
-        }
-    }
+                if ($carbohydrates !== null) {
+                    $results = $foodQuant * $carbohydrates; 
+                  } else {
+                    $results = $foodName; 
+                  }
+                  
+                return response()->json($results);
+
+                } 
 
     private function fetchCarbohydrateData($foodName)
     {
@@ -122,11 +143,10 @@ class MealsController extends Controller
         $data = $response->json();
 
         if (isset($data['foods']) && count($data['foods']) > 0) {
-            $carbohydrates = $data['foods'][0]['nf_total_carbohydrate']; 
+            $carbohydrates = $data['foods'][0]['nf_calories']; 
             return $carbohydrates;
         } else {
             return null;
         }
     }
-    
 }

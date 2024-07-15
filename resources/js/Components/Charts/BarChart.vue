@@ -61,6 +61,8 @@ export default {
         const data = await response.json();
         console.log('Fetched data:', data);
 
+  
+
         // Transform data into chart-compatible format
         if (Array.isArray(data)) {
           const chartData = {
@@ -81,7 +83,7 @@ export default {
             // Add date and glucose level to the data array
             chartData.datasets[0].data.push({
               x: item.Date,
-              y: item.GlucoseConsumed,
+              y: item.Original,
             });
           });
 

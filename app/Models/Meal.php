@@ -14,6 +14,7 @@ class Meal extends Model
         'meal_type',
         'description',
         'items',
+        'Carbohydrates',
         'Date',
     ];
 

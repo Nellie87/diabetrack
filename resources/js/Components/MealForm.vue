@@ -34,8 +34,8 @@
       </div>
 
       <div class="mb-4">
-        <label for="Datetime" class="block text-gray-700">Datetime:</label>
-        <input id="Datetime"  type="datetime-local" class="form-control mt-1 block w-full" v-model="Datetime" />
+        <label for="Date" class="block text-gray-700">Datetime:</label>
+        <input id="Date"  type="datetime-local" class="form-control mt-1 block w-full" v-model="Date" />
       </div>
       
       <button type="submit">Add {{ mealType }} Meal</button>
@@ -60,7 +60,7 @@ const mealItems = ref([
   { food_name: '', quantity: 1, selectedServing: null, servings: [] }
 ]);
 const description = ref('');
-const Datetime = ref('');
+const Date = ref('');
 const suggestions = ref([[]]);
 
 const addMealItem = () => {
@@ -82,8 +82,8 @@ const fetchSuggestions = async (index) => {
   try {
     const response = await axios.get('https://trackapi.nutritionix.com/v2/search/instant', {
       headers: {
-        'x-app-id': 'c64312d1',
-        'x-app-key': '1e933a8b27c2d8693f51562dcb9098c5',
+        'x-app-id': '481b79d4',
+        'x-app-key': '2474d00427ff9e47bc9d0d13f22d78a6',
       },
       params: {
         query: item.food_name
@@ -102,8 +102,8 @@ const fetchServings = async (index, food_name) => {
     { query: food_name },
     {
       headers: {
-        'x-app-id': 'c64312d1',
-        'x-app-key': '1e933a8b27c2d8693f51562dcb9098c5',
+        'x-app-id': '481b79d4',
+        'x-app-key': '2474d00427ff9e47bc9d0d13f22d78a6',
         'Content-Type': 'application/json'
       }
     });
@@ -133,7 +133,7 @@ const submitMeal = async () => {
       quantity: item.quantity,
       serving: item.selectedServing,
     })),
-    datetime: Datetime.value,
+    Date: Date.value,
   };
 
   try {
@@ -141,7 +141,7 @@ const submitMeal = async () => {
     emit('meal-added', response.data);
     mealItems.value = [{ food_name: '', quantity: 1, selectedServing: null, servings: [] }];
     description.value = '';
-    Datetime.value = '';
+    Date.value = '';
     suggestions.value = [[]];
   } catch (error) {
     console.error('Error submitting meal:', error);
