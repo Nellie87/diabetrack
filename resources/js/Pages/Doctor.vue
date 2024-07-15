@@ -69,6 +69,7 @@ const replyContent = ref({});
 const showReply = ref({}); // Toggle to show or hide reply section
 const replyToMessageId = ref(null); // Track the ID of the message being replied to
 const selectedMessageForReply = ref(null); // Track selected message for reply
+import BarChart from '/resources/js/Components/Charts/BarChart.vue';
 
 const fetchUsers = async () => {
     try {
@@ -254,23 +255,41 @@ console.log('Selected User:', selectedUser.value);
 
         <!-- User details modal -->
         <div v-if="selectedUser" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white p-6 rounded-md shadow-md w-full max-w-2xl mx-4 overflow-y-auto max-h-screen">
+            <div class="bg-white p-6 rounded-md shadow-md w-full max-w-4xl mx-4 overflow-y-auto max-h-screen">
+                <div class="text-center">
+
                 <h3 class="text-2xl font-semibold mb-4">Details for {{ selectedUser.name }}</h3>
                 <p><strong>Email:</strong> {{ selectedUser.email }}</p>
                 <p><strong>ID:</strong> {{ selectedUser.id }}</p>
-                <p><strong>Email:</strong> {{ selectedUser.email }}</p>
-                <p><strong>Role:</strong> {{ selectedUser.role }}</p>
+               
+                </div>
                 <p v-if="selectedUser.additionalData"><strong>Additional Data:</strong> {{ selectedUser.additionalData }}</p>
                 
-                <!-- Hardcoded GradientLineChart for testing -->
-                <gradient-line-chart
-                    id="chart-line"
-                    title="Sugar Levels Overview"
-                    apiUrl="http://127.0.0.1:8000/chart-data"
-                    :chart-data="hardcodedChartData"
-                ></gradient-line-chart>
+                <div class="chart-container">
+    <!-- Hardcoded GradientLineChart for testing -->
+    <gradient-line-chart
+      id="chart-line"
+      title="Sugar Levels Overview"
+      apiUrl="http://127.0.0.1:8000/chart-data"
+      :chart-data="hardcodedChartData"
+    ></gradient-line-chart>
 
-                  <!-- Send Message Section -->
+    <!-- Send Message Section -->
+    <bar-chart
+      id="chart-bar"
+      title="Carbs Overview"
+      apiUrl="http://127.0.0.1:8000/chart-datas"
+      :chart="{
+        labels: ['Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [{
+          label: 'Mobile Apps',
+          data: [0, 0, 0, 0, 0, 0],
+        }]
+      }"
+    ></bar-chart>
+  </div>
+                            <!-- Message  Section -->
+
                   <h4 class="text-xl font-semibold mt-6 mb-4">Send a New Message</h4>
                 <textarea v-model="messageContent" placeholder="Enter your message" class="w-full p-2 border rounded-md" rows="4"></textarea>
                 <div class="mt-2 flex justify-end">
@@ -341,24 +360,16 @@ console.log('Selected User:', selectedUser.value);
             <GradientLineChart :chart-data="hardcodedChartData" />
         </div>
 
-        <!-- Lock Screen Modal -->
-        <!-- <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75">
-            <div class="bg-white p-6 rounded-md shadow-md w-full max-w-sm mx-4">
-                <h3 class="text-xl font-semibold mb-4">Screen Locked</h3>
-                <p class="mb-4">Enter your password to unlock:</p>
-                <input
-                    type="password"
-                    v-model="password"
-                    @keydown.enter="unlock"
-                    placeholder="Enter password"
-                    class="w-full p-2 border rounded-md mb-4"
-                />
-                <div class="flex justify-end">
-                    <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded">
-                        Unlock
-                    </button>
-                </div>
-            </div>
-        </div> -->
     </AppLayout>
 </template>
+<style>
+.chart-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Adjust the gap between columns as needed */
+}
+
+.gradient-line-chart, .bar-chart {
+  flex: 1; /* Ensures both charts take equal space */
+}
+</style>
