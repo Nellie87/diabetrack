@@ -173,31 +173,33 @@ function showItem2(){
                 <MealForm mealType="Dinner" @meal-added="addMeal" />
                 </div>
             </div>   
-            <div>
-                <BarChart
-            id="chart-bar"
-            title="Carbs Overview"
-            apiUrl="http://127.0.0.1:8000/chart-datas"
-            :chart="{
-              labels: [
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ],
-              datasets: [
-                {
-                  label: 'Mobile Apps',
-                  data: [0, 0, 0, 0, 0, 0,],
-                },
-              ],
-            }"
-          />
+            <div class="col-lg-7">
+                <div class="card z-index-2">
+                    <BarChart
+                    id="chart-bar"
+                    title="Carbs Overview"
+                    apiUrl="http://127.0.0.1:8000/chart-datas"
+                    :chart="{
+                    labels: [
+                        'Apr',
+                        'May',
+                        'Jun',
+                        'Jul',
+                        'Aug',
+                        'Sep',
+                        'Oct',
+                        'Nov',
+                        'Dec',
+                         ],
+                    datasets: [
+                    {
+                    label: 'Mobile Apps',
+                    data: [0, 0, 0, 0, 0, 0,],
+                    },
+                    ],
+                    }"
+                    />
+                </div>
             </div>         
         </div>
         <!--
