@@ -83,7 +83,7 @@ export default {
             // Add date and glucose level to the data array
             chartData.datasets[0].data.push({
               x: item.Date,
-              y: item.Original,
+              y: item.Carbohydrates,
             });
           });
 

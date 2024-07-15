@@ -129,19 +129,19 @@ const addMeal = (meal) => {
 };
 }
 const myVariable = ref(false);
-function showItem(){
-    myVariable.value = true;
-    localStorage.setItem('myvariable', 'true');
+function showItem() {
+  myVariable.value = !myVariable.value; 
+  localStorage.setItem('myvariable', myVariable.value ? 'true' : 'false'); 
 }
 const myVariable1 = ref(false);
 function showItem1(){
-    myVariable1.value = true;
-    localStorage.setItem('myvariable1', 'true');
+    myVariable1.value = !myVariable1.value;
+    localStorage.setItem('myvariable1', myVariable1.value ? 'true' : 'false'); 
 }
 const myVariable2 = ref(false);
 function showItem2(){
-    myVariable2.value = true;
-    localStorage.setItem('myvariable2', 'true');
+    myVariable2.value = !myVariable2.value;
+    localStorage.setItem('myvariable2', myVariable2.value ? 'true' : 'false');
 }
 </script>
 
@@ -155,27 +155,23 @@ function showItem2(){
             <div>
                 <button type="button" @click="showItem">Add Breakfast Meal</button>
                 <div v-if="myVariable==true" id="app">
-                <h1>Meal Planner</h1>
                 <MealForm mealType="Breakfast" @meal-added="addMeal" />
                 </div>
             </div>
             <div>
                 <button type="button" @click="showItem1">Add Lunch Meal</button>
                 <div v-if="myVariable1==true" id="app">
-                <h1>Meal Planner</h1>
                 <MealForm mealType="Lunch" @meal-added="addMeal" />
                 </div>
             </div>
             <div>
                 <button type="button" @click="showItem2">Add Dinner Meal</button>
                 <div v-if="myVariable2==true" id="app">
-                <h1>Meal Planner</h1>
                 <MealForm mealType="Dinner" @meal-added="addMeal" />
                 </div>
             </div>   
             <div class="col-lg-7">
                 <div class="card z-index-2">
-                    <!--
                     <BarChart
                     id="chart-bar"
                     title="Breakfast Chart"
@@ -200,7 +196,6 @@ function showItem2(){
                     ],
                     }"
                     />
-                -->
                 </div>
             </div>         
         </div>

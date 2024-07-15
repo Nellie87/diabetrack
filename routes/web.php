@@ -59,7 +59,7 @@ Route::post('/logout', [CustomAuthenticatedSessionController::class, 'destroy'])
         Route::get('/sesh', [UserController::class, 'getProfile'])->name('patient.profile');
         Route::get('/chart-data', [GlucoseReadingController::class, 'getData']);
         Route::get('/chart-datas', [MealsController::class, 'getData']);
-        Route::get('/chart2', [MealsController::class, 'getData3']);
+        Route::get('/chart2', [MealsController::class, 'getData']);
         Route::get('/chart-datas1', [MedicationController::class, 'getData']);
         Route::get('/diet', [PatientController::class, 'index2'])->name('meals.index2');
         

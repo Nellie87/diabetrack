@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h2>{{ mealType }} Meal</h2>
     <form @submit.prevent="submitMeal">
       <div v-for="(item, index) in mealItems" :key="index" class="meal-item">
         <label for="meal">Meal Item:</label>
