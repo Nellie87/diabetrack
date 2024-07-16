@@ -22,14 +22,14 @@ onMounted(async () => {
 });
 
 const fetchUsers = async () => {
-  try {
-    const response = await axios.get('/users');
-    console.log(response.data); // Debug the response
-    users.value = response.data;
-  } catch (error) {
-    console.error('Error fetching users:', error);
-  }
+    try {
+        const response = await axios.get('/users');
+        users.value = response.data;
+    } catch (error) {
+        feedbackMessage.value = 'Failed to fetch users';
+    }
 };
+
 
 const startEditing = (user) => {
   editingUser.value = { ...user }; // Create a copy of the user object to edit
@@ -108,58 +108,66 @@ const totalPages = computed(() => {
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
           <thead class="bg-gray-2 dark:bg-meta-4">
-            <tr>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
-            <tr v-for="(user, index) in paginatedUsers" :key="index">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div v-if="editingUser && editingUser.id === user.id">
-                  <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
-                </div>
-                <div v-else>
-                  <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div v-if="editingUser && editingUser.id === user.id">
-                  <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-save"></i>
-                  </button>
-                  <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-                <div v-else>
-                  <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <tr>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+  </tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-600">
+  <tr v-for="(user, index) in paginatedUsers" :key="index">
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="text-sm text-gray-900 dark:text-black">{{ user.id }}</div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="text-sm text-gray-900 dark:text-black">{{ user.name }}</div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="text-sm text-gray-900 dark:text-black">{{ user.email }}</div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="text-sm text-gray-900 dark:text-black">{{ user.created_at }}</div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="text-sm text-gray-900 dark:text-black">
+        {{ user.role }}
+
+        {{ user.role === 0 ? 'Admin' : user.role === 1 ? 'Patient' : user.role === 2 ? 'Doctor' : 'Unknown' }}
+      </div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div v-if="editingUser && editingUser.id === user.id">
+        <input type="text" v-model="editingUser.role" class="border rounded p-1 text-sm dark:bg-gray-800 dark:text-white" :id="'role-' + user.id" name="role"/>
+      </div>
+      <div v-else>
+        <div class="text-sm text-gray-900 dark:text-black">{{ user.role }}</div>
+      </div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div v-if="editingUser && editingUser.id === user.id">
+        <button @click="saveUser(editingUser)" class="bg-green-500 text-white px-3 py-1 rounded">
+          <i class="fas fa-save"></i>
+        </button>
+        <button @click="cancelEditing" class="bg-red-500 text-white px-3 py-1 rounded">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div v-else>
+        <button @click="startEditing(user)" class="bg-blue-500 text-white px-3 py-1 rounded">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button @click="deleteUser(user)" class="bg-red-500 text-white px-3 py-1 rounded">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </td>
+  </tr>
+</tbody>
+</table>
       </div>
 
       <!-- Pagination controls -->

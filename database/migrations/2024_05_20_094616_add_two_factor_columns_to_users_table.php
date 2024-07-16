@@ -12,13 +12,13 @@ class AddTwoFactorColumnsToUsersTable extends Migration
      * @return void
      */
     public function up()
-    {
-        Schema::table('users', function (Blueprint $table) {
-           
+{
+    Schema::table('users', function (Blueprint $table) {
+        if (!Schema::hasColumn('users', 'two_factor_confirmed_at')) {
             $table->timestamp('two_factor_confirmed_at')->nullable();
-        });
-    }
-
+        }
+    });
+}
     /**
      * Reverse the migrations.
      *

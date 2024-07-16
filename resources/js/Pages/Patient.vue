@@ -1,20 +1,38 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import axios from 'axios';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import { computed } from 'vue';
 import { usePage } from '@inertiajs/vue3';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
+import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
+import HeaderSection from '/resources/js/Components/HeaderSection.vue';
+import HeroSection2 from '/resources/js/Components/HeroSection2.vue';
+import ServicesSection from '/resources/js/Components/ServicesSection.vue';
+import BarChart from '/resources/js/Components/Charts/BarChart.vue';
+import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
+import ProgressBar from '/resources/js/Components/ProgressBar.vue';
+import NotificationsPanel from '/resources/js/Components/NotificationPanel.vue';
+// import Modal from '@/Components/Modal.vue'; // Import the Modal component
+
+import Modal from '@/Components/Modes.vue'; // Import the Modal component
+import GlucoseReadingTable from '@/Components/Tables/GlucoseReadingTable.vue';
+
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
-// import Welcome from '@/Components/Welcome.vue';
+
+const props = defineProps({
+    user: Object,
+});
 
 const isLocked = ref(false);
 const password = ref('');
 
 let timeoutId = null;
 const lockTimeout = 300000; // 5 minutes in milliseconds
+
+const showModal = ref(false);
+const modalTitle = ref('');
+const modalMessage = ref('');
 
 // Lock screen function
 function lockScreen() {
@@ -77,128 +95,565 @@ onMounted(() => {
         resetLockTimeout();
     }
 });
+
+const glucoseReadingForm = ref({
+    Datetime: '',
+    GlucoseLevel: '',
+    Notes: '',
+});
+
+async function submitglucoseReadingForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(glucoseReadingForm.value).forEach(key => {
+            formData.append(key, glucoseReadingForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+                glucoseReadingForm.value = {
+                Datetime: '',
+                GlucoseLevel: '',
+                Notes: '',
+            };
+            window.location.reload();
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+}
+
+
+
+const dietForm = ref({
+    Date: '',
+    MealType: '',
+    FoodItems: '',
+    Carbohydrates: '',
+    Notes: '',
+});
+
+async function submitdietForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(dietForm.value).forEach(key => {
+            formData.append(key, dietForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form2', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            dietForm.value = {
+                Date: '',
+                MealType: '',
+                FoodItems: '',
+                Carbohydrates: '',
+                Notes: '',               
+            };
+            window.location.reload();
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+
+}
+
+const medicationsForm = ref({
+    MedicationName: '',
+    Type: '',
+    Dosage: '',
+    Frequency: '',
+    StartDate: '',
+});
+
+
+
+
+
+async function submitmedicationForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(medicationsForm.value).forEach(key => {
+            formData.append(key, medicationsForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form3', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            medicationsForm.value = {
+                MedicationName: '',
+                Type: '',
+                Dosage: '',
+                Frequency: '',
+                StartDate: '',    
+            }     
+            
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+}
+
+async function submitpatientForm() {
+    try {
+        const formData = new FormData();
+        Object.keys(patientForm.value).forEach(key => {
+            formData.append(key, patientForm.value[key]);
+        });
+
+        const response = await axios.post('/submit-form4', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        if (response.data.success) {
+            alert('Form submitted successfully.');
+            patientForm.value = {
+                PhoneNo: '',
+                Gender: '',
+                Address: '',
+                EmergencyContactName: '',
+                EmergencyContactPhone: '',
+                DoctorID: '',
+            };
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.');
+    }
+    
+};
+
+// Active tab state
+const activeTab = ref('glucoseReading');
+
+// Function to change the active tab
+function changeTab(tab) {
+    activeTab.value = tab;
+}
+
+const glucoseReadings = ref([]);
+const loading = ref(false);
+const error = ref(null);
+
+const fetchGlucoseReadings = () => {
+  loading.value = true;
+  axios.get('/glucose/readings')
+    .then(response => {
+      glucoseReadings.value = response.data;
+      error.value = null; // Clear any previous errors
+    })
+    .catch(err => {
+      console.error('Error fetching glucose readings:', err);
+      error.value = 'Failed to fetch glucose readings. Please try again later.';
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+}
+
+// import { onMounted } from 'vue';
+onMounted(fetchGlucoseReadings);
+
+{ glucoseReadings, loading, error }
 </script>
 
 <template>
+    <AppLayout>
+        <HeroSection2/>
+        <div class="py-4 container-fluid">
+            <div class="mt-4 row">
+                <div class="mb-4 col-lg-5 mb-lg-0">
+                    <div class="p-3 card-body">
+                        <h3 class="text-lg font-semibold mb-4">Enter Glucose Readings:</h3>
+                        <form class="form" @submit.prevent="submitglucoseReadingForm">
+                            <div class="form-group">
+                            <div class="mb-4">
+                                <label for="Date" class="block text-gray-700">Date:</label>
+                                <input id="Datetime" type="datetime-local" class="form-control mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
+                            </div>
+                            <div class="mb-4">
+                                <label for="GlucoseReading" class="block text-gray-700">Glucose Reading:</label>
+                                <input id="GlucoseLevel" placeholder="(mg/dl)" type="number" min="0" max="1000" class="form-control mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
+                            </div>
+                            </div>
+                        
+                            <div class="mb-4">
+                                <label for="Notes" class="block text-gray-700">Notes:</label>
+                                <input id="Notes" type="text" class="form-control mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
+                            </div>
+                           <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Submit
+                           </button>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="card z-index-2">
+                        <gradient-line-chart
+                            id="chart-line"
+                            title="Sugar Levels Overview"
+                            apiUrl="http://127.0.0.1:8000/chart-data"
+
+                            description="<i class='fa fa-arrow-up text-success'></i>
+                            <span class='font-weight-bold'></span> "
+                            :chart="{
+                            labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                            datasets: [{
+                            label: 'My First dataset',
+                            data: [65, 59, 80, 81, 56, 55],
+                            fill: false,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            lineTension: 0.1
+                            }]
+                            }"
+                        />
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+            <div>
+            
+                  <h2 class="text-lg font-bold mb-4">Glucose Readings</h2>
+                  <glucose-reading-table :glucose-readings="glucoseReadings" />
+            </div>
+    </AppLayout>
+
+</template>
+
+<style scoped>
+.blur {
+    filter: blur(4px);
+}
+.linechartdiv{
+    background-color: #ffffff;
+    color: #424242;
+    border: 1px solid #ece7e7;
+    padding: 10px;
+    margin: 10px;
+
+}
+.card {
+    box-shadow: 0 20px 27px 0 rgba(0, 0, 0, 0.05);
+}
+.z-index-2 {
+    z-index: 2 !important;
+}
+.card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0, 0, 0, 0.125);
+    border-radius: 1rem;
+}
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+.row {
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: calc(var(--bs-gutter-y)* -1);
+    margin-right: calc(var(--bs-gutter-x)* -0.5);
+    margin-left: calc(var(--bs-gutter-x)* -0.5);
+}
+.container-fluid, .container-xxl, .container-xl, .container-lg, .container-md, .container-sm {
+    width: 100%;
+    padding-right: var(--bs-gutter-x, 1.5rem);
+    padding-left: var(--bs-gutter-x, 1.5rem);
+    margin-right: auto;
+    margin-left: auto;
+    background-color: #f0f8ff;
+}
+.mb-xl-0 {
+        margin-bottom: 0 !important;
+    }
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+.col-xl-3 {
+        flex: 0 0 auto;
+        width: 25%;
+    }
+    .col-sm-6 {
+        flex: 0 0 auto;
+        width: 50%;
+    }
+
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.mb-lg-0 {
+        margin-bottom: 0 !important;
+    }
+
+.col-lg-5 {
+        flex: 0 0 auto;
+        width: 41.66666667%;
+    }
+    
+    .p-3 {
+    padding: 1rem !important;
+}
+.card-body {
+    flex: 1 1 auto;
+    padding: 1rem 1rem;
+}
+.col-lg-7 {
+        flex: 0 0 auto;
+        width: 58.33333333%;
+    }
+
+.form-control {
+    border: 1px solid #ccc;
+    display: block;
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    border-radius: 20px;
+    font-family: muli-bold;
+    background: 0 0;
+}
+.form-group {
+    display: flex;
+}
+form {
+        width: 100%;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+</style>
+    <!--
     <AppLayout title="Dashboard">
         <template #header>
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-               Patient Dashboard
+                Welcome User
             </h2>
         </template>
+        <!-- Main content 
+        <div id="app">
+    <button @click="toggleSideNav" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Toggle Notifications</button>
+    
+     Include the NotificationsSideNav component 
+    <NotificationsPanel v-if="toggleSideNav" />
+        </div>
+        
 
-        <!-- Main content -->
-         
+            <div class="py-4 container-fluid">
+                
+                <form @submit.prevent="submitForm">
+
+        <div class="py-4 bg-gray-100">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 flex space-x-4">
+                <button @click="changeTab('glucoseReading')" :class="{ 'bg-blue-500 text-white': activeTab === 'glucoseReading', 'bg-white text-gray-800': activeTab !== 'glucoseReading' }" class="px-4 py-2 rounded">
+                    Glucose Reading
+                </button>
+                <button @click="changeTab('diet')" :class="{ 'bg-blue-500 text-white': activeTab === 'diet', 'bg-white text-gray-800': activeTab !== 'diet' }" class="px-4 py-2 rounded">
+                    Diet
+                </button>
+                <button @click="changeTab('medication')" :class="{ 'bg-blue-500 text-white': activeTab === 'medication', 'bg-white text-gray-800': activeTab !== 'medication' }" class="px-4 py-2 rounded">
+                    Medication
+                </button>
+                <button @click="changeTab('patient')" :class="{ 'bg-blue-500 text-white': activeTab === 'patient', 'bg-white text-gray-800': activeTab !== 'patient' }" class="px-4 py-2 rounded">
+                    Patient Info
+                </button>
+            </div>
+        </div>
+        </form>
+    </div>
+    
+    <div class="mt-4 row">
+
+         Main content 
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <Welcome />
-                </div>
+                    <div class="p-6 bg-white border-b border-gray-200">
+
+                         Glucose Reading Form 
+                        <div v-show="activeTab === 'glucoseReading'">
+                            <h3 class="text-lg font-semibold mb-4">Enter Glucose Readings</h3>
+                            <form @submit.prevent="submitglucoseReadingForm">
+                    <div class="mb-4">
+                        <label for="Date" class="block text-gray-700">Date:</label>
+                        <input id="Datetime" type="datetime-local" class="mt-1 block w-full" v-model="glucoseReadingForm.Datetime" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="GlucoseReading" class="block text-gray-700">Glucose Reading:</label>
+                        <input id="GlucoseLevel" placeholder="Enter your glucose readings(mg/dl)" type="number" min="0" max="1000" class="mt-1 block w-full" v-model="glucoseReadingForm.GlucoseLevel" />
+                    </div>
+                        
+                    <div class="mb-4">
+                            <label for="Notes" class="block text-gray-700">Notes:</label>
+                            <input id="Notes" type="text" class="mt-1 block w-full" v-model="glucoseReadingForm.Notes" />
+                        </div>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Submit
+                        </button>
+                        </form>
+                        </div>
+                    </div>
+          </div>                              
+          <div class="col-lg-7">
+         line chart 
+        <div class="card z-index-2">
+                    <gradient-line-chart
+            id="chart-line"
+            title="Sugar Levels Overview"
+            apiUrl="http://127.0.0.1:8000/chart-data"
+
+            description="<i class='fa fa-arrow-up text-success'></i>
+      <span class='font-weight-bold'></span> "
+            :chart="{
+              labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+              datasets: [{
+                label: 'My First dataset',
+                data: [65, 59, 80, 81, 56, 55],
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                lineTension: 0.1
+              }]
+            }"
+          />
+          </div>
+
+          <Modal v-if="showModal" :title="modalTitle" :message="modalMessage" @close="showModal = false" />
+           Modal usage example 
+           </div>
+           </div>
+           <div>
+            
+    <h2 class="text-lg font-bold mb-4">Glucose Readings</h2>
+    <glucose-reading-table :glucose-readings="glucoseReadings" />
+  </div>
+                        
+
+                         Diet Form 
+                        <div v-show="activeTab === 'Diet'">
+                                           
+                        </div>
+
+                        Medication Form 
+                        <div v-show="activeTab === 'Medication'">
+                            <h3 class="text-lg font-semibold mb-4">Medication Form</h3>
+                            <form @submit.prevent="submitmedicationForm">
+          <div class="mb-4">
+            <label for="MedicationName" class="block text-gray-700">Medication Name:</label>
+            <input id="MedicationName" type="text" class="mt-1 block w-full" v-model="medicationsForm.MedicationName" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="Type" class="block text-gray-700">Type:</label>
+            <input id="Type" type="text" class="mt-1 block w-full" v-model="medicationsForm.Type" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="Dosage" class="block text-gray-700">Dosage:</label>
+            <input id="Dosage" type="text" class="mt-1 block w-full" v-model="medicationsForm.Dosage" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="Frequency" class="block text-gray-700">Frequency:</label>
+            <input id="Frequency" type="text" class="mt-1 block w-full" v-model="medicationsForm.Frequency" />
+          </div>
+      
+          <div class="mb-4">
+            <label for="StartDate" class="block text-gray-700">Start Date:</label>
+            <input id="StartDate" type="date" class="mt-1 block w-full" v-model="medicationsForm.StartDate" />
+          </div>
+      
+          <button @click="submitmedicationForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+        </form>
+    </div>
+
+                         Patient Form 
+                        <div v-show="activeTab === 'patient'">
+                            <h3 class="text-lg font-semibold mb-4">Patient Information Form</h3>
+                            <form @submit.prevent="submitpatientForm">
+
+                            <div class="mb-4">
+              <label for="PhoneNo" class="block text-gray-700">Phone Number:</label>
+              <input id="PhoneNo" type="text" class="mt-1 block w-full" v-model="patientForm.PhoneNo" />
             </div>
-        </div>
-        <div>
-        <!-- <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-            <ApplicationLogo class="block h-12 w-auto" /> -->
-<!-- 
-            <h1 class="mt-8 text-2xl font-medium text-gray-900">
-                Welcome , {{ user.name }}!
-            </h1> -->
-
-            <p class="mt-6 text-gray-500 leading-relaxed">
-                How are you feeling today?
-            </p>
-        </div>
-
-        <div class="bg-gray-200 bg-opacity-25 grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 p-6 lg:p-8">
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://laravel.com/docs">Enter readings</a>
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laravel has wonderful documentation covering every aspect of the framework. Whether you're new to the framework or have previous experience, we recommend reading all of the documentation from beginning to end.
-                </p>
-
-                <p class="mt-4 text-sm">
-                    <a href="https://laravel.com/docs" class="inline-flex items-center font-semibold text-indigo-700">
-                        Explore the documentation
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="ms-1 w-5 h-5 fill-indigo-500">
-                            <path fill-rule="evenodd" d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </p>
+      
+            <div class="mb-4">
+              <label for="Gender" class="block text-gray-700">Gender:</label>
+              <input id="Gender" type="text" class="mt-1 block w-full" v-model="patientForm.Gender" />
             </div>
-
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" d="M15.75 10.5l4.72-4.72a.75.75 0 011.28.53v11.38a.75.75 0 01-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 002.25-2.25v-9a2.25 2.25 0 00-2.25-2.25h-9A2.25 2.25 0 002.25 7.5v9a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://laracasts.com">View previous readings</a>
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laracasts offers thousands of video tutorials on Laravel, PHP, and JavaScript development. Check them out, see for yourself, and massively level up your development skills in the process.
-                </p>
-
-                <p class="mt-4 text-sm">
-                    <a href="https://laracasts.com" class="inline-flex items-center font-semibold text-indigo-700">
-                        Start watching Laracasts
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="ms-1 w-5 h-5 fill-indigo-500">
-                            <path fill-rule="evenodd" d="M5 10a.75.75 0 01.75-.75h6.638L10.23 7.29a.75.75 0 111.04-1.08l3.5 3.25a.75.75 0 010 1.08l-3.5 3.25a.75.75 0 11-1.04-1.08l2.158-1.96H5.75A.75.75 0 015 10z" clip-rule="evenodd" />
-                        </svg>
-                    </a>
-                </p>
+      
+            <div class="mb-4">
+              <label for="Address" class="block text-gray-700">Address:</label>
+              <input id="Address" type="text" class="mt-1 block w-full" v-model="patientForm.Address" />
             </div>
-
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        <a href="https://tailwindcss.com/">Graphs</a>
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Laravel Jetstream is built with Tailwind, an amazing utility first CSS framework that doesn't get in your way. You'll be amazed how easily you can build and maintain fresh, modern designs with this wonderful framework at your fingertips.
-                </p>
+      
+            <div class="mb-4">
+              <label for="EmergencyContactName" class="block text-gray-700">Emergency Contact Name:</label>
+              <input id="EmergencyContactName" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactName" />
             </div>
-
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="w-6 h-6 stroke-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-                    </svg>
-                    <h2 class="ms-3 text-xl font-semibold text-gray-900">
-                        Authentication
-                    </h2>
-                </div>
-
-                <p class="mt-4 text-gray-500 text-sm leading-relaxed">
-                    Authentication and registration views are included with Laravel Jetstream, as well as support for user email verification and resetting forgotten passwords. So, you're free to get started with what matters most: building your application.
-                </p>
+      
+            <div class="mb-4">
+              <label for="EmergencyContactPhone" class="block text-gray-700">Emergency Contact Phone:</label>
+              <input id="EmergencyContactPhone" type="text" class="mt-1 block w-full" v-model="patientForm.EmergencyContactPhone" />
             </div>
-        </div>
- 
-     
-    </AppLayout>
-    
-</template>
+      
+            <div class="mb-4">
+              <label for="DoctorID" class="block text-gray-700">Doctor ID:</label>
+              <input id="DoctorID" type="text" class="mt-1 block w-full" v-model="patientForm.DoctorID" />
+            </div>
+      
+            <button @click="submitpatientForm" type="submit" class="px-4 py-2 bg-indigo-600 text-white">Submit</button>
+          </form>
+                        </div>
+                    
 
-<style>
-.blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
-}
-</style>
+                         Lock Screen Modal 
+                                                 <div v-show="isLocked" class="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center">
+                            <div class="bg-white p-6 rounded-lg shadow-lg">
+                                <h3 class="text-lg font-semibold mb-4">Screen Locked</h3>
+                                <p class="mb-4">Enter your password to unlock the screen.</p>
+                                <input v-model="password" type="password" placeholder="Password" class="mb-4 p-2 border border-gray-300 rounded" />
+                                <button @click="unlock" class="px-4 py-2 bg-blue-500 text-white rounded">Unlock</button>
+                            </div>
+                        </div>
+          </div>  
+</AppLayout>
+-->
+
+

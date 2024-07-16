@@ -11,4 +11,14 @@ class PatientController extends Controller
     {
         return Inertia::render('Patient');
     }
+
+    public function index2()
+    {
+        return Inertia::render('Patient2');
+    }
+
+    public function index3()
+    {
+        return Inertia::render('Patient3');
+    }
 }

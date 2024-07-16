@@ -5,6 +5,7 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
 import Dropdown from '@/Components/Dropdown.vue';
+import SideNav from '@/Components/SideNav.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
@@ -100,27 +101,115 @@ const confirmLogout = () => {
             logout(); // Call the logout function if the user confirms
         }
     };
+
+// Handle the back button click
+const goBack = () => {
+    window.history.back();
+};
+
+const navLinks= [
+        { text: 'Home', url: '/' },
+        {text: 'Profile', url:'/user/profile'},
+        {text: 'Glucose Info', url: '/patient'},
+        {text: 'Diet', url: '/diet'},
+        {text: 'Medications', url: '/patient3'},
+        {text: 'Doctors', url: '/doctors'}
+      ]
 </script>
 
 <template>
-    <div>
-        <Head :title="Diabetrack" />
+   <div id="app">
+        <div class="layout">
+            <SideNav :links="navLinks" />
+            <main class="main-content" :class="{ 'blur': isLocked }" >
+            <slot/>
+            </main>
+    </div>
+  </div>
+     <!-- Lock screen overlay with centered square GIF -->
+    <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 backdrop-blur-md">
+        <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
+               <h2 class="text-2xl font-semibold mb-4">Screen is Locked</h2>
+               <div class="square-gif-container">
+                         <!-- Replace with your own GIF URL and apply class for square form -->
+                         <img src="/videos/waiting.gif" class="square-gif rounded-md mb-4" alt="Locked Screen GIF">
+                </div>
+                <input v-model="password" type="password" placeholder="Enter password to continue" class="w-full px-3 py-2 border rounded-md mb-4">
+                <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md justify-center items-center">Unlock</button>
+        </div>
+    </div>
+  <!-- Lock screen button -->
+        <div class="fixed bottom-4 right-4">
+            <button @click="manualLock" class="bg-red-500 text-white px-4 py-2 rounded-md">Lock Screen</button>
+        </div>
 
-        <Banner />
+        
+</template>
 
-        <div class="min-h-screen bg-gray-100" style="padding-top: 4rem;">
-            <nav class="bg-white border-b border-gray-100">
-                <!-- Primary Navigation Menu -->
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<style>
+.layout {
+  display: flex;
+}
+.main-content {
+  flex: 1;
+  background-color: #fff;
+}
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+.blur {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+}
+nav {
+    display: block;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+/* CSS for square aspect ratio */
+.square-gif-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px; /* Adjust container width */
+    height: 200px; /* Adjust container height */
+}
+
+.square-gif {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover; /* Ensure the GIF fills the square without stretching */
+}
+</style>
+        <!--
+
+        
+             
                     <div class="flex justify-between h-16">
                         <div class="flex">
-                            <!-- Logo -->
+                            <!-- Logo 
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
-                                    <ApplicationMark class="block h-9 w-auto" />
-                                </Link>
+                                <!-- <Link :href="route('dashboard')"> 
+                                    <!-- <ApplicationMark class="block h-9 w-auto" /> 
+                                <!-- </Link> 
+                                <!-- Back Button 
+                <Button class="me-2" type="button" @click.prevent="goBack">
+                    Back
+                Button>
                             </div>
-                             <!-- Main content -->
+                             <!-- Main content 
         <div :class="{ 'blur': isLocked }" class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
@@ -129,34 +218,18 @@ const confirmLogout = () => {
             </div>
         </div>
 
-        <!-- Lock screen overlay -->
-        <div v-if="isLocked" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 backdrop-blur-md">
-            <div class="bg-white p-8 rounded-lg shadow-lg">
-                <h2 class="text-2xl font-semibold mb-4">Screen is Locked</h2>
-                <input v-model="password" type="password" placeholder="Enter password to continue" class="w-full px-3 py-2 border rounded-md mb-4">
-                <button @click="unlock" class="bg-blue-500 text-white px-4 py-2 rounded-md justify-center items-center">Unlock</button>
-            </div>
-        </div>
-
-        <!-- Lock screen button -->
-        <div class="fixed bottom-4 right-4">
-            <button @click="manualLock" class="bg-red-500 text-white px-4 py-2 rounded-md">Lock Screen</button>
-        </div>
-
-
-
-
-                            <!-- Navigation Links -->
+                            <!-- Navigation Links 
                             <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                                <!-- <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
                                     Dashboard
-                                </NavLink>
+                                </NavLink> 
+                                
                             </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ms-6">
                             <div class="ms-3 relative">
-                                <!-- Teams Dropdown -->
+                                <!-- Teams Dropdown 
                                 <Dropdown v-if="$page.props.jetstream.hasTeamFeatures" align="right" width="60">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
@@ -172,12 +245,12 @@ const confirmLogout = () => {
 
                                     <template #content>
                                         <div class="w-60">
-                                            <!-- Team Management -->
+                                            <!-- Team Management 
                                             <div class="block px-4 py-2 text-xs text-gray-400">
                                                 Manage Team
                                             </div>
 
-                                            <!-- Team Settings -->
+                                            <!-- Team Settings 
                                             <DropdownLink :href="route('teams.show', $page.props.auth.user.current_team)">
                                                 Team Settings
                                             </DropdownLink>
@@ -186,7 +259,7 @@ const confirmLogout = () => {
                                                 Create New Team
                                             </DropdownLink>
 
-                                            <!-- Team Switcher -->
+                                            <!-- Team Switcher 
                                             <template v-if="$page.props.auth.user.all_teams.length > 1">
                                                 <div class="border-t border-gray-200" />
 
@@ -213,15 +286,16 @@ const confirmLogout = () => {
                                 </Dropdown>
                             </div>
 
-                            <!-- Settings Dropdown -->
+                            <!-- Settings Dropdown 
                             <div class="ms-3 relative">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <button v-if="$page.props.jetstream.managesProfilePhotos" class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
-                                            <!-- <img class="h-8 w-8 rounded-full object-cover" :src="$page.props.auth.user.profile_photo_path" :alt="$page.props.auth.user.name"> -->
-                                            <!-- <img src="{{Storage::url($this->user->profile_photo_path)}}" alt="{{ $this->user->name }}" class="rounded-full h-20 w-20 object-cover"> -->
-                                            <img class="h-8 w-8 rounded-full object-cover" src="{{ Storage::url(Auth::user()->profile_photo_path) }}" />
-                                        </button>
+                                            <!-- <img class="h-8 w-8 rounded-full object-cover" :src="$page.props.auth.user.profile_photo_path" :alt="$page.props.auth.user.name"> 
+                                            <!-- <img src="{{Storage::url($this->user->profile_photo_path)}}" alt="{{ $this->user->name }}" class="rounded-full h-20 w-20 object-cover"> 
+                                            <img class="h-8 w-8 rounded-full object-cover" src="/images/cover-04.jpg" />
+                                        </button>     
+
 
                                         <span v-else class="inline-flex rounded-md">
                                             <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none focus:bg-gray-50 active:bg-gray-50 transition ease-in-out duration-150">
@@ -235,7 +309,7 @@ const confirmLogout = () => {
                                     </template>
 
                                     <template #content>
-                                        <!-- Account Management -->
+                                        <!-- Account Management 
                                         <div class="block px-4 py-2 text-xs text-gray-400">
                                             Manage Account
                                         </div>
@@ -248,7 +322,7 @@ const confirmLogout = () => {
                                             API Tokens
                                         </DropdownLink>
 
-                                           <!-- Lock Screen Button -->
+                                           <!-- Lock Screen Button
             <div class="border-t border-gray-200" />
             <form @submit.prevent="manualLock">
                 <DropdownLink as="button">
@@ -260,7 +334,7 @@ const confirmLogout = () => {
 
                                         <div class="border-t border-gray-200" />
 
-                                        <!-- Authentication -->
+                                        <!-- Authentication 
                                      <form @submit.prevent="confirmLogout">
     <DropdownLink as="button">
         Log Out
@@ -272,7 +346,7 @@ const confirmLogout = () => {
                             </div>
                         </div>
 
-                        <!-- Hamburger -->
+                        <!-- Hamburger 
                         <div class="-me-2 flex items-center sm:hidden">
                             <button class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out" @click="showingNavigationDropdown = ! showingNavigationDropdown">
                                 <svg
@@ -301,15 +375,19 @@ const confirmLogout = () => {
                     </div>
                 </div>
 
-                <!-- Responsive Navigation Menu -->
+                <!-- Responsive Navigation Menu 
                 <div :class="{'block': showingNavigationDropdown, 'hidden': ! showingNavigationDropdown}" class="sm:hidden">
                     <div class="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
+                      <!-- <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
                         </ResponsiveNavLink>
+                        <!-- Back Button 
+                <!-- <SecondaryButton class="me-2" type="button" @click.prevent="goBack">
+                    Back
+                </SecondaryButton> 
                     </div>
 
-                    <!-- Responsive Settings Options -->
+                    <!-- Responsive Settings Options 
                     <div class="pt-4 pb-1 border-t border-gray-200">
                         <div class="flex items-center px-4">
                             <div v-if="$page.props.jetstream.managesProfilePhotos" class="shrink-0 me-3">
@@ -341,7 +419,7 @@ const confirmLogout = () => {
                                                 Lock Screen
                                             </ResponsiveNavLink>
                                             </form>
-                            <!-- Authentication -->
+                            <!-- Authentication 
                             <form @submit.prevent="confirmLogout">
                                 <ResponsiveNavLink as="button">
                                     Log Out
@@ -350,7 +428,7 @@ const confirmLogout = () => {
 
                              
 
-                            <!-- Team Management -->
+                            <!-- Team Management 
                             <template v-if="$page.props.jetstream.hasTeamFeatures">
                                 <div class="border-t border-gray-200" />
 
@@ -358,7 +436,7 @@ const confirmLogout = () => {
                                     Manage Team
                                 </div>
 
-                                <!-- Team Settings -->
+                                <!-- Team Settings 
                                 <ResponsiveNavLink :href="route('teams.show', $page.props.auth.user.current_team)" :active="route().current('teams.show')">
                                     Team Settings
                                 </ResponsiveNavLink>
@@ -367,7 +445,7 @@ const confirmLogout = () => {
                                     Create New Team
                                 </ResponsiveNavLink>
 
-                                <!-- Team Switcher -->
+                                <!-- Team Switcher 
                                 <template v-if="$page.props.auth.user.all_teams.length > 1">
                                     <div class="border-t border-gray-200" />
 
@@ -394,32 +472,17 @@ const confirmLogout = () => {
                 </div>
             </nav>
 
-            <!-- Page Heading -->
+            <!-- Page Heading 
             <header v-if="$slots.header" class="bg-white shadow">
                 <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                     <slot name="header" />
                 </div>
             </header>
 
-            <!-- Page Content -->
+            <!-- Page Content
             <main>
                 <slot />
             </main>
-        </div>
+        
     </div>
-</template>
-<style>
-.blur {
-    filter: blur(5px);
-    transition: filter 0.3s ease-in-out;
-}
-nav {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-</style>
+    -->
