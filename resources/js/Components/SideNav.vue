@@ -1,7 +1,7 @@
 
 <template>
     <div class="sidenav">
-      <div class="header">Diabetrack</div>
+      <!-- <div class="header">Diabetrack</div> -->
       <ul>
         <li v-for="link in links" :key="link.text">
           <a :href="link.url">{{ link.text }}</a>

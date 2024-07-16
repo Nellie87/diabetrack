@@ -6,8 +6,8 @@ import { usePage } from '@inertiajs/vue3';
 import HeroSection2 from '/resources/js/Components/HeroSection2.vue';
 import GradientLineChart from '/resources/js/Components/Charts/GradientLineChart.vue';
 import BarChart from '/resources/js/Components/Charts/BarChart.vue';
-import MealForm from 'C:/xampp/htdocs/diabetrack/resources/js/Components/MealForm.vue';
-import MealSearch from 'C:/xampp/htdocs/diabetrack/resources/js/Components/MealSearch.vue';
+import MealForm from '/resources/js/Components/MealForm.vue';
+import MealSearch from '/resources/js/Components/MealSearch.vue';
 import ProgressDoughnutChart from '/resources/js/Components/Charts/CircleChart.vue';
 import ProgressBar from '/resources/js/Components/ProgressBar.vue';
 import NotificationsPanel from '/resources/js/Components/NotificationPanel.vue';
@@ -147,6 +147,7 @@ function showItem2(){
 
 <template>
     <AppLayout>
+        
         <HeroSection2/>
         <div class="py-4 container-fluid">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
