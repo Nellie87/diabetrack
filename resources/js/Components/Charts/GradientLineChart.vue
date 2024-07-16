@@ -70,7 +70,7 @@ export default {
           const chartData = {
             labels: [],
             datasets: [{
-              label: 'Glucose Level',
+              label: 'Glucose Level (mg/dl)',
               data: [],
               borderColor: 'rgba(75, 192, 192, 1)',
               backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -133,7 +133,7 @@ export default {
           datasets: this.chartData.datasets.map((dataset) => ({
             ...dataset,
             backgroundColor: gradientStroke1,
-            tension: 0.1,
+            tension: 0.2,
             borderWidth: 0,
             pointRadius: 0,
             borderColor: "#cb0c9f",
@@ -179,18 +179,18 @@ export default {
             x: {
               type: 'time',
               time: {
-                unit: 'minute', // Adjust based on your data granularity
-                round: 'minute',
+                unit: 'hour', 
+                round: 'hour',
                 displayFormats: {
                   millisecond: 'MMM dd, HH:mm:ss.SSS',
                   second: 'MMM dd, HH:mm:ss',
                   minute: 'MMM dd, HH:mm',
                   hour: 'MMM dd, HH:00',
-                  day: 'MMM dd', // Display format for day
-                  week: 'MMM dd', // Display format for week (e.g., 'Sep 4, 2023')
-                  month: 'MMM YYYY', // Display format for month
-                  quarter: '[Q]Q - YYYY', // Display format for quarter (e.g., 'Q3 - 2023')
-                  year: 'YYYY', // Display format for year
+                  day: 'MMM dd', 
+                  week: 'MMM dd', 
+                  month: 'MMM YYYY', 
+                  quarter: '[Q]Q - YYYY', 
+                  year: 'YYYY', 
                 },
               },
               grid: {

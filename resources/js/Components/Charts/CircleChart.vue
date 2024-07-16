@@ -1,6 +1,6 @@
 <template>
     <div>
-      <h2>Task Progress</h2>
+      <h2></h2>
       <canvas :id="id" :height="height"></canvas>
     </div>
      </template>

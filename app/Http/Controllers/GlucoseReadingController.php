@@ -6,6 +6,7 @@ use App\Models\glucose_reading;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class GlucoseReadingController extends Controller
 {
@@ -14,7 +15,23 @@ class GlucoseReadingController extends Controller
     public function submit(Request $request)
     {
         $data = $request->validate([
-            'Datetime' => 'required|date',
+            'Datetime' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $timezone = 'MSK';  
+                    $inputDateTime = Carbon::parse($value, $timezone);
+                    $now = Carbon::now($timezone);
+        
+                    if ($inputDateTime->gt($now)) {
+                        $fail('The ' . $attribute . ' must be a date and time before or equal to now.');
+                    }
+
+                    if (glucose_reading::where('Datetime', $inputDateTime)->exists()) {
+                        $fail('The ' . $attribute . ' has already been taken.');
+                    }
+                },
+            ],
             'GlucoseLevel' => 'required|integer',
             'Notes' => 'nullable|string|max:255',
         ]);
@@ -22,15 +39,12 @@ class GlucoseReadingController extends Controller
         $user = Auth::user();
         $userId = (string) $user->id;
 
-        // Create a new instance of GlucoseReading model and fill it with validated data
         $glucose = new glucose_reading();
         $glucose->fill($data);
-        $glucose->PatientID = $userId; // Assign the authenticated user's ID to the model
+        $glucose->PatientID = $userId; 
 
-        // Save the model to the database
         $glucose->save();
 
-        // Optionally, return a JSON response
         return response()->json(['success' => 'Form submitted successfully!', 'glucose' => $glucose]);
     }
 
@@ -39,7 +53,6 @@ class GlucoseReadingController extends Controller
     $user = Auth::user();
     $userId = $user->id;
 
-    // Select all fields ('*') instead of just 'GlucoseLevel' and 'Datetime'
     $readings = glucose_reading::where('PatientID', $userId)
         ->orderBy('Datetime', 'asc')
         ->get();
