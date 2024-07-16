@@ -53,7 +53,6 @@ class GlucoseReadingController extends Controller
     $user = Auth::user();
     $userId = $user->id;
 
-    // Select all fields ('*') instead of just 'GlucoseLevel' and 'Datetime'
     $readings = glucose_reading::where('PatientID', $userId)
         ->orderBy('Datetime', 'asc')
         ->get();

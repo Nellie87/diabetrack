@@ -137,14 +137,20 @@ const submitMeal = async () => {
 
   try {
     const response = await axios.post('/meals', mealData);
-    emit('meal-added', response.data);
+    if (response.data.success) {
+      alert('Form submitted successfully.');
     mealItems.value = [{ food_name: '', quantity: 1, selectedServing: null, servings: [] }];
     description.value = '';
     Date.value = '';
     suggestions.value = [[]];
-  } catch (error) {
-    console.error('Error submitting meal:', error);
+    window.location.reload();
+  } else {
+    alert('Submission failed. Please try again.')
   }
+} catch (error) {
+        console.error('Error submitting form:', error);
+        alert('An error occurred while submitting the form. Please try again.',error);
+    }
 };
 </script>
 

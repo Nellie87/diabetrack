@@ -32,7 +32,23 @@ class MealsController extends Controller
             'meal_type' => 'required|string|max:255',
             'description' => 'required|string',
             'items' => 'required|array',
-            'Date' => 'required|date', 
+            'Date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $timezone = 'MSK';  
+                    $inputDate = Carbon::parse($value, $timezone);
+                    $now = Carbon::now($timezone);
+        
+                    if ($inputDate->gt($now)) {
+                        $fail('The ' . $attribute . ' must be a date and time before or equal to now.');
+                    }
+
+                    if (meal::where('Date', $inputDate)->exists()) {
+                        $fail('The ' . $attribute . ' has already been taken.');
+                    }
+                },
+            ],
         ]);
 
         $user = Auth::user();
@@ -98,6 +114,25 @@ class MealsController extends Controller
     
         $readings = Meal::where('PatientID', $userId)
             ->where('meal_type','Dinner')
+            ->select('Carbohydrates','Date')
+            ->get();
+
+
+        $transformedReadings = $readings->map(function ($item) {
+            $carbName = $item->Carbohydrates;
+            $item->Date = Carbon::parse($item->Date)->format('Y-m-d H:i:s');
+            return $item;
+        });
+    
+        return response()->json($transformedReadings);
+    }
+
+    public function getData3()
+    {
+        $user = Auth::user();
+        $userId = $user->id; 
+    
+        $readings = Meal::where('PatientID', $userId)
             ->select('Carbohydrates','Date')
             ->get();
 

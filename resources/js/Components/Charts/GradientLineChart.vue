@@ -133,7 +133,7 @@ export default {
           datasets: this.chartData.datasets.map((dataset) => ({
             ...dataset,
             backgroundColor: gradientStroke1,
-            tension: 0.1,
+            tension: 0.2,
             borderWidth: 0,
             pointRadius: 0,
             borderColor: "#cb0c9f",
@@ -179,8 +179,8 @@ export default {
             x: {
               type: 'time',
               time: {
-                unit: 'minute', 
-                round: 'minute',
+                unit: 'hour', 
+                round: 'hour',
                 displayFormats: {
                   millisecond: 'MMM dd, HH:mm:ss.SSS',
                   second: 'MMM dd, HH:mm:ss',
