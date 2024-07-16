@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Models\Patient;
 use Inertia\Inertia;
+use App\Http\Controllers\MessageController;
+
 
 
 
@@ -108,3 +110,15 @@ Route::post('/glucose/submit', [GlucoseReadingController::class, 'submit']);
 
 // Route for fetching glucose readings
 Route::get('/glucose/readings', [GlucoseReadingController::class, 'getData']);
+
+// Fetch message history for a specific user
+Route::get('/messages/{userId}', [MessageController::class, 'getMessageHistory']);
+
+// Send a new message
+Route::post('/send-message', [MessageController::class, 'sendMessage']);
+
+// Send a reply to a message
+Route::post('/send-reply', [MessageController::class, 'sendReply']);
+
+// Fetch message history (including replies) for a specific user
+Route::get('/message-history/{userId}', [MessageController::class, 'fetchMessageHistory'])->name('message-history');
