@@ -5,7 +5,8 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
   resolve: {
     alias: {
-      'chart.js': 'chart.js/dist/chart.esm.js', // Ensure the correct path to Chart.js module
+        'chart.js': 'chart.js/auto',
+ // Ensure the correct path to Chart.js module
     },
   },
   plugins: [
